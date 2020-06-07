@@ -1,10 +1,8 @@
 import * as Pixie from 'pixi.js';
 import { Sprite } from 'pixi.js';
-const PIXIE: any = Pixie;
+import { Registry } from './Registry';
 
-let app = new Pixie.Application({width: 256, height: 256});
-//Add the canvas that Pixi automatically created for you to the HTML document
-document.body.appendChild(app.view);
+const registry = new Registry();
 
 const loader = new Pixie.Loader();
 
@@ -22,7 +20,7 @@ function setup() {
     cat.scale = new Pixie.Point(0.4, 0.4);
     cat.vx = 0;
     cat.vy = 0;
-    app.stage.addChild(cat);
+    registry.app.pixieApp.stage.addChild(cat);
 
             //Capture the keyboard arrow keys
     let left = keyboard("ArrowLeft"),
@@ -83,7 +81,7 @@ function setup() {
     //Set the game state
     state = play;
 
-    app.ticker.add(delta => gameLoop(delta));
+    registry.app.pixieApp.ticker.add(delta => gameLoop(delta));
 }
 
 function gameLoop(delta){
