@@ -4,7 +4,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 module.exports = env => {
     return {
-        entry: './src/index.ts',
+        entry: './src/index.tsx',
         module: {
             rules: [
                 {

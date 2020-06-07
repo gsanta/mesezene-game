@@ -1,5 +1,5 @@
 import { Registry } from "./Registry";
-import { Point } from "pixi.js";
+import { Point, Sprite } from "pixi.js";
 
 function getScreenSize(): Point {
     if (typeof document !== 'undefined') {
