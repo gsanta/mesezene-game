@@ -1,12 +1,14 @@
-import { PixieApp } from "./PixieApp";
 import { GameWindow } from "./GameWindow";
+import { Services } from "./Services";
+import { GameScript } from "./model/GameScript";
 
 export class Registry {
-    app: PixieApp;
+    gameScripts: GameScript[] = [];
     gameWindow: GameWindow;
+    services: Services;
 
     constructor() {
-        this.app = new PixieApp();
         this.gameWindow = new GameWindow(this);
+        this.services = new Services(this);
     }
 }

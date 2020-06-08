@@ -1,11 +1,11 @@
-import { Registry } from './Registry';
 import * as ReactDOM from 'react-dom';
 import { App } from './components/App';
 import * as React from 'react';
+import { Registry } from './Registry';
 
-// const registry = new Registry();
+const registry = new Registry();
 
-ReactDOM.render(<App/>, document.getElementById('app'));
+ReactDOM.render(<App registry={registry}/>, document.getElementById('app'));
 
 // const loader = new Pixie.Loader();
 
@@ -18,73 +18,73 @@ ReactDOM.render(<App/>, document.getElementById('app'));
 // let state: any;
 
 function setup() {
-    cat = new Sprite(loader.resources["assets/sprites/balloon2.png"].texture);
-    cat.y = 96; 
-    cat.scale = new Pixie.Point(0.4, 0.4);
-    cat.vx = 0;
-    cat.vy = 0;
-    registry.app.pixieApp.stage.addChild(cat);
+    // cat = new Sprite(loader.resources["assets/sprites/balloon2.png"].texture);
+    // cat.y = 96; 
+    // cat.scale = new Pixie.Point(0.4, 0.4);
+    // cat.vx = 0;
+    // cat.vy = 0;
+    // registry.app.pixieApp.stage.addChild(cat);
 
             //Capture the keyboard arrow keys
-    let left = keyboard("ArrowLeft"),
-        up = keyboard("ArrowUp"),
-        right = keyboard("ArrowRight"),
-        down = keyboard("ArrowDown");
+    // let left = keyboard("ArrowLeft"),
+    //     up = keyboard("ArrowUp"),
+    //     right = keyboard("ArrowRight"),
+    //     down = keyboard("ArrowDown");
 
     //Left arrow key `press` method
-    left.press = () => {
-        //Change the cat's velocity when the key is pressed
-        cat.vx = -5;
-        cat.vy = 0;
-    };
+    // left.press = () => {
+    //     //Change the cat's velocity when the key is pressed
+    //     cat.vx = -5;
+    //     cat.vy = 0;
+    // };
     
-    //Left arrow key `release` method
-    left.release = () => {
-        //If the left arrow has been released, and the right arrow isn't down,
-        //and the cat isn't moving vertically:
-        //Stop the cat
-        if (!right.isDown && cat.vy === 0) {
-        cat.vx = 0;
-        }
-    };
+    // //Left arrow key `release` method
+    // left.release = () => {
+    //     //If the left arrow has been released, and the right arrow isn't down,
+    //     //and the cat isn't moving vertically:
+    //     //Stop the cat
+    //     if (!right.isDown && cat.vy === 0) {
+    //     cat.vx = 0;
+    //     }
+    // };
 
     //Up
-    up.press = () => {
-        cat.vy = -5;
-        cat.vx = 0;
-    };
-    up.release = () => {
-        if (!down.isDown && cat.vx === 0) {
-        cat.vy = 0;
-        }
-    };
+    // up.press = () => {
+    //     cat.vy = -5;
+    //     cat.vx = 0;
+    // };
+    // up.release = () => {
+    //     if (!down.isDown && cat.vx === 0) {
+    //     cat.vy = 0;
+    //     }
+    // };
 
     //Right
-    right.press = () => {
-        cat.vx = 5;
-        cat.vy = 0;
-    };
-    right.release = () => {
-        if (!left.isDown && cat.vy === 0) {
-        cat.vx = 0;
-        }
-    };
+    // right.press = () => {
+    //     cat.vx = 5;
+    //     cat.vy = 0;
+    // };
+    // right.release = () => {
+    //     if (!left.isDown && cat.vy === 0) {
+    //     cat.vx = 0;
+    //     }
+    // };
 
     //Down
-    down.press = () => {
-        cat.vy = 5;
-        cat.vx = 0;
-    };
-    down.release = () => {
-        if (!up.isDown && cat.vx === 0) {
-        cat.vy = 0;
-        }
-    };
+    // down.press = () => {
+    //     cat.vy = 5;
+    //     cat.vx = 0;
+    // };
+    // down.release = () => {
+    //     if (!up.isDown && cat.vx === 0) {
+    //     cat.vy = 0;
+    //     }
+    // };
 
     //Set the game state
-    state = play;
+    // state = play;
 
-    registry.app.pixieApp.ticker.add(delta => gameLoop(delta));
+    // registry.app.pixieApp.ticker.add(delta => gameLoop(delta));
 }
 
 // function gameLoop(delta){
