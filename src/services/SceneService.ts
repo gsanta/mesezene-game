@@ -14,10 +14,10 @@ export class SceneService extends GameScript {
     }
 
     update() {
-        this.player.moveWithVelocity();
+        // this.player.moveWithVelocity();
 
-        this.getSpriteByName('middle-layer').move();
-        this.getSpriteByName('background-layer').move();
+        // this.getSpriteByName('middle-layer').move();
+        // this.getSpriteByName('background-layer').move();
     }
 
     private getSpriteByName(name: string) {

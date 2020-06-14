@@ -21,7 +21,9 @@ export const appJson: AppJson = {
             name: 'player',
             isTiling: false,
             speedX: 1,
-            speedY: 1
+            speedY: 1,
+            viewportX: 0,
+            viewportY: 0
         },
         {
             x: 0,
@@ -31,7 +33,9 @@ export const appJson: AppJson = {
             name: 'background-layer',
             isTiling: true,
             speedX: -0.64,
-            speedY: 0
+            speedY: 0,
+            viewportX: 0,
+            viewportY: 0
         },
         {
             x: 0,
@@ -41,7 +45,9 @@ export const appJson: AppJson = {
             name: 'middle-layer',
             isTiling: true,
             speedX: -1.28,
-            speedY: 0
+            speedY: 0,
+            viewportX: 0,
+            viewportY: 0
         }
     ]
 }

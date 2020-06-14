@@ -9,11 +9,15 @@ export interface GameObjectJson {
     isTiling: boolean;
     speedX: number;
     speedY: number;
+    viewportX: number;
+    viewportY: number;
 }
 
 export class GameObject {
     sprite: Sprite;
-    velocity: Point = new Point(0, 0);
+    protected viewportX: number;
+    viewportY: number;
+    speed: Point;
     name: string;
 
     constructor(sprite: Sprite) {
@@ -29,28 +33,45 @@ export class GameObject {
         return new Point(this.sprite.x, this.sprite.y);
     }
 
-    setVelocity(velocity: Point) {
-        this.velocity = velocity;
-    }
+    // setVelocity(velocity: Point) {
+    //     this.velocity = velocity;
+    // }
 
     scale(point: Point) {
         this.sprite.scale = point;
     }
 
-    moveWithVelocity() {
-        this.sprite.x += this.velocity.x;
-        this.sprite.y += this.velocity.y;
+    // moveWithVelocity() {
+
+    //     this.sprite.x += this.velocity.x;
+    //     this.sprite.y += this.velocity.y;
+    // }
+
+    // move() {
+    //     (this.sprite as TilingSprite).tilePosition.x += this.velocity.x;
+    //     (this.sprite as TilingSprite).tilePosition.y += this.velocity.y;
+    // }
+
+    setViewportX(newViewportX: number) {
+        this.viewportX = newViewportX;
+        var distanceTravelled = newViewportX - this.viewportX;
+        this.viewportX = newViewportX;
+        (this.sprite as TilingSprite).tilePosition.x -= (distanceTravelled * this.speed.x);
     }
 
-    move() {
-        (this.sprite as TilingSprite).tilePosition.x += this.velocity.x;
-        (this.sprite as TilingSprite).tilePosition.y += this.velocity.y;
+    getViewportX() {
+        return this.viewportX;
+    }
+
+    moveViewportXBy(speed: number) {
+        this.viewportX += speed;
     }
 
     fromJson(json: GameObjectJson) {
-        this.setPosition(new Point(json.x, json.y));
         this.scale(new Point(json.scale, json.scale));
         this.name = json.name;
-        this.velocity = new Point(json.speedX, json.speedY);
+        this.speed = new Point(json.speedX, json.speedY);
+        this.viewportX = json.viewportX;
+        this.viewportY = json.viewportY;
     }
 }
