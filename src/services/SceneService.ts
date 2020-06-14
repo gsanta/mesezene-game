@@ -1,5 +1,6 @@
 import { GameObject } from "../model/GameObject";
 import { GameScript } from "../model/GameScript";
+import { Point } from "pixi.js";
 
 export class SceneService extends GameScript {
     sprites: GameObject[] = [];
@@ -14,5 +15,12 @@ export class SceneService extends GameScript {
 
     update() {
         this.player.moveWithVelocity();
+
+        this.getSpriteByName('middle-layer').move();
+        this.getSpriteByName('background-layer').move();
+    }
+
+    private getSpriteByName(name: string) {
+        return this.sprites.find(sprite => sprite.name === name);
     }
 }

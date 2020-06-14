@@ -24,7 +24,7 @@ export class GameWindow extends GameScript {
     resize(): void {
         const screenSize = getScreenSize(this.htmlElement);
         if (screenSize) {
-            this.registry.services.loader.application.renderer.resize(window.innerWidth, window.innerHeight);
+            // this.registry.services.loader.application.renderer.resize(1000, 500);
         }
     };
 }
