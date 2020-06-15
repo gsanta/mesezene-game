@@ -4,7 +4,8 @@ export interface GameObjectJson {
     x: number;
     y: number;
     scale: number;
-    path: string;
+    path?: string;
+    frameName?: string;
     name: string;
     isTiling: boolean;
     speedX: number;
@@ -13,10 +14,16 @@ export interface GameObjectJson {
     viewportY: number;
 }
 
+export enum GameObjectType {
+    GameObject = 'GameObject',
+    TilingGameObject = 'TilingGameObject'
+}
+
 export class GameObject {
+    type: GameObjectType = GameObjectType.GameObject;
     sprite: Sprite;
-    protected viewportX: number;
-    viewportY: number;
+    protected viewportX: number = 0;
+    viewportY: number = 0;
     speed: Point;
     name: string;
 
@@ -53,10 +60,10 @@ export class GameObject {
     // }
 
     setViewportX(newViewportX: number) {
+        const distanceTravelled = newViewportX - this.viewportX;
         this.viewportX = newViewportX;
-        var distanceTravelled = newViewportX - this.viewportX;
-        this.viewportX = newViewportX;
-        (this.sprite as TilingSprite).tilePosition.x -= (distanceTravelled * this.speed.x);
+        console.log(distanceTravelled);
+        this.sprite.position.x -= (distanceTravelled * this.speed.x);
     }
 
     getViewportX() {
@@ -73,5 +80,10 @@ export class GameObject {
         this.speed = new Point(json.speedX, json.speedY);
         this.viewportX = json.viewportX;
         this.viewportY = json.viewportY;
+
+        if (this.type === GameObjectType.GameObject) {
+            this.sprite.position.x = json.viewportX;
+            this.sprite.position.y = json.viewportY;
+        }
     }
 }
