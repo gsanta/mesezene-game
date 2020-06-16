@@ -1,17 +1,31 @@
 import { GameObject, GameObjectType } from "../model/GameObject";
 import { GameScript } from "../model/GameScript";
-import { Point } from "pixi.js";
+import { Point, Application } from "pixi.js";
 import { ScrollerObject } from "../model/ScrollerObject";
+import { Registry } from "../Registry";
 
 export class SceneService extends GameScript {
+    application: Application;
+    sceneDimensions: Point;
+
     sprites: GameObject[] = [];
     scroller: ScrollerObject;
     player: GameObject;
     gameSpeed: number;
 
+    platforms: GameObject[] = [];
+
+    platformRegistry: GameObject[] = [];
+
+    constructor(registry: Registry) {
+        super(registry);
+
+        this.application = new Application({width: 256, height: 256});
+    }
+
     awake() {
-        this.scroller = new ScrollerObject(this.getTilingSprites());
-        this.registry.services.loader.application.ticker.add(delta => {
+        this.scroller = new ScrollerObject(this.sprites);
+        this.registry.services.scene.application.ticker.add(delta => {
             this.registry.gameScripts.forEach(script => script.update(delta));
         });
     }

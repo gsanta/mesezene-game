@@ -40,6 +40,10 @@ export class GameObject {
         return new Point(this.sprite.x, this.sprite.y);
     }
 
+    getDimensions() {
+        return new Point(this.sprite.width, this.sprite.height);
+    }
+
     // setVelocity(velocity: Point) {
     //     this.velocity = velocity;
     // }
@@ -62,7 +66,6 @@ export class GameObject {
     setViewportX(newViewportX: number) {
         const distanceTravelled = newViewportX - this.viewportX;
         this.viewportX = newViewportX;
-        console.log(distanceTravelled);
         this.sprite.position.x -= (distanceTravelled * this.speed.x);
     }
 
@@ -72,6 +75,14 @@ export class GameObject {
 
     moveViewportXBy(speed: number) {
         this.viewportX += speed;
+    }
+
+    clone(): GameObject {
+        const clone = new GameObject(new Sprite(this.sprite.texture));
+        clone.setPosition(new Point(this.getPosition().x, this.getPosition().y));
+        clone.speed = this.speed;
+
+        return clone;
     }
 
     fromJson(json: GameObjectJson) {

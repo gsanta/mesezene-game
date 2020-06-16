@@ -9,6 +9,10 @@ export class ScrollerObject extends GameObject {
         this.children = children;
     }
 
+    addChild(gameObject: GameObject) {
+        this.children.push(gameObject);
+    }
+
     setViewportX(viewportX: number) {
         this.viewportX = viewportX;
 

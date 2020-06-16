@@ -1,5 +1,5 @@
 import { Registry } from "../Registry";
-import { Application, Loader, Sprite, TilingSprite } from "pixi.js";
+import { Application, Loader, Sprite, TilingSprite, Point } from "pixi.js";
 import { GameScript } from "../model/GameScript";
 import { GameObject, GameObjectJson } from "../model/GameObject";
 import { TilingGameObject } from "../model/TilingGameObject";
@@ -70,17 +70,13 @@ export const appJson: AppJson = {
 }
 
 export class SceneLoaderService extends GameScript {
-    application: Application;
     private loader: Loader;
-    constructor(registry: Registry) {
-        super(registry);
-        this.registry = registry;
-
-        this.application = new Application({width: 256, height: 256});
-    }
 
     load(appJson: AppJson) {
-        this.registry.gameWindow.htmlElement.appendChild(this.application.view);
+        const application = this.registry.services.scene.application;
+
+
+        this.registry.gameWindow.htmlElement.appendChild(application.view);
         this.loader = new Loader();
 
         this.setupScene(appJson);
@@ -96,28 +92,33 @@ export class SceneLoaderService extends GameScript {
     }
 
     private setupScene(appJson: AppJson) {
+        this.registry.services.scene.sceneDimensions = new Point(appJson.width, appJson.height);
+
         this.registry.services.scene.gameSpeed = appJson.gameSpeed;
-        this.registry.services.loader.application.renderer.resize(appJson.width, appJson.height);
+        this.registry.services.scene.application.renderer.resize(appJson.width, appJson.height);
     }
 
     private setupSprites(appJson: AppJson) {
+        const application = this.registry.services.scene.application;
+
         appJson.sprites.forEach(spriteJson => {
             let gameObject: GameObject;
 
             if (spriteJson.isTiling) {
                 const texture = this.loader.resources[spriteJson.path].texture;
                 gameObject = new TilingGameObject(new TilingSprite(texture, texture.baseTexture.width, texture.baseTexture.height));
+                application.stage.addChild(gameObject.sprite);
             } else if (spriteJson.frameName) {
                 const sheet = this.loader.resources[appJson.spriteSheet];
                 gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
+                this.registry.services.scene.platformRegistry.push(gameObject);    
             } else {
                 gameObject = new GameObject(new Sprite(this.loader.resources[spriteJson.path].texture));
+                application.stage.addChild(gameObject.sprite);
             }
 
             gameObject.fromJson(spriteJson);
             this.registry.services.scene.sprites.push(gameObject);
-            this.application.stage.addChild(gameObject.sprite);
-
         });
 
         this.registry.services.scene.player = this.registry.services.scene.sprites[0];

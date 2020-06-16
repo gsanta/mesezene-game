@@ -9,7 +9,6 @@ export class TilingGameObject extends GameObject {
     setViewportX(newViewportX: number) {
         const distanceTravelled = newViewportX - this.viewportX;
         this.viewportX = newViewportX;
-        console.log(distanceTravelled);
         this.sprite.tilePosition.x -= (distanceTravelled * this.speed.x);
     }
 }
