@@ -64,7 +64,31 @@ export const appJson: AppJson = {
             speedX: 1.28,
             speedY: 0,
             viewportX: 32,
-            viewportY: 500
+            viewportY: 470
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            frameName: 'platform_02',
+            name: 'front-layer',
+            isTiling: false,
+            speedX: 1.28,
+            speedY: 0,
+            viewportX: 32,
+            viewportY: 470
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            frameName: 'platform_03',
+            name: 'front-layer',
+            isTiling: false,
+            speedX: 1.28,
+            speedY: 0,
+            viewportX: 32,
+            viewportY: 470
         }
     ]
 }

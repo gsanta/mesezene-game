@@ -18,10 +18,8 @@ export class PlatformManagerService extends GameScript {
     update() {
         let maxX = this.getMaxX(); 
         
-        console.log('maxX: ' + maxX)
-
-        if (maxX <  this.registry.services.scene.sceneDimensions.x - 320) {
-            this.generateRandomPlatform([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50])
+        if (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
+            this.generateRandomPlatform([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50]);
         } 
     }
 
@@ -35,15 +33,14 @@ export class PlatformManagerService extends GameScript {
         this.registry.services.scene.platforms.push(gameObject);
         this.registry.services.scene.application.stage.addChild(gameObject.sprite);
 
-
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
 
     private getMaxX(): number {
         const rightMostPlatform = this.getRightMostPlatform();
-        console.log(this.registry.services.scene.scroller.getViewportX())
-        const maxX = rightMostPlatform ? rightMostPlatform.getPosition().x + rightMostPlatform.getDimensions().x + this.registry.services.scene.scroller.getViewportX() : 0;
-
+        const maxX = rightMostPlatform ? rightMostPlatform.getPosition().x + rightMostPlatform.getDimensions().x : 0;
+        // rightMostPlatform && console.log(rightMostPlatform.getPosition().x);
+        console.log(maxX);
         return maxX;
     }
 

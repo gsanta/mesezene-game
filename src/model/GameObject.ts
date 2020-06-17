@@ -79,8 +79,12 @@ export class GameObject {
 
     clone(): GameObject {
         const clone = new GameObject(new Sprite(this.sprite.texture));
-        clone.setPosition(new Point(this.getPosition().x, this.getPosition().y));
         clone.speed = this.speed;
+
+        clone.sprite.x = this.sprite.x;
+        clone.sprite.y = this.sprite.y;
+        clone.viewportX = this.viewportX;
+        clone.viewportY = this.viewportY;
 
         return clone;
     }
