@@ -24,6 +24,14 @@
             "trimmed": false,
             "spriteSourceSize": {"x":0,"y":0,"w":64,"h":256},
             "sourceSize": {"w":64,"h":256}
+        },
+        "player":
+        {
+            "frame": {"x":75,"y":229,"w":80,"h":230},
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": {"x":0,"y":0,"w":64,"h":256},
+            "sourceSize": {"w":64,"h":256}
         }
     },
     "meta": {

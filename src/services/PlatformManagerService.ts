@@ -39,8 +39,6 @@ export class PlatformManagerService extends GameScript {
     private getMaxX(): number {
         const rightMostPlatform = this.getRightMostPlatform();
         const maxX = rightMostPlatform ? rightMostPlatform.getPosition().x + rightMostPlatform.getDimensions().x : 0;
-        // rightMostPlatform && console.log(rightMostPlatform.getPosition().x);
-        console.log(maxX);
         return maxX;
     }
 

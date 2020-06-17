@@ -4,6 +4,7 @@ import { Registry } from "./Registry";
 import { SceneService } from "./services/SceneService";
 import { SceneLoaderService } from "./services/SceneLoaderService";
 import { PlatformManagerService } from "./services/PlatformManagerService";
+import { CollisionService } from "./services/CollisionService";
 
 export class Services {
     private registry: Registry;
@@ -13,6 +14,7 @@ export class Services {
     scene: SceneService;
     loader: SceneLoaderService;
     platformManager: PlatformManagerService;
+    collision: CollisionService;
 
     constructor(registry: Registry) {
         this.registry = registry;
@@ -21,5 +23,6 @@ export class Services {
         this.scene = new SceneService(registry);
         this.loader = new SceneLoaderService(registry);
         this.platformManager = new PlatformManagerService(registry);
+        this.collision = new CollisionService(registry);
     }
 }

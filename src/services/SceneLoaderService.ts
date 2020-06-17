@@ -89,6 +89,18 @@ export const appJson: AppJson = {
             speedY: 0,
             viewportX: 32,
             viewportY: 470
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            frameName: 'player',
+            name: 'front-layer',
+            isTiling: false,
+            speedX: 0,
+            speedY: 0,
+            viewportX: 32,
+            viewportY: 470
         }
     ]
 }
@@ -135,7 +147,13 @@ export class SceneLoaderService extends GameScript {
             } else if (spriteJson.frameName) {
                 const sheet = this.loader.resources[appJson.spriteSheet];
                 gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
-                this.registry.services.scene.platformRegistry.push(gameObject);    
+
+                if (spriteJson.frameName.startsWith('platform')) {
+                    this.registry.services.scene.platformRegistry.push(gameObject);    
+                } else if (spriteJson.frameName.startsWith('player')) {
+                    this.registry.services.scene.player = gameObject;
+                    application.stage.addChild(gameObject.sprite);
+                }
             } else {
                 gameObject = new GameObject(new Sprite(this.loader.resources[spriteJson.path].texture));
                 application.stage.addChild(gameObject.sprite);
