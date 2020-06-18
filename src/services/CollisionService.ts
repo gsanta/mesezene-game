@@ -14,13 +14,12 @@ export class CollisionService extends GameScript {
     
         this.registry.services.scene.platforms.forEach(platform => {
             if (this.hitTestRectangle(this.registry.services.scene.player.sprite, platform.sprite)) {
-                console.log('hit detected');
+            } else {
             }
         });
     }
     
     private hitTestRectangle(r1: Sprite, r2: Sprite) {
-
         //Define the variables we'll need to calculate
         let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
       

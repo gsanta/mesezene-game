@@ -77,6 +77,16 @@ export class GameObject {
         this.viewportX += speed;
     }
 
+    move(delta: Point) {
+        if (delta.y) {
+            this.sprite.position.y += delta.y;
+        }
+
+        if (delta.x) {
+            this.sprite.position.x += delta.x;
+        }
+    }
+
     clone(): GameObject {
         const clone = new GameObject(new Sprite(this.sprite.texture));
         clone.speed = this.speed;

@@ -163,8 +163,6 @@ export class SceneLoaderService extends GameScript {
             this.registry.services.scene.sprites.push(gameObject);
         });
 
-        this.registry.services.scene.player = this.registry.services.scene.sprites[0];
-    // loader
     //     .add("assets/sprites/balloon2.png")
     //     .load(setup);
     }

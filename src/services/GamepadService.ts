@@ -1,6 +1,7 @@
 import { GameScript } from "../model/GameScript";
 import { Registry } from "../Registry";
-import { Point } from "pixi.js";
+import { Point, Rectangle } from "pixi.js";
+import { GameObject } from "../model/GameObject";
 
 export enum GamepadKey {
     Left = 'Left',
@@ -12,6 +13,8 @@ export enum GamepadKey {
 
 export class GamepadService extends GameScript {
     private downKeys: Set<GamepadKey> = new Set();
+    private borders: Rectangle;
+
 
     constructor(registry: Registry) {
         super(registry);
@@ -22,7 +25,7 @@ export class GamepadService extends GameScript {
         const player = this.registry.services.scene.player;
         if (!release) {
             this.downKeys.add(GamepadKey.Left);
-            // player.setVelocity(new Point(-5, 0));
+            player.speed.x = 2;
         } else {
             this.downKeys.delete(GamepadKey.Left);
 
@@ -34,43 +37,43 @@ export class GamepadService extends GameScript {
 
     up(release: boolean) {
         const player = this.registry.services.scene.player;
-        // if (!release) {
-        //     this.downKeys.add(GamepadKey.Up);
-        //     player.setVelocity(new Point(0, -5));
-        // } else {
-        //     this.downKeys.delete(GamepadKey.Up);
+        if (!release) {
+            this.downKeys.add(GamepadKey.Up);
+            player.speed.y = -2;
+        } else {
+            this.downKeys.delete(GamepadKey.Up);
 
-        //     if (this.downKeys.has(GamepadKey.Down) === false && player.velocity.x === 0) {
-        //         player.velocity.y = 0;
-        //     }
-        // }
+            if (this.downKeys.has(GamepadKey.Down) === false && player.speed.x === 0) {
+                player.speed.y = 0;
+            }
+        }
     }
 
     right(release: boolean) {
         const player = this.registry.services.scene.player;
-        // if (!release) {
-        //     this.downKeys.add(GamepadKey.Right);
-        //     player.setVelocity(new Point(5, 0));
-        // } else {
-        //     this.downKeys.delete(GamepadKey.Right);
+        if (!release) {
+            this.downKeys.add(GamepadKey.Right);
+            player.speed.x = -2;
+        } else {
+            this.downKeys.delete(GamepadKey.Right);
 
-        //     if (this.downKeys.has(GamepadKey.Left) === false && player.velocity.y === 0) {
-        //         player.velocity.x = 0;
-        //     }
-        // }
+            if (this.downKeys.has(GamepadKey.Left) === false && player.speed.y === 0) {
+                player.speed.x = 0;
+            }
+        }
     }
 
     down(release: boolean) {
         const player = this.registry.services.scene.player;
-        // if (!release) {
-        //     this.downKeys.add(GamepadKey.Down);
-        //     player.setVelocity(new Point(0, 5));
-        // } else {
-        //     this.downKeys.delete(GamepadKey.Down);
+        if (!release) {
+            this.downKeys.add(GamepadKey.Down);
+            player.speed.y = 2;
+        } else {
+            this.downKeys.delete(GamepadKey.Down);
 
-        //     if (this.downKeys.has(GamepadKey.Up) === false && player.velocity.x === 0) {
-        //         player.velocity.y = 0;
-        //     }
-        // }
+            if (this.downKeys.has(GamepadKey.Up) === false && player.speed.x === 0) {
+                player.speed.y = 0;
+            }
+        }
     }
 }

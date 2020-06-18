@@ -20,7 +20,14 @@ export class PlatformManagerService extends GameScript {
         
         if (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
             this.generateRandomPlatform([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50]);
-        } 
+        }
+
+        this.cleanupSprites();
+    }
+
+    private cleanupSprites() {
+        const invalidPlatforms = this.registry.services.scene.platforms.filter(platform => platform.getPosition().x + platform.getDimensions().x < 0);
+        this.registry.services.scene.platforms = this.registry.services.scene.platforms.filter(platform => invalidPlatforms.indexOf(platform) === -1);
     }
 
     private generateRandomPlatform(xRange: [number, number]): number {
