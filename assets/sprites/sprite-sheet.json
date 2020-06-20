@@ -27,7 +27,7 @@
         },
         "player":
         {
-            "frame": {"x":75,"y":229,"w":80,"h":230},
+            "frame": {"x":63,"y":192,"w":84,"h":245},
             "rotated": false,
             "trimmed": false,
             "spriteSourceSize": {"x":0,"y":0,"w":64,"h":256},

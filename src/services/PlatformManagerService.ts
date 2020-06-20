@@ -9,22 +9,22 @@ export class PlatformManagerService extends GameScript {
     }
 
     awake() {
-        let maxX = this.getMaxX(); 
-        while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
-            maxX = this.generateRandomPlatform([maxX, maxX + 200]);
-        }
+        // let maxX = this.getMaxX(); 
+        // while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
+        //     maxX = this.generateRandomPlatform([maxX, maxX + 200]);
+        // }
 
-        this.generateRandomPlatform([maxX, maxX + 200]);
+        this.generateRandomPlatform([200, 201]);
     }
 
     update() {
-        let maxX = this.getMaxX(); 
+        // let maxX = this.getMaxX(); 
         
-        if (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
-            this.generateRandomPlatform([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50]);
-        }
+        // if (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
+        //     this.generateRandomPlatform([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50]);
+        // }
 
-        this.cleanupSprites();
+        // this.cleanupSprites();
     }
 
     private cleanupSprites() {

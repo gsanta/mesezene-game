@@ -34,6 +34,5 @@ export class ScrollerObject extends GameObject {
 
     move(delta: Point) {
         this.children.forEach(child => child.move(child.speed));
-        console.log(this.children[2].sprite.position.x)
     }
 }

@@ -1,4 +1,5 @@
 import { Point, Sprite, TilingSprite } from "pixi.js";
+import { Rectangle } from "./primitives/Rectangle";
 
 export interface GameObjectJson {
     x: number;
@@ -12,6 +13,8 @@ export interface GameObjectJson {
     speedY: number;
     viewportX: number;
     viewportY: number;
+    collisionBoxWidth?: number;
+    collisionBoxHeight?: number;
 }
 
 export enum GameObjectType {
@@ -26,6 +29,7 @@ export class GameObject {
     viewportY: number = 0;
     speed: Point;
     name: string;
+    scale: Point = new Point(0, 0);
 
     constructor(sprite: Sprite) {
         this.sprite = sprite;
@@ -40,17 +44,14 @@ export class GameObject {
         return new Point(this.sprite.x, this.sprite.y);
     }
 
-    getDimensions() {
-        return new Point(this.sprite.width, this.sprite.height);
+    getDimensions(): Rectangle {
+        return new Rectangle(this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height);
     }
+
 
     // setVelocity(velocity: Point) {
     //     this.velocity = velocity;
     // }
-
-    scale(point: Point) {
-        this.sprite.scale = point;
-    }
 
     // moveWithVelocity() {
 
@@ -100,7 +101,8 @@ export class GameObject {
     }
 
     fromJson(json: GameObjectJson) {
-        this.scale(new Point(json.scale, json.scale));
+        this.scale = json.scale ? new Point(json.scale, json.scale) : new Point(0, 0);
+        this.sprite.scale = this.scale;
         this.name = json.name;
         this.speed = new Point(json.speedX, json.speedY);
         this.viewportX = json.viewportX;

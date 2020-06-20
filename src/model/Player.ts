@@ -1,6 +1,5 @@
 import { GameObject } from "./GameObject";
 
-
 export interface PlayerConfig {
     jumpSpeed: number;
     jumpMax: number;
@@ -14,7 +13,7 @@ export class Player extends GameObject {
 
     config: PlayerConfig = {
         jumpSpeed: 8,
-        jumpMax: 120
+        jumpMax: 400
     }
 
     jump() {

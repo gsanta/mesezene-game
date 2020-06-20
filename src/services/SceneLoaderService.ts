@@ -144,24 +144,28 @@ export class SceneLoaderService extends GameScript {
             if (spriteJson.isTiling) {
                 const texture = this.loader.resources[spriteJson.path].texture;
                 gameObject = new TilingGameObject(new TilingSprite(texture, texture.baseTexture.width, texture.baseTexture.height));
+                gameObject.fromJson(spriteJson);
                 application.stage.addChild(gameObject.sprite);
             } else if (spriteJson.frameName) {
                 const sheet = this.loader.resources[appJson.spriteSheet];
                 
                 if (spriteJson.frameName.startsWith('platform')) {
                     gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
+                    gameObject.fromJson(spriteJson);
                     this.registry.services.scene.platformRegistry.push(gameObject);    
                 } else if (spriteJson.frameName.startsWith('player')) {
-                    this.registry.services.scene.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));;
+                    this.registry.services.scene.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject = this.registry.services.scene.player;
+                    gameObject.fromJson(spriteJson);
+                    console.log(this.registry.services.scene.player.getDimensions().toString());
                     application.stage.addChild(gameObject.sprite);
                 }
             } else {
                 gameObject = new GameObject(new Sprite(this.loader.resources[spriteJson.path].texture));
+                gameObject.fromJson(spriteJson);
                 application.stage.addChild(gameObject.sprite);
             }
 
-            gameObject.fromJson(spriteJson);
             this.registry.services.scene.sprites.push(gameObject);
         });
 

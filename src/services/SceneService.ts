@@ -5,6 +5,7 @@ import { ScrollerObject } from "../model/ScrollerObject";
 import { Registry } from "../Registry";
 import { GamepadKey } from "./GamepadService";
 import { Player } from "../model/Player";
+import { CharacterCollider } from "./CharacterCollider";
 
 export class SceneService extends GameScript {
     application: Application;
@@ -21,11 +22,13 @@ export class SceneService extends GameScript {
 
     private vertialBorders: [number, number];
     private horizontalBorders: [number, number];
+    private collider: CharacterCollider;
 
     constructor(registry: Registry) {
         super(registry);
 
         this.application = new Application({width: 256, height: 256});
+        this.collider = new CharacterCollider(registry);
     }
 
     awake() {
@@ -46,6 +49,7 @@ export class SceneService extends GameScript {
 
         this.platforms.forEach(platform => platform.move(platform.speed))
         this.moveWithConstrains(this.player);
+        console.log(this.collider.calculateCollision());
 
         if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
             this.player.jump();
@@ -74,13 +78,5 @@ export class SceneService extends GameScript {
         }
         
         player.move(speed);
-    }
-
-    private getSpriteByName(name: string) {
-        return this.sprites.find(sprite => sprite.name === name);
-    }
-
-    private getTilingSprites(): GameObject[] {
-        return this.sprites.filter(sprite => sprite.type === GameObjectType.TilingGameObject);
     }
 }
