@@ -1,11 +1,11 @@
-import { GameObject, GameObjectType } from "../model/GameObject";
+import { Application, Container, Point } from "pixi.js";
+import { GameObject } from "../model/GameObject";
 import { GameScript } from "../model/GameScript";
-import { Point, Application } from "pixi.js";
+import { Player } from "../model/Player";
 import { ScrollerObject } from "../model/ScrollerObject";
 import { Registry } from "../Registry";
-import { GamepadKey } from "./GamepadService";
-import { Player } from "../model/Player";
 import { CharacterCollider } from "./CharacterCollider";
+import { GamepadKey } from "./GamepadService";
 
 export class SceneService extends GameScript {
     application: Application;
@@ -20,6 +20,8 @@ export class SceneService extends GameScript {
 
     platformRegistry: GameObject[] = [];
 
+    backgroundContainer: Container;
+    layerContainers: Container[];
     layers: {fromY: number, toY: number}[];
 
     private vertialBorders: [number, number];
@@ -30,7 +32,18 @@ export class SceneService extends GameScript {
         super(registry);
 
         this.application = new Application({width: 256, height: 256});
+        this.application.stage.sortableChildren = true;
         this.collider = new CharacterCollider(registry);
+
+        this.layerContainers = [
+            new Container(),
+            new Container(),
+            new Container(),
+            new Container()
+        ];
+        this.backgroundContainer = new Container();
+        this.application.stage.addChild(this.backgroundContainer);
+        this.layerContainers.forEach(container => this.application.stage.addChild(container));
     }
 
     awake() {
@@ -43,21 +56,18 @@ export class SceneService extends GameScript {
         this.vertialBorders = [405, 510];
         this.horizontalBorders = [0, this.registry.services.scene.sceneDimensions.x];
         this.layers = [
-            {fromY: 400, toY: 430},
-            {fromY: 430, toY: 460},
-            {fromY: 460, toY: 490},
-            {fromY: 490, toY: 520}
+            {fromY: 510, toY: 545},
+            {fromY: 545, toY: 580},
+            {fromY: 580, toY: 615},
+            {fromY: 615, toY: 650}
         ];
     }
 
     update() {
-        // var newViewportX = this.scroller.getViewportX() + 5;
-        // this.scroller.setViewportX(newViewportX);
         this.scroller.move(new Point(this.gameSpeed, 0));
 
         this.platforms.forEach(platform => platform.move(platform.speed))
         this.moveWithConstrains(this.player);
-        console.log(this.collider.calculateCollision());
 
         if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
             this.player.jump();
@@ -65,18 +75,20 @@ export class SceneService extends GameScript {
 
         this.player.update();
         this.updateVerticalLayer(this.player);
-        console.log(this.player.verticalLayer);
-        // this.player.moveWithVelocity();
-
-        // this.getSpriteByName('middle-layer').move();
-        // this.getSpriteByName('background-layer').move();
+        console.log(this.collider.calculateCollision())
     }
 
     private updateVerticalLayer(player: Player) {
-        const y = player.sprite.y - player.currentJumpY;
+        const y = player.sprite.y + player.currentJumpY + player.sprite.height;
+        console.log(player.sprite.y + player.sprite.height);
 
         const layerIndex = this.layers.findIndex(l => l.fromY <= y && l.toY >= y);
-        player.verticalLayer = layerIndex;
+
+        if (layerIndex !== player.verticalLayer) {
+            this.layerContainers[player.verticalLayer].removeChild(player.sprite);
+            this.layerContainers[layerIndex].addChild(player.sprite);
+            player.verticalLayer = layerIndex;
+        }
     }
 
 

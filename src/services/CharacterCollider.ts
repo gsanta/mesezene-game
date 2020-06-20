@@ -40,7 +40,8 @@ export class CharacterCollider {
 
         let collision: Collision;
 
-        platforms.find(platform => {
+        console.log(platforms.map(platform => platform.verticalLayer).join(', ') + '; ' + player.verticalLayer)
+        platforms.filter(platform => platform.verticalLayer === player.verticalLayer).find(platform => {
             const platformCollisionBox = platform.getDimensions();
 
             collision = this.getObjectCollision(playerCollisionBox, platformCollisionBox, 1, 1);

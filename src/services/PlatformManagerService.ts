@@ -9,10 +9,12 @@ export class PlatformManagerService extends GameScript {
     }
 
     awake() {
-        let maxX = this.getMaxX(); 
-        while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
-            maxX = this.generateRandomPlatform([maxX, maxX + 200]);
-        }
+        // let maxX = this.getMaxX(); 
+        // while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
+        //     maxX = this.generateRandomPlatform([maxX, maxX + 200]);
+        // }
+
+        this.generateRandomPlatform([0, 200]);
     }
 
     update() {
@@ -26,8 +28,9 @@ export class PlatformManagerService extends GameScript {
     }
 
     private cleanupSprites() {
-        const invalidPlatforms = this.registry.services.scene.platforms.filter(platform => platform.getPosition().x + platform.getDimensions().x < 0);
+        const invalidPlatforms = this.registry.services.scene.platforms.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
         this.registry.services.scene.platforms = this.registry.services.scene.platforms.filter(platform => invalidPlatforms.indexOf(platform) === -1);
+        this.registry.services.scene.application.stage.removeChild(...invalidPlatforms.map(platform => platform.sprite));
     }
 
     private generateRandomPlatform(xRange: [number, number]): number {
@@ -35,15 +38,14 @@ export class PlatformManagerService extends GameScript {
         const gameObject = platformRegistry[Math.floor(platformRegistry.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
         gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
-        gameObject.verticalLayer = 3// Math.floor(Math.random() * 3);
+        gameObject.verticalLayer = Math.floor(Math.random() * 3);
 
         const layerBorders = this.registry.services.scene.layers[gameObject.verticalLayer];
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layerBorders.fromY + 5));
+        gameObject.setPosition(new Point(gameObject.getPosition().x, layerBorders.toY - 10 - gameObject.getDimensions().height));
     
         this.registry.services.scene.sprites.push(gameObject);
         this.registry.services.scene.platforms.push(gameObject);
-        this.registry.services.scene.application.stage.addChild(gameObject.sprite);
-
+        this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
 

@@ -11,10 +11,11 @@ export class Player extends GameObject {
 
     currentJumpY = 0;
     currentJumpSpeed = 0;
+    verticalLayer = 3;
 
     config: PlayerConfig = {
         jumpSpeed: 8,
-        jumpMax: 400
+        jumpMax: 200
     }
 
     jump() {
@@ -32,11 +33,8 @@ export class Player extends GameObject {
 
     move(delta: Point) {
         super.move(delta);
-
-
-
     }
-    
+
     updateJump() {
         let delta = 0;
         if (this.currentJumpSpeed > 0) {
