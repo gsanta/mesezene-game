@@ -63,11 +63,11 @@ export class GameObject {
     //     (this.sprite as TilingSprite).tilePosition.y += this.velocity.y;
     // }
 
-    setViewportX(newViewportX: number) {
-        const distanceTravelled = newViewportX - this.viewportX;
-        this.viewportX = newViewportX;
-        this.sprite.position.x -= (distanceTravelled * this.speed.x);
-    }
+    // setViewportX(newViewportX: number) {
+    //     const distanceTravelled = newViewportX - this.viewportX;
+    //     this.viewportX = newViewportX;
+    //     this.sprite.position.x -= (distanceTravelled * this.speed.x);
+    // }
 
     getViewportX() {
         return this.viewportX;

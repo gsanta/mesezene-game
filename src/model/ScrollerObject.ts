@@ -1,4 +1,5 @@
 import { GameObject } from "./GameObject";
+import { Point } from "pixi.js";
 
 
 export class ScrollerObject extends GameObject {
@@ -13,11 +14,11 @@ export class ScrollerObject extends GameObject {
         this.children.push(gameObject);
     }
 
-    setViewportX(viewportX: number) {
-        this.viewportX = viewportX;
+    // setViewportX(viewportX: number) {
+    //     this.viewportX = viewportX;
 
-        this.children.forEach(child => child.setViewportX(viewportX));
-    }
+    //     this.children.forEach(child => child.setViewportX(viewportX));
+    // }
 
     getViewportX() {
         return this.viewportX;
@@ -28,6 +29,11 @@ export class ScrollerObject extends GameObject {
 
         // this.children.forEach(child => child.moveViewportXBy(speed));
 
-        this.setViewportX(this.viewportX);
+        // this.setViewportX(this.viewportX);
+    }
+
+    move(delta: Point) {
+        this.children.forEach(child => child.move(child.speed));
+        console.log(this.children[2].sprite.position.x)
     }
 }

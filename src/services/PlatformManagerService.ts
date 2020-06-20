@@ -13,6 +13,8 @@ export class PlatformManagerService extends GameScript {
         while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
             maxX = this.generateRandomPlatform([maxX, maxX + 200]);
         }
+
+        this.generateRandomPlatform([maxX, maxX + 200]);
     }
 
     update() {

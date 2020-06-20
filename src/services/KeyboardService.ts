@@ -41,6 +41,9 @@ export class KeyboardService {
             case Keyboard.ArrowDown:
                 this.registry.services.gamepad.down(false);
             break;
+            case Keyboard.Space:
+                this.registry.services.gamepad.jump(false);
+            break;
         }
 
         e.preventDefault();
@@ -60,6 +63,9 @@ export class KeyboardService {
             break;
             case Keyboard.ArrowDown:
                 this.registry.services.gamepad.down(true);
+            break;
+            case Keyboard.Space:
+                this.registry.services.gamepad.jump(true);
             break;
         }
 

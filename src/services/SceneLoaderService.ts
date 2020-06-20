@@ -3,6 +3,7 @@ import { Application, Loader, Sprite, TilingSprite, Point } from "pixi.js";
 import { GameScript } from "../model/GameScript";
 import { GameObject, GameObjectJson } from "../model/GameObject";
 import { TilingGameObject } from "../model/TilingGameObject";
+import { Player } from "../model/Player";
 
 export interface AppJson {
     width: number;
@@ -37,7 +38,7 @@ export const appJson: AppJson = {
             path: "assets/sprites/background.png",
             name: 'background-layer',
             isTiling: true,
-            speedX: 0.64,
+            speedX: -0.64,
             speedY: 0,
             viewportX: 0,
             viewportY: 0
@@ -49,7 +50,7 @@ export const appJson: AppJson = {
             path: "assets/sprites/middle.png",
             name: 'middle-layer',
             isTiling: true,
-            speedX: 1.28,
+            speedX: -1.28,
             speedY: 0,
             viewportX: 0,
             viewportY: 0
@@ -61,7 +62,7 @@ export const appJson: AppJson = {
             frameName: 'platform_01',
             name: 'front-layer',
             isTiling: false,
-            speedX: 1.28,
+            speedX: -1.28,
             speedY: 0,
             viewportX: 32,
             viewportY: 470
@@ -73,7 +74,7 @@ export const appJson: AppJson = {
             frameName: 'platform_02',
             name: 'front-layer',
             isTiling: false,
-            speedX: 1.28,
+            speedX: -1.28,
             speedY: 0,
             viewportX: 32,
             viewportY: 470
@@ -85,7 +86,7 @@ export const appJson: AppJson = {
             frameName: 'platform_03',
             name: 'front-layer',
             isTiling: false,
-            speedX: 1.28,
+            speedX: -1.28,
             speedY: 0,
             viewportX: 32,
             viewportY: 470
@@ -146,12 +147,13 @@ export class SceneLoaderService extends GameScript {
                 application.stage.addChild(gameObject.sprite);
             } else if (spriteJson.frameName) {
                 const sheet = this.loader.resources[appJson.spriteSheet];
-                gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
-
+                
                 if (spriteJson.frameName.startsWith('platform')) {
+                    gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
                     this.registry.services.scene.platformRegistry.push(gameObject);    
                 } else if (spriteJson.frameName.startsWith('player')) {
-                    this.registry.services.scene.player = gameObject;
+                    this.registry.services.scene.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));;
+                    gameObject = this.registry.services.scene.player;
                     application.stage.addChild(gameObject.sprite);
                 }
             } else {
