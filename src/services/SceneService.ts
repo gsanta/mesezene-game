@@ -20,6 +20,8 @@ export class SceneService extends GameScript {
 
     platformRegistry: GameObject[] = [];
 
+    layers: {fromY: number, toY: number}[];
+
     private vertialBorders: [number, number];
     private horizontalBorders: [number, number];
     private collider: CharacterCollider;
@@ -38,8 +40,14 @@ export class SceneService extends GameScript {
             this.registry.gameScripts.forEach(script => script.update(delta));
         });
 
-        this.vertialBorders = [400, 500];
+        this.vertialBorders = [405, 510];
         this.horizontalBorders = [0, this.registry.services.scene.sceneDimensions.x];
+        this.layers = [
+            {fromY: 400, toY: 430},
+            {fromY: 430, toY: 460},
+            {fromY: 460, toY: 490},
+            {fromY: 490, toY: 520}
+        ];
     }
 
     update() {
@@ -56,11 +64,21 @@ export class SceneService extends GameScript {
         }
 
         this.player.update();
+        this.updateVerticalLayer(this.player);
+        console.log(this.player.verticalLayer);
         // this.player.moveWithVelocity();
 
         // this.getSpriteByName('middle-layer').move();
         // this.getSpriteByName('background-layer').move();
     }
+
+    private updateVerticalLayer(player: Player) {
+        const y = player.sprite.y - player.currentJumpY;
+
+        const layerIndex = this.layers.findIndex(l => l.fromY <= y && l.toY >= y);
+        player.verticalLayer = layerIndex;
+    }
+
 
     private moveWithConstrains(player: GameObject) {
         let speed = new Point(player.speed.x, player.speed.y);

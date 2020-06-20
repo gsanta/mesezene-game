@@ -1,4 +1,5 @@
 import { GameObject } from "./GameObject";
+import { Point } from "pixi.js";
 
 export interface PlayerConfig {
     jumpSpeed: number;
@@ -29,6 +30,13 @@ export class Player extends GameObject {
         }
     }
 
+    move(delta: Point) {
+        super.move(delta);
+
+
+
+    }
+    
     updateJump() {
         let delta = 0;
         if (this.currentJumpSpeed > 0) {

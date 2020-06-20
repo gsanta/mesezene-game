@@ -31,6 +31,8 @@ export class GameObject {
     name: string;
     scale: Point = new Point(0, 0);
 
+    verticalLayer: number;
+
     constructor(sprite: Sprite) {
         this.sprite = sprite;
     }
@@ -96,6 +98,8 @@ export class GameObject {
         clone.sprite.y = this.sprite.y;
         clone.viewportX = this.viewportX;
         clone.viewportY = this.viewportY;
+        clone.scale = this.scale ? new Point(this.scale.x, this.scale.y) : new Point(1, 1);
+        clone.sprite.scale = this.scale;
 
         return clone;
     }

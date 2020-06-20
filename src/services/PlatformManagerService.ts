@@ -9,22 +9,20 @@ export class PlatformManagerService extends GameScript {
     }
 
     awake() {
-        // let maxX = this.getMaxX(); 
-        // while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
-        //     maxX = this.generateRandomPlatform([maxX, maxX + 200]);
-        // }
-
-        this.generateRandomPlatform([200, 201]);
+        let maxX = this.getMaxX(); 
+        while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
+            maxX = this.generateRandomPlatform([maxX, maxX + 200]);
+        }
     }
 
     update() {
-        // let maxX = this.getMaxX(); 
+        let maxX = this.getMaxX(); 
         
-        // if (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
-        //     this.generateRandomPlatform([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50]);
-        // }
+        if (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
+            this.generateRandomPlatform([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50]);
+        }
 
-        // this.cleanupSprites();
+        this.cleanupSprites();
     }
 
     private cleanupSprites() {
@@ -37,6 +35,10 @@ export class PlatformManagerService extends GameScript {
         const gameObject = platformRegistry[Math.floor(platformRegistry.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
         gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
+        gameObject.verticalLayer = 3// Math.floor(Math.random() * 3);
+
+        const layerBorders = this.registry.services.scene.layers[gameObject.verticalLayer];
+        gameObject.setPosition(new Point(gameObject.getPosition().x, layerBorders.fromY + 5));
     
         this.registry.services.scene.sprites.push(gameObject);
         this.registry.services.scene.platforms.push(gameObject);

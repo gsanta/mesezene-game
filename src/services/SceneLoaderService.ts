@@ -15,7 +15,7 @@ export interface AppJson {
 
 export const appJson: AppJson = {
     width: 700,
-    height: 600,
+    height: 700,
     gameSpeed: 2,
     spriteSheet: 'assets/sprites/sprite-sheet.json',
     sprites: [
@@ -58,7 +58,7 @@ export const appJson: AppJson = {
         {
             x: 0,
             y: 0,
-            scale: 0.5,
+            scale: 0.4,
             frameName: 'platform_01',
             name: 'front-layer',
             isTiling: false,
@@ -70,7 +70,7 @@ export const appJson: AppJson = {
         {
             x: 0,
             y: 0,
-            scale: 0.5,
+            scale: 0.4,
             frameName: 'platform_02',
             name: 'front-layer',
             isTiling: false,
@@ -82,7 +82,7 @@ export const appJson: AppJson = {
         {
             x: 0,
             y: 0,
-            scale: 0.5,
+            scale: 0.4,
             frameName: 'platform_03',
             name: 'front-layer',
             isTiling: false,
