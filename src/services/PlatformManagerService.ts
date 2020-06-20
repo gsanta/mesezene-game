@@ -42,6 +42,8 @@ export class PlatformManagerService extends GameScript {
 
         const layerBorders = this.registry.services.scene.layers[gameObject.verticalLayer];
         gameObject.setPosition(new Point(gameObject.getPosition().x, layerBorders.toY - 10 - gameObject.getDimensions().height));
+
+        // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
     
         this.registry.services.scene.sprites.push(gameObject);
         this.registry.services.scene.platforms.push(gameObject);

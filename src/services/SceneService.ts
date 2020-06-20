@@ -17,8 +17,10 @@ export class SceneService extends GameScript {
     gameSpeed: number;
 
     platforms: GameObject[] = [];
+    balloons: GameObject[] = [];
 
     platformRegistry: GameObject[] = [];
+    balloonRegistry: GameObject[] = [];
 
     backgroundContainer: Container;
     layerContainers: Container[];
@@ -75,12 +77,16 @@ export class SceneService extends GameScript {
 
         this.player.update();
         this.updateVerticalLayer(this.player);
-        console.log(this.collider.calculateCollision())
+
+        const collision = this.collider.calculateCollision();
+        if (collision && collision.v !== 0 && collision.h !== 0) {
+            console.log(collision)
+            console.log(collision.gameObject.name)
+        } 
     }
 
     private updateVerticalLayer(player: Player) {
         const y = player.sprite.y + player.currentJumpY + player.sprite.height;
-        console.log(player.sprite.y + player.sprite.height);
 
         const layerIndex = this.layers.findIndex(l => l.fromY <= y && l.toY >= y);
 

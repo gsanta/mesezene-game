@@ -32,6 +32,14 @@
             "trimmed": false,
             "spriteSourceSize": {"x":0,"y":0,"w":64,"h":256},
             "sourceSize": {"w":64,"h":256}
+        },
+        "balloon_01":
+        {
+            "frame": {"x":63,"y":500,"w":67,"h":394},
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": {"x":0,"y":0,"w":64,"h":256},
+            "sourceSize": {"w":64,"h":256}
         }
     },
     "meta": {

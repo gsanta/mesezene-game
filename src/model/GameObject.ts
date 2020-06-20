@@ -13,8 +13,7 @@ export interface GameObjectJson {
     speedY: number;
     viewportX: number;
     viewportY: number;
-    collisionBoxWidth?: number;
-    collisionBoxHeight?: number;
+    collisionBox?: string;
 }
 
 export enum GameObjectType {
@@ -32,6 +31,7 @@ export class GameObject {
     scale: Point = new Point(0, 0);
 
     verticalLayer: number;
+    collisionBox: Rectangle;
 
     constructor(sprite: Sprite) {
         this.sprite = sprite;
@@ -47,6 +47,16 @@ export class GameObject {
     }
 
     getDimensions(): Rectangle {
+        return new Rectangle(this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height);
+    }
+
+    getCollisionBox(): Rectangle {
+        if (this.collisionBox) {
+            const [x, y, width, height] = [this.sprite.x + this.collisionBox.x, this.sprite.y + this.collisionBox.y, this.collisionBox.width, this.collisionBox.height];
+            return new Rectangle(x, y, width, height);
+        }
+
+        return this.getDimensions();
         return new Rectangle(this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height);
     }
 
@@ -100,6 +110,11 @@ export class GameObject {
         clone.viewportY = this.viewportY;
         clone.scale = this.scale ? new Point(this.scale.x, this.scale.y) : new Point(1, 1);
         clone.sprite.scale = this.scale;
+        clone.name = this.name;
+
+        if (this.collisionBox) {
+            clone.collisionBox =  this.collisionBox;
+        }
 
         return clone;
     }
@@ -107,7 +122,7 @@ export class GameObject {
     fromJson(json: GameObjectJson) {
         this.scale = json.scale ? new Point(json.scale, json.scale) : new Point(0, 0);
         this.sprite.scale = this.scale;
-        this.name = json.name;
+        this.name = json.frameName || json.name;
         this.speed = new Point(json.speedX, json.speedY);
         this.viewportX = json.viewportX;
         this.viewportY = json.viewportY;
@@ -115,6 +130,11 @@ export class GameObject {
         if (this.type === GameObjectType.GameObject) {
             this.sprite.position.x = json.viewportX;
             this.sprite.position.y = json.viewportY;
+        }
+
+        if (json.collisionBox) {
+            const [x, y, width, height] = json.collisionBox.split(' ').map(val => parseInt(val, 10));
+            this.collisionBox = new Rectangle(x, y, width * this.scale.x, height * this.scale.y);
         }
     }
 }

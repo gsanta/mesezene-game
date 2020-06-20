@@ -95,6 +95,19 @@ export const appJson: AppJson = {
             x: 0,
             y: 0,
             scale: 0.5,
+            frameName: 'balloon_01',
+            name: 'front-layer',
+            isTiling: false,
+            speedX: -1.28,
+            speedY: 0,
+            viewportX: 32,
+            viewportY: 470,
+            collisionBox: "0 0 67 80"
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
             frameName: 'player',
             name: 'front-layer',
             isTiling: false,
@@ -153,6 +166,12 @@ export class SceneLoaderService extends GameScript {
                     gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject.fromJson(spriteJson);
                     this.registry.services.scene.platformRegistry.push(gameObject);    
+                    this.registry.services.scene.platformRegistry.push(gameObject);
+                } else if (spriteJson.frameName.startsWith('balloon')) {
+                    gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
+                    gameObject.fromJson(spriteJson);
+                    this.registry.services.scene.balloons.push(gameObject);    
+                    this.registry.services.scene.balloonRegistry.push(gameObject);    
                 } else if (spriteJson.frameName.startsWith('player')) {
                     this.registry.services.scene.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject = this.registry.services.scene.player;
