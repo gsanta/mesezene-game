@@ -30,6 +30,10 @@ export class SceneService extends GameScript {
     private horizontalBorders: [number, number];
     private collider: CharacterCollider;
 
+    private hitPaused = false;
+
+    private prevHitItem: GameObject;
+
     constructor(registry: Registry) {
         super(registry);
 
@@ -66,9 +70,11 @@ export class SceneService extends GameScript {
     }
 
     update() {
+
         this.scroller.move(new Point(this.gameSpeed, 0));
 
         this.platforms.forEach(platform => platform.move(platform.speed))
+        this.balloons.forEach(platform => platform.move(platform.speed))
         this.moveWithConstrains(this.player);
 
         if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
@@ -80,9 +86,21 @@ export class SceneService extends GameScript {
 
         const collision = this.collider.calculateCollision();
         if (collision && collision.v !== 0 && collision.h !== 0) {
-            console.log(collision)
-            console.log(collision.gameObject.name)
-        } 
+            if (collision.gameObject.name.indexOf('balloon') !== -1) {
+                this.registry.scoreStore.setCollectedBallons(this.registry.scoreStore.collectedBalloons + 1);
+                this.balloons = this.balloons.filter(balloon => balloon !== collision.gameObject);
+                this.layerContainers[collision.gameObject.verticalLayer].removeChild(collision.gameObject.sprite);
+                // this.hitPaused = true;
+                // setTimeout(() => {
+                //     this.hitPaused = false;
+                // }, 1000);        
+            } else if (collision.gameObject.name.indexOf('platform') !== -1 && collision.gameObject.isColliding) {
+                this.registry.scoreStore.setHitPlatforms(this.registry.scoreStore.hitPlatforms + 1);
+                collision.gameObject.isColliding = false;
+                this.hitPaused = true;
+            }
+        }
+
     }
 
     private updateVerticalLayer(player: Player) {

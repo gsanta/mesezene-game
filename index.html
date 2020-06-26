@@ -1,24 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Hello World</title>
-  <style>
-    html, body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
+    <head>
+        <meta charset="utf-8" />
+        <title>Hello World</title>
+        <style>
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
 
-    #app {
-        width: 100%;
-        height: 100%;
-    }
-  </style>
-</head>
-<body>
-    <div id="app"></div>
-    <script src="./bundle.js"></script>
-</body>
+            #mesezene-app {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="mesezene-app"></div>
+        <script>
+            var mesezeneGlobals = {
+                urlPrefix: '.'
+            }
+        </script>
+        <script src="./mesezene-bundle.js"></script>
+        <script>
+            mesezene.createMesezeneGame(document.getElementById('mesezene-app'));
+        </script>
+    </body>
 </html>

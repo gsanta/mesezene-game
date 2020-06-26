@@ -15,7 +15,7 @@ export class Player extends GameObject {
 
     config: PlayerConfig = {
         jumpSpeed: 8,
-        jumpMax: 200
+        jumpMax: 250
     }
 
     jump() {

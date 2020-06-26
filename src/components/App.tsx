@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Registry } from '../Registry';
 import { appJson } from '../services/SceneLoaderService';
+import { Header } from './Header';
+import { TheEnd } from './TheEnd';
 import styled from 'styled-components';
 
 const AppStyled = styled.div`
@@ -10,6 +12,13 @@ const AppStyled = styled.div`
     height: 100%;
     align-items: center;
     background: black;
+`;
+
+const CanvasContainerStyled = styled.div`
+    width: 700px;
+    height: 700px;
+    outline: none;
+    position: relative;
 `;
 
 export interface AppContext {
@@ -34,13 +43,16 @@ export class App extends React.Component<AppContext> {
 
     render() {
         return (
-            <AppStyled 
-                id="pixie"
-                ref={this.ref}
-                tabIndex={0}
-                onKeyDown={(e) => this.props.registry.services.keyboard.onKeyDown(e.nativeEvent)}
-                onKeyUp={(e) => this.props.registry.services.keyboard.onKeyUp(e.nativeEvent)}
-            >
+            <AppStyled id="pixie">
+                <CanvasContainerStyled 
+                    tabIndex={0}
+                    onKeyDown={(e) => this.props.registry.services.keyboard.onKeyDown(e.nativeEvent)}
+                    onKeyUp={(e) => this.props.registry.services.keyboard.onKeyUp(e.nativeEvent)}
+                    ref={this.ref}
+                >
+                    <Header registry={this.props.registry}/>
+                    <TheEnd registry={this.props.registry}/>
+                </CanvasContainerStyled>
             </AppStyled>
         )
     }

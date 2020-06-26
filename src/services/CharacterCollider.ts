@@ -42,14 +42,15 @@ export class CharacterCollider {
 
         let collision: Collision;
 
-        // console.log(platforms.map(platform => platform.verticalLayer).join(', ') + '; ' + player.verticalLayer
         const collidingObjects = [...this.registry.services.scene.platforms, ...this.registry.services.scene.balloons];
+
+        console.log(this.registry.services.scene.balloons.filter(platform => platform.verticalLayer === player.verticalLayer).length)
 
         collidingObjects.filter(platform => platform.verticalLayer === player.verticalLayer).find(platform => {
             const platformCollisionBox = platform.getCollisionBox();
 
             collision = this.getObjectCollision(playerCollisionBox, platformCollisionBox, 1, 1, platform);
-            return collision; 
+            return collision && (collision.h || collision.v); 
         });
 
         return collision;
@@ -68,6 +69,7 @@ export class CharacterCollider {
                 v: vertical ? vertical : 0,
                 gameObject
             };
+            console.log(collision)
         } else {
             collision = {
                 h: diag ? diag.h : 0,

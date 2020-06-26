@@ -52,7 +52,9 @@ module.exports = env => {
             extensions: [ '.tsx', '.ts', '.js', 'scss', '.css' ]
         },
         output: {
-            filename: 'bundle.js',            
+            filename: 'mesezene-bundle.js',
+            library: 'mesezene',
+            libraryTarget: 'var'    
         },
         context: __dirname,
         devtool: 'eval',

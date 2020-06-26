@@ -29,6 +29,7 @@ export class GameObject {
     speed: Point;
     name: string;
     scale: Point = new Point(0, 0);
+    isColliding = true;
 
     verticalLayer: number;
     collisionBox: Rectangle;
@@ -56,8 +57,11 @@ export class GameObject {
             return new Rectangle(x, y, width, height);
         }
 
+        if (this.name.indexOf('balloon') !== -1) {
+            return new Rectangle(this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height / 4);
+        }
+
         return this.getDimensions();
-        return new Rectangle(this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height);
     }
 
 
@@ -120,7 +124,7 @@ export class GameObject {
     }
 
     fromJson(json: GameObjectJson) {
-        this.scale = json.scale ? new Point(json.scale, json.scale) : new Point(0, 0);
+        this.scale = json.scale ? new Point(json.scale, json.scale) : new Point(1, 1);
         this.sprite.scale = this.scale;
         this.name = json.frameName || json.name;
         this.speed = new Point(json.speedX, json.speedY);

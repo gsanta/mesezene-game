@@ -5,4 +5,6 @@ import { Registry } from './Registry';
 
 const registry = new Registry();
 
-ReactDOM.render(<App registry={registry}/>, document.getElementById('app'));
+export function createMesezeneGame(htmlElement: HTMLElement) {
+    ReactDOM.render(<App registry={registry}/>, htmlElement);
+}

@@ -1,9 +1,11 @@
-import { Registry } from "../Registry";
-import { Application, Loader, Sprite, TilingSprite, Point } from "pixi.js";
-import { GameScript } from "../model/GameScript";
+import { Loader, Point, Sprite, TilingSprite } from "pixi.js";
 import { GameObject, GameObjectJson } from "../model/GameObject";
-import { TilingGameObject } from "../model/TilingGameObject";
+import { GameScript } from "../model/GameScript";
+import { MesezeneGlobals } from "../model/MesezeneGlobals";
 import { Player } from "../model/Player";
+import { TilingGameObject } from "../model/TilingGameObject";
+
+declare const mesezeneGlobals: MesezeneGlobals;
 
 export interface AppJson {
     width: number;
@@ -102,7 +104,7 @@ export const appJson: AppJson = {
             speedY: 0,
             viewportX: 32,
             viewportY: 470,
-            collisionBox: "0 0 67 80"
+            // collisionBox: "0 0 67 80"
         },
         {
             x: 0,
@@ -132,8 +134,8 @@ export class SceneLoaderService extends GameScript {
         this.setupScene(appJson);
 
         this.loader
-            .add(appJson.sprites.filter(sprite => sprite.path).map(sprite => sprite.path))
-            .add(appJson.spriteSheet)
+            .add(appJson.sprites.filter(sprite => sprite.path).map(sprite => `${mesezeneGlobals.urlPrefix}/${sprite.path}`))
+            .add(`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`)
             .load(() => {
                 this.setupSprites(appJson);
                 this.registry.gameScripts.forEach(script => script.awake());
@@ -155,22 +157,20 @@ export class SceneLoaderService extends GameScript {
             let gameObject: GameObject;
 
             if (spriteJson.isTiling) {
-                const texture = this.loader.resources[spriteJson.path].texture;
+                const texture = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${spriteJson.path}`].texture;
                 gameObject = new TilingGameObject(new TilingSprite(texture, texture.baseTexture.width, texture.baseTexture.height));
                 gameObject.fromJson(spriteJson);
                 this.registry.services.scene.backgroundContainer.addChild(gameObject.sprite);
             } else if (spriteJson.frameName) {
-                const sheet = this.loader.resources[appJson.spriteSheet];
+                const sheet = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`];
                 
                 if (spriteJson.frameName.startsWith('platform')) {
                     gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject.fromJson(spriteJson);
                     this.registry.services.scene.platformRegistry.push(gameObject);    
-                    this.registry.services.scene.platformRegistry.push(gameObject);
                 } else if (spriteJson.frameName.startsWith('balloon')) {
                     gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject.fromJson(spriteJson);
-                    this.registry.services.scene.balloons.push(gameObject);    
                     this.registry.services.scene.balloonRegistry.push(gameObject);    
                 } else if (spriteJson.frameName.startsWith('player')) {
                     this.registry.services.scene.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));
@@ -180,7 +180,7 @@ export class SceneLoaderService extends GameScript {
                     // application.stage.addChild(gameObject.sprite);
                 }
             } else {
-                gameObject = new GameObject(new Sprite(this.loader.resources[spriteJson.path].texture));
+                gameObject = new GameObject(new Sprite(this.loader.resources[`${mesezeneGlobals.urlPrefix}/${spriteJson.path}`].texture));
                 gameObject.fromJson(spriteJson);
                 application.stage.addChild(gameObject.sprite);
             }
