@@ -127,7 +127,6 @@ export class SceneLoaderService extends GameScript {
     load(appJson: AppJson) {
         const application = this.registry.services.scene.application;
 
-
         this.registry.gameWindow.htmlElement.appendChild(application.view);
         this.loader = new Loader();
 

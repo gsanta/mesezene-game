@@ -6,6 +6,8 @@ import { SceneLoaderService } from "./services/SceneLoaderService";
 import { PlatformManagerService } from "./services/PlatformManagerService";
 import { CollisionService } from "./services/CollisionService";
 import { BalloonManagerService } from "./services/BalloonManagerService";
+import { LoginService } from "./services/LoginService";
+import { RenderService } from "./services/RenderService";
 
 export class Services {
     private registry: Registry;
@@ -17,6 +19,8 @@ export class Services {
     platformManager: PlatformManagerService;
     balloonManager: BalloonManagerService;
     collision: CollisionService;
+    loginService: LoginService;
+    renderService: RenderService;
 
     constructor(registry: Registry) {
         this.registry = registry;
@@ -27,5 +31,7 @@ export class Services {
         this.platformManager = new PlatformManagerService(registry);
         this.collision = new CollisionService(registry);
         this.balloonManager = new BalloonManagerService(registry);
+        this.loginService = new LoginService(registry);
+        this.renderService = new RenderService();
     }
 }

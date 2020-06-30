@@ -4,6 +4,10 @@ import { appJson } from '../services/SceneLoaderService';
 import { Header } from './Header';
 import { TheEnd } from './TheEnd';
 import styled from 'styled-components';
+import { AppProps } from './AppProps';
+import { Game } from './Game';
+import { Login } from './Login';
+import { Screen } from '../stores/AppStore';
 
 const AppStyled = styled.div`
     display: flex;
@@ -14,45 +18,29 @@ const AppStyled = styled.div`
     background: black;
 `;
 
-const CanvasContainerStyled = styled.div`
-    width: 700px;
-    height: 700px;
-    outline: none;
-    position: relative;
-`;
-
-export interface AppContext {
-    registry: Registry;
-}
-
-export class App extends React.Component<AppContext> {
-    private ref: React.RefObject<HTMLDivElement>;
-
-    constructor(props: AppContext) {
-        super(props);
-
-        this.ref = React.createRef();
-    }
-
+export class App extends React.Component<AppProps> {
+    
     componentDidMount() {
-        this.props.registry.gameWindow.htmlElement = this.ref.current;
-        this.props.registry.gameWindow.resize();
-        this.ref.current.focus();
-        this.props.registry.services.loader.load(appJson);
+        this.props.registry.services.renderService.setRenderer(() => this.forceUpdate());
     }
 
     render() {
+        let screen: JSX.Element;
+
+        switch(this.props.registry.appStore.activeScreen) {
+            case Screen.GameScreen: 
+                screen = <Game registry={this.props.registry}/>;
+            break;
+            case Screen.LoginScreen:
+                screen = <Login registry={this.props.registry}/>;
+            break;
+        }
+
         return (
             <AppStyled id="pixie">
-                <CanvasContainerStyled 
-                    tabIndex={0}
-                    onKeyDown={(e) => this.props.registry.services.keyboard.onKeyDown(e.nativeEvent)}
-                    onKeyUp={(e) => this.props.registry.services.keyboard.onKeyUp(e.nativeEvent)}
-                    ref={this.ref}
-                >
-                    <Header registry={this.props.registry}/>
-                    <TheEnd registry={this.props.registry}/>
-                </CanvasContainerStyled>
+                {/* <Login registry={this.props.registry}/> */}
+                {screen}
+                {/* <Game registry={this.props.registry}/> */}
             </AppStyled>
         )
     }
