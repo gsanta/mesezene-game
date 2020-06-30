@@ -2,9 +2,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useState } from 'react';
 import { AppProps } from './AppProps';
-import { AppScreen } from '../stores/AppStore';
 
-const LoginStyled = styled.div`
+const RegistrationStyled = styled.div`
     width: 300px;
     height: 300px;
     background: red;
@@ -17,35 +16,34 @@ const FormRowStyled = styled.div`
     margin-top: 20px;
 `;
 
-export function Login(props: AppProps) {
+export function Registration(props: AppProps) {
 
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
-
+    const [passwordRepeat, setPasswordRepeat] = useState('');
+    const [email, setEmail] = useState('');
 
     return (
-        <LoginStyled>
+        <RegistrationStyled>
             <FormRowStyled>
                 <div>Név</div>
                 <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)}></input>
+            </FormRowStyled>
+            <FormRowStyled>
+                <div>Email</div>
+                <input type="text" value={email} onChange={(e) => setEmail(e.target.value)}></input>
             </FormRowStyled>
             <FormRowStyled>
                 <div>Jelszó</div>
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
             </FormRowStyled>
             <FormRowStyled>
-                <button onClick={() => props.registry.services.loginService.login(userName, password)}>Belépés</button>
+                <div>Jelszó újra</div>
+                <input type="password" value={passwordRepeat} onChange={(e) => setPasswordRepeat(e.target.value)}></input>
             </FormRowStyled>
             <FormRowStyled>
-                <div
-                    onClick={() => {
-                        props.registry.appStore.activeScreen = AppScreen.RegistrationScreen;
-                        props.registry.services.renderService.reRender();
-                    }}
-                >
-                    Regisztrálok
-                </div>
+                <button onClick={() => props.registry.services.loginService.register(userName, email, password, passwordRepeat)}>Regisztráció</button>
             </FormRowStyled>
-        </LoginStyled>
+        </RegistrationStyled>
     );
 }

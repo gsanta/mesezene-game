@@ -1,15 +1,16 @@
 
-export enum Screen {
+export enum AppScreen {
     LoginScreen = 'LoginScreen',
-    GameScreen = 'GameScreen'
+    RegistrationScreen = 'RegistrationScreen',
+    GameScreen = 'GameScreen',
 }
 
 export class AppStore {
     loggedIn = false;
-
-    activeScreen: Screen;
+    jwtToken: string;
+    activeScreen: AppScreen;
 
     constructor() {
-        this.activeScreen = Screen.LoginScreen;
+        this.activeScreen = AppScreen.LoginScreen;
     }
 }

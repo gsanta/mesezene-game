@@ -7,7 +7,8 @@ import styled from 'styled-components';
 import { AppProps } from './AppProps';
 import { Game } from './Game';
 import { Login } from './Login';
-import { Screen } from '../stores/AppStore';
+import { Registration } from './Registration';
+import { AppScreen } from '../stores/AppStore';
 
 const AppStyled = styled.div`
     display: flex;
@@ -28,10 +29,13 @@ export class App extends React.Component<AppProps> {
         let screen: JSX.Element;
 
         switch(this.props.registry.appStore.activeScreen) {
-            case Screen.GameScreen: 
+            case AppScreen.GameScreen: 
                 screen = <Game registry={this.props.registry}/>;
             break;
-            case Screen.LoginScreen:
+            case AppScreen.RegistrationScreen:
+                screen = <Registration registry={this.props.registry}/>;
+            break;
+            case AppScreen.LoginScreen:
                 screen = <Login registry={this.props.registry}/>;
             break;
         }
