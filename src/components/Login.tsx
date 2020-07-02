@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { AppProps } from './AppProps';
 import { AppScreen } from '../stores/AppStore';
 import { FormRowStyled, LinkStyled, FormPanelComponent, ErrorStyled } from './FormPanelComponent';
+import Button from '@material-ui/core/Button';
+import { TextField } from '@material-ui/core';
 
 const LoginStyled = styled.div`
     display: flex;
@@ -34,15 +36,15 @@ export function Login(props: AppProps) {
                 Mesezene Játék
             </h2>
             <FormRowStyled>
-                <div>Név</div>
-                <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)}></input>
+                <TextField label="Név" value={userName} onChange={(e) => setUserName(e.target.value)}/>
             </FormRowStyled>
             <FormRowStyled>
-                <div>Jelszó</div>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+                <TextField type="password" label="Jelszó" value={password} onChange={(e) => setPassword(e.target.value)}/>
             </FormRowStyled>
             <FormRowStyled>
-                <button onClick={() => props.registry.services.loginService.login(userName, password)}>Belépés</button>
+                <Button onClick={() => props.registry.services.loginService.login(userName, password)} variant="contained" color="primary">
+                    Belépés
+                </Button>
                 <LinkStyled
                     onClick={() => {
                         props.registry.appStore.activeScreen = AppScreen.RegistrationScreen;

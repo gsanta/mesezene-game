@@ -16,7 +16,7 @@ const AppStyled = styled.div`
     outline: none;
     height: 100%;
     align-items: center;
-    background: black;
+    background: #f6f4b2;
 `;
 
 export class App extends React.Component<AppProps> {

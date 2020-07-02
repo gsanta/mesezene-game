@@ -28,15 +28,13 @@ module.exports = env => {
                     ]
                 },
                 {
-                    test: /\.gwm$/,
-                    use: 'raw-loader'
-                },
-                {
                     test: /\.(png|jpg|gif)$/,
                     use: [
                         {
                             loader: 'file-loader',
-                            options: {}
+                            options: {
+                                esModule: false,
+                            },
                         }
                     ]
                 }
@@ -49,7 +47,7 @@ module.exports = env => {
             })
         ],
         resolve: {
-            extensions: [ '.tsx', '.ts', '.js', 'scss', '.css' ]
+            extensions: [ '.tsx', '.ts', '.js', 'scss', '.css', '.png' ]
         },
         output: {
             filename: 'mesezene-bundle.js',

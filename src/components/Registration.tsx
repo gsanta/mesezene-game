@@ -2,14 +2,9 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useState } from 'react';
 import { AppProps } from './AppProps';
-import { FormPanelComponent, LinkStyled, ErrorStyled } from './FormPanelComponent';
+import { FormPanelComponent, LinkStyled, ErrorStyled, FormRowStyled } from './FormPanelComponent';
 import { AppScreen } from '../stores/AppStore';
-
-const FormRowStyled = styled.div`
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-`;
+import { TextField, Button } from '@material-ui/core';
 
 export function Registration(props: AppProps) {
 
@@ -24,30 +19,28 @@ export function Registration(props: AppProps) {
                 Mesezene Játék Regisztráció
             </h2>
             <FormRowStyled>
-                <div>Név</div>
-                <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)}></input>
+                <TextField label="Név" value={userName} onChange={(e) => setUserName(e.target.value)}/>
             </FormRowStyled>
             <FormRowStyled>
-                <div>Email</div>
-                <input type="text" value={email} onChange={(e) => setEmail(e.target.value)}></input>
+                <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
             </FormRowStyled>
             <FormRowStyled>
-                <div>Jelszó</div>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+                <TextField label="Jelszó" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
             </FormRowStyled>
             <FormRowStyled>
-                <div>Jelszó újra</div>
-                <input type="password" value={passwordRepeat} onChange={(e) => setPasswordRepeat(e.target.value)}></input>
+                <TextField label="Jelszó újra" type="password" value={passwordRepeat} onChange={(e) => setPasswordRepeat(e.target.value)}/>
             </FormRowStyled>
             <FormRowStyled>
-                <button onClick={() => props.registry.services.loginService.register(userName, email, password, passwordRepeat)}>Regisztráció</button>
+                <Button onClick={() => props.registry.services.loginService.register(userName, email, password, passwordRepeat)} variant="contained" color="primary">
+                    Regisztráció
+                </Button>
                 <LinkStyled
                     onClick={() => {
                         props.registry.appStore.activeScreen = AppScreen.LoginScreen;
                         props.registry.services.renderService.reRender();
                     }}
                 >
-                    Belépés
+                    Vissza a belépéshez
                 </LinkStyled>
             </FormRowStyled>
             {props.registry.messageStore.validationError ? <ErrorStyled>{props.registry.messageStore.validationError}</ErrorStyled> : null}
