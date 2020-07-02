@@ -2,13 +2,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useState } from 'react';
 import { AppProps } from './AppProps';
-
-const RegistrationStyled = styled.div`
-    width: 300px;
-    height: 300px;
-    background: red;
-    padding: 20px;
-`;
+import { FormPanelComponent, LinkStyled, ErrorStyled } from './FormPanelComponent';
+import { AppScreen } from '../stores/AppStore';
 
 const FormRowStyled = styled.div`
     display: flex;
@@ -23,8 +18,11 @@ export function Registration(props: AppProps) {
     const [passwordRepeat, setPasswordRepeat] = useState('');
     const [email, setEmail] = useState('');
 
-    return (
-        <RegistrationStyled>
+    const leftPanel = (
+        <React.Fragment>
+            <h2>
+                Mesezene Játék Regisztráció
+            </h2>
             <FormRowStyled>
                 <div>Név</div>
                 <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)}></input>
@@ -43,7 +41,24 @@ export function Registration(props: AppProps) {
             </FormRowStyled>
             <FormRowStyled>
                 <button onClick={() => props.registry.services.loginService.register(userName, email, password, passwordRepeat)}>Regisztráció</button>
+                <LinkStyled
+                    onClick={() => {
+                        props.registry.appStore.activeScreen = AppScreen.LoginScreen;
+                        props.registry.services.renderService.reRender();
+                    }}
+                >
+                    Belépés
+                </LinkStyled>
             </FormRowStyled>
-        </RegistrationStyled>
+            {props.registry.messageStore.validationError ? <ErrorStyled>{props.registry.messageStore.validationError}</ErrorStyled> : null}
+        </React.Fragment>
+    );
+
+    const renderRightPanel = () => {
+
+    }
+
+    return (
+        <FormPanelComponent registry={props.registry} leftPanel={leftPanel} rightPanel={null}/>
     );
 }
