@@ -18,7 +18,7 @@ const LeftPanelStyled = styled.div`
     width: 300px;
     height: 500px;
     padding: 20px;
-    background: #e4d76c;
+    background: #f6f4b2;
 `;
 
 const RightPanelStyled = styled.div`

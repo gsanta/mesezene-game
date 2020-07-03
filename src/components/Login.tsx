@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { AppProps } from './AppProps';
 import { AppScreen } from '../stores/AppStore';
 import { FormRowStyled, LinkStyled, FormPanelComponent, ErrorStyled } from './FormPanelComponent';
-import Button from '@material-ui/core/Button';
+import { ButtonGui } from './ButtonGui';
+import { TextFieldGui } from './TextFieldGui';
 import { TextField } from '@material-ui/core';
 
 const LoginStyled = styled.div`
@@ -39,12 +40,12 @@ export function Login(props: AppProps) {
                 <TextField label="Név" value={userName} onChange={(e) => setUserName(e.target.value)}/>
             </FormRowStyled>
             <FormRowStyled>
-                <TextField type="password" label="Jelszó" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                <TextFieldGui type="password" label="Jelszó" value={password} onChange={(e) => setPassword(e.target.value)}/>
             </FormRowStyled>
             <FormRowStyled>
-                <Button onClick={() => props.registry.services.loginService.login(userName, password)} variant="contained" color="primary">
+                <ButtonGui onClick={() => props.registry.services.loginService.login(userName, password)} variant="contained" color="primary">
                     Belépés
-                </Button>
+                </ButtonGui>
                 <LinkStyled
                     onClick={() => {
                         props.registry.appStore.activeScreen = AppScreen.RegistrationScreen;
