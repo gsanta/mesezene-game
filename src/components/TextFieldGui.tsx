@@ -13,7 +13,15 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export function TextFieldGui(props) {
+
+export interface TextFieldProps {
+    label: string;
+    value: string;
+    onChange(val: string): void;
+    type?: string;
+}
+
+export function TextFieldGui(props: TextFieldProps) {
     const classes = useStylesReddit();
   
     return (
@@ -24,20 +32,23 @@ export function TextFieldGui(props) {
                   root: classes.label,
                   focused: classes.focusedLabel,
                   error: classes.erroredLabel
-                },
+                }
             }}
-            label="Reddit"
+            value={props.value}
+            label={props.label}
             className={classes.margin}
-            defaultValue="react-reddit"
             variant="filled"
             id="reddit-input"
+            type={props.type || 'text'}
+            onChange={e => props.onChange(e.target.value)}
         />
     )
 }
 
 const useStylesReddit = makeStyles((theme) => ({
     root: {
-      border: '2px solid #e4d76c',
+      border: `2px solid ${'#3ca59d'}`,
+      color: '#3ca59d',
       overflow: 'hidden',
       borderRadius: 4,
       backgroundColor: 'transparent',
@@ -48,12 +59,13 @@ const useStylesReddit = makeStyles((theme) => ({
       '&$focused': {
         backgroundColor: 'transparent',
         // boxShadow: `${fade(theme.palette.primary.main, 0.25)} 0 0 0 2px`,
-        borderColor: purple[500],
+        borderColor: '#3ca59d',
       },
     },
     focused: {},
     margin: {
         margin: theme.spacing(1),
+        'marginLeft': 0
     },
     label: {
         "&$focusedLabel": {
