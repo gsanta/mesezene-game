@@ -1,10 +1,11 @@
 import * as React from 'react';
-import styled from 'styled-components';
 import { useState } from 'react';
-import { AppProps } from './AppProps';
-import { FormPanelComponent, LinkStyled, ErrorStyled, FormRowStyled } from './FormPanelComponent';
 import { AppScreen } from '../stores/AppStore';
-import { TextField, Button } from '@material-ui/core';
+import { AppProps } from './AppProps';
+import { ButtonGui } from './ButtonGui';
+import { ContentStyled, ErrorStyled, FooterStyled, FormPanelComponent, FormRowStyled, HeaderStyled, LinkStyled } from './FormPanelComponent';
+import { TextFieldGui } from './TextFieldGui';
+const logoImg = require('../../assets/logo.png');
 
 export function Registration(props: AppProps) {
 
@@ -15,35 +16,38 @@ export function Registration(props: AppProps) {
 
     const leftPanel = (
         <React.Fragment>
-            <h2>
-                Mesezene Játék Regisztráció
-            </h2>
-            <FormRowStyled>
-                <TextField label="Név" value={userName} onChange={(e) => setUserName(e.target.value)}/>
-            </FormRowStyled>
-            <FormRowStyled>
-                <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
-            </FormRowStyled>
-            <FormRowStyled>
-                <TextField label="Jelszó" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
-            </FormRowStyled>
-            <FormRowStyled>
-                <TextField label="Jelszó újra" type="password" value={passwordRepeat} onChange={(e) => setPasswordRepeat(e.target.value)}/>
-            </FormRowStyled>
-            <FormRowStyled>
-                <Button onClick={() => props.registry.services.loginService.register(userName, email, password, passwordRepeat)} variant="contained" color="primary">
-                    Regisztráció
-                </Button>
-                <LinkStyled
-                    onClick={() => {
-                        props.registry.appStore.activeScreen = AppScreen.LoginScreen;
-                        props.registry.services.renderService.reRender();
-                    }}
-                >
-                    Vissza a belépéshez
-                </LinkStyled>
-            </FormRowStyled>
-            {props.registry.messageStore.validationError ? <ErrorStyled>{props.registry.messageStore.validationError}</ErrorStyled> : null}
+            <HeaderStyled>
+                <img src={logoImg}/>
+            </HeaderStyled>
+            <ContentStyled>
+                <FormRowStyled>
+                    <TextFieldGui label="Név" value={userName} onChange={(val) => setUserName(val)}/>
+                </FormRowStyled>
+                <FormRowStyled>
+                    <TextFieldGui label="Email" value={email} onChange={(val) => setEmail(val)}/>
+                </FormRowStyled>
+                <FormRowStyled>
+                    <TextFieldGui label="Jelszó" type="password" value={password} onChange={(val) => setPassword(val)}/>
+                </FormRowStyled>
+                <FormRowStyled>
+                    <TextFieldGui label="Jelszó újra" type="password" value={passwordRepeat} onChange={(val) => setPasswordRepeat(val)}/>
+                </FormRowStyled>
+            </ContentStyled>
+            <FooterStyled>
+                    <ButtonGui onClick={() => props.registry.services.loginService.register(userName, email, password, passwordRepeat)} variant="contained" color="primary">
+                        Regisztrálok
+                    </ButtonGui>
+                    <LinkStyled
+                        onClick={() => {
+                            props.registry.appStore.activeScreen = AppScreen.LoginScreen;
+                            props.registry.services.renderService.reRender();
+                        }}
+                    >
+                        Vissza a belépéshez
+                    </LinkStyled>
+
+                {props.registry.messageStore.validationError ? <ErrorStyled>{props.registry.messageStore.validationError}</ErrorStyled> : null}
+            </FooterStyled>
         </React.Fragment>
     );
 

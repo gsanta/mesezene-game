@@ -13,7 +13,7 @@ const LoginStyled = styled.div`
 `;
 
 const LeftPanelStyled = styled.div`
-    width: 300px;
+    width: 320px;
     height: 100%;
     background: whitesmoke;
     display: flex;
@@ -27,6 +27,33 @@ const RightPanelStyled = styled.div`
     background-image: url(${loginBackgroundImg});
 `;
 
+export const HeaderStyled = styled.h2`
+    padding: 15px 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+
+    img {
+        width: 150px;
+    }
+`;
+
+export const FooterStyled = styled.div`
+    padding: 15px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    > *:not(:last-child) {
+        margin-bottom: 20px;
+    }
+`;
+
+export const ContentStyled = styled.div`
+    padding: 15px 0;
+`;
+
+
 export const FormRowStyled = styled.div`
     display: flex;
     justify-content: space-around;
@@ -34,8 +61,10 @@ export const FormRowStyled = styled.div`
 `;
 
 export const LinkStyled = styled.div`
-    text-decoration: underline;
-    color: #e79c2a;
+    color: #50863b;
+    text-transform: uppercase;
+    font-family: roboto;
+    font-weight: bold;
     cursor: pointer;
 `;
 

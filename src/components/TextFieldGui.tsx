@@ -47,8 +47,8 @@ export function TextFieldGui(props: TextFieldProps) {
 
 const useStylesReddit = makeStyles((theme) => ({
     root: {
-      border: `2px solid ${'#3ca59d'}`,
-      color: '#3ca59d',
+      border: `2px solid ${'#1a9b91'}`,
+      color: '#1a9b91',
       overflow: 'hidden',
       borderRadius: 4,
       backgroundColor: 'transparent',
@@ -59,7 +59,7 @@ const useStylesReddit = makeStyles((theme) => ({
       '&$focused': {
         backgroundColor: 'transparent',
         // boxShadow: `${fade(theme.palette.primary.main, 0.25)} 0 0 0 2px`,
-        borderColor: '#3ca59d',
+        borderColor: '#1a9b91',
       },
     },
     focused: {},
@@ -68,8 +68,9 @@ const useStylesReddit = makeStyles((theme) => ({
         'marginLeft': 0
     },
     label: {
+        color: '#1a9b91',
         "&$focusedLabel": {
-          color: purple[500]
+          color: '#1a9b91'
         },
         "&$erroredLabel": {
           color: "orange"

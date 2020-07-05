@@ -4,29 +4,10 @@ import styled from 'styled-components';
 import { AppScreen } from '../stores/AppStore';
 import { AppProps } from './AppProps';
 import { ButtonGui } from './ButtonGui';
-import { ErrorStyled, FormPanelComponent, FormRowStyled } from './FormPanelComponent';
+import { ErrorStyled, FormPanelComponent, FormRowStyled, HeaderStyled, FooterStyled, ContentStyled, LinkStyled } from './FormPanelComponent';
 import { TextFieldGui } from './TextFieldGui';
 
 const logoImg = require('../../assets/logo.png');
-
-const HeaderStyled = styled.h2`
-    padding: 20px 0;
-    margin: 0;
-    display: flex;
-    justify-content: space-around;
-
-    img {
-        width: 150px;
-    }
-`;
-
-const FooterStyled = styled.div`
-    padding: 20px 0;
-`;
-
-const ContentStyled = styled.div`
-    padding: 20px 0;
-`;
 
 export function Login(props: AppProps) {
 
@@ -47,22 +28,17 @@ export function Login(props: AppProps) {
                 </FormRowStyled>
             </ContentStyled>
             <FooterStyled>
-                <FormRowStyled>
-                    <ButtonGui onClick={() => props.registry.services.loginService.login(userName, password)} variant="contained" color="primary">
-                        Belépés
-                    </ButtonGui>
-
-                    <ButtonGui 
-                        onClick={() => {
-                            props.registry.appStore.activeScreen = AppScreen.RegistrationScreen;
-                            props.registry.services.renderService.reRender();
-                        }}
-                        variant="contained"
-                        color="secondary"
-                    >
-                        Regisztrálok
-                    </ButtonGui>
-                </FormRowStyled>
+                <ButtonGui onClick={() => props.registry.services.loginService.login(userName, password)} variant="contained" color="primary">
+                    Belépés
+                </ButtonGui>
+                <LinkStyled
+                    onClick={() => {
+                        props.registry.appStore.activeScreen = AppScreen.RegistrationScreen;
+                        props.registry.services.renderService.reRender();
+                    }}
+                >
+                    Regisztrálok
+                </LinkStyled>
 
                 {props.registry.messageStore.validationError ? <ErrorStyled>{props.registry.messageStore.validationError}</ErrorStyled> : null}
             </FooterStyled>

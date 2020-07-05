@@ -11,22 +11,11 @@ export interface ButtonProps {
     color: string;
 }
 
-
-// export const ButtonGui = withStyles((props: Theme & ButtonProps) => ({
-//     root: {
-//         color: props.palette.getContrastText(purple[500]),
-//         backgroundColor: props.color1,
-//         '&:hover': {
-//             backgroundColor: props.color1,
-//         },
-//     },
-// }))(Button);
-
 export function ButtonGui(props: ButtonProps) {
     const classes = useStylesReddit();
 
     return (
-        <Button className={props.color === 'primary' ? classes.primary : classes.secondary}>{props.children}</Button>
+        <Button className={props.color === 'primary' ? classes.primary : classes.secondary} onClick={props.onClick}>{props.children}</Button>
     )
 }
 
@@ -40,7 +29,6 @@ const useStylesReddit = makeStyles((theme) => ({
     },
 
     secondary: {
-        // color: theme.palette.getContrastText(purple[500]),
         color: 'white',
         backgroundColor: '#50863b',
         '&:hover': {
