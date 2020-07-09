@@ -1,5 +1,7 @@
 import { Registry } from "../Registry"
 import { AppScreen } from "../stores/AppStore";
+import { MesezeneGlobals } from "../model/MesezeneGlobals";
+declare const mesezeneGlobals: MesezeneGlobals;
 
 export class UserService {
 
@@ -12,7 +14,7 @@ export class UserService {
     async login(userName: string, password: string) {
 
         try {
-            const response = await fetch('http://localhost/cemeteryjs/wp-json/jwt-auth/v1/token', {
+            const response = await fetch(`${mesezeneGlobals.siteUrl}/wp-json/jwt-auth/v1/token`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -42,7 +44,7 @@ export class UserService {
     async register(userName: string, email: string, password: string, passwordRepeat: string) {
 
         try {
-            const response = await fetch('http://localhost/cemeteryjs//wp-json/wp/v2/users/register', {
+            const response = await fetch(`${mesezeneGlobals.siteUrl}/wp-json/wp/v2/users/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

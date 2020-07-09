@@ -11,7 +11,6 @@ const AppStyled = styled.div`
     outline: none;
     height: 100%;
     align-items: center;
-    background: black;
 `;
 
 const CanvasContainerStyled = styled.div`
