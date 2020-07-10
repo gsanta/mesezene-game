@@ -31,11 +31,11 @@ export class UserService {
                 throw new Error('Token missing.')
             }
             
-            this.registry.appStore.loggedIn = true;
-            this.registry.appStore.jwtToken = responseJson.token;
-            this.registry.appStore.activeScreen = AppScreen.GameScreen;
+            this.registry.stores.appStore.loggedIn = true;
+            this.registry.stores.appStore.jwtToken = responseJson.token;
+            this.registry.stores.appStore.activeScreen = AppScreen.GameScreen;
         } catch (e) {
-            this.registry.messageStore.validationError = 'Sikertelen belépés';
+            this.registry.stores.messageStore.validationError = 'Sikertelen belépés';
         } finally {
             this.registry.services.renderService.reRender();
         }
@@ -65,7 +65,7 @@ export class UserService {
 
             await this.login(userName, password);
         } catch (e) {
-            this.registry.messageStore.validationError = 'Sikertelen regisztráció';
+            this.registry.stores.messageStore.validationError = 'Sikertelen regisztráció';
             this.registry.services.renderService.reRender();
         }
     }

@@ -4,20 +4,20 @@ import { GameScript } from "../model/GameScript";
 import { Player } from "../model/Player";
 import { ScrollerObject } from "../model/ScrollerObject";
 import { Registry } from "../Registry";
-import { CharacterCollider } from "./CharacterCollider";
+import { CollisionService } from "./CollisionService";
 import { GamepadKey } from "./GamepadService";
+
+export enum SceneActions {
+    SCENE_UPDATE = 'SCENE_UPDATE',
+    SCENE_START = 'SCENE_START'
+}
 
 export class SceneService extends GameScript {
     application: Application;
     sceneDimensions: Point;
 
-    sprites: GameObject[] = [];
     scroller: ScrollerObject;
-    player: Player;
     gameSpeed: number;
-
-    platforms: GameObject[] = [];
-    balloons: GameObject[] = [];
 
     platformRegistry: GameObject[] = [];
     balloonRegistry: GameObject[] = [];
@@ -28,7 +28,7 @@ export class SceneService extends GameScript {
 
     private vertialBorders: [number, number];
     private horizontalBorders: [number, number];
-    private collider: CharacterCollider;
+    private collider: CollisionService;
 
     private hitPaused = false;
 
@@ -39,7 +39,7 @@ export class SceneService extends GameScript {
 
         this.application = new Application({width: 256, height: 256});
         this.application.stage.sortableChildren = true;
-        this.collider = new CharacterCollider(registry);
+        this.collider = new CollisionService(registry);
 
         this.layerContainers = [
             new Container(),
@@ -53,7 +53,7 @@ export class SceneService extends GameScript {
     }
 
     awake() {
-        const scrollableSprites = this.sprites.filter(sprite => sprite !== this.player);
+        const scrollableSprites = this.registry.stores.game.sprites.filter(sprite => sprite !== this.registry.stores.game.player);
         this.scroller = new ScrollerObject(scrollableSprites);
         this.registry.services.scene.application.ticker.add(delta => {
             this.registry.gameScripts.forEach(script => script.update(delta));
@@ -67,40 +67,47 @@ export class SceneService extends GameScript {
             {fromY: 580, toY: 615},
             {fromY: 615, toY: 650}
         ];
+
+        this.registry.services.event.dispatch(SceneActions.SCENE_START);
     }
 
     update() {
+        const player = this.registry.stores.game.player;
+        const obstacles = this.registry.stores.game.platforms;
+        let balloons = this.registry.stores.game.balloons; 
 
         this.scroller.move(new Point(this.gameSpeed, 0));
 
-        this.platforms.forEach(platform => platform.move(platform.speed))
-        this.balloons.forEach(platform => platform.move(platform.speed))
-        this.moveWithConstrains(this.player);
+        obstacles.forEach(platform => platform.move(platform.speed))
+        balloons.forEach(platform => platform.move(platform.speed))
+        this.moveWithConstrains(player);
 
         if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
-            this.player.jump();
+            player.jump();
         }
 
-        this.player.update();
-        this.updateVerticalLayer(this.player);
+        player.update();
+        this.updateVerticalLayer(player);
 
         const collision = this.collider.calculateCollision();
         if (collision && collision.v !== 0 && collision.h !== 0) {
             if (collision.gameObject.name.indexOf('balloon') !== -1) {
-                this.registry.scoreStore.setCollectedBallons(this.registry.scoreStore.collectedBalloons + 1);
-                this.balloons = this.balloons.filter(balloon => balloon !== collision.gameObject);
+                this.registry.stores.scoreStore.setScores(this.registry.stores.scoreStore.getScores() + 1);
+                balloons = balloons.filter(balloon => balloon !== collision.gameObject);
+                this.registry.stores.game.balloons = balloons;
                 this.layerContainers[collision.gameObject.verticalLayer].removeChild(collision.gameObject.sprite);
                 // this.hitPaused = true;
                 // setTimeout(() => {
                 //     this.hitPaused = false;
                 // }, 1000);        
             } else if (collision.gameObject.name.indexOf('platform') !== -1 && collision.gameObject.isColliding) {
-                this.registry.scoreStore.setHitPlatforms(this.registry.scoreStore.hitPlatforms + 1);
+                this.registry.stores.scoreStore.setLives(this.registry.stores.scoreStore.getLives() - 1);
                 collision.gameObject.isColliding = false;
                 this.hitPaused = true;
             }
         }
 
+        this.registry.services.event.dispatch(SceneActions.SCENE_UPDATE);
     }
 
     private updateVerticalLayer(player: Player) {

@@ -172,8 +172,8 @@ export class SceneLoaderService extends GameScript {
                     gameObject.fromJson(spriteJson);
                     this.registry.services.scene.balloonRegistry.push(gameObject);    
                 } else if (spriteJson.frameName.startsWith('player')) {
-                    this.registry.services.scene.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));
-                    gameObject = this.registry.services.scene.player;
+                    this.registry.stores.game.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));
+                    gameObject = this.registry.stores.game.player;
                     gameObject.fromJson(spriteJson);
                     this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
                     // application.stage.addChild(gameObject.sprite);
@@ -184,7 +184,7 @@ export class SceneLoaderService extends GameScript {
                 application.stage.addChild(gameObject.sprite);
             }
 
-            this.registry.services.scene.sprites.push(gameObject);
+            this.registry.stores.game.sprites.push(gameObject);
         });
 
     //     .add("assets/sprites/balloon2.png")

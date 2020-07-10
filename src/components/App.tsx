@@ -28,7 +28,7 @@ export class App extends React.Component<AppProps> {
     render() {
         let screen: JSX.Element;
 
-        switch(this.props.registry.appStore.activeScreen) {
+        switch(this.props.registry.stores.appStore.activeScreen) {
             case AppScreen.GameScreen: 
                 screen = <Game registry={this.props.registry}/>;
             break;

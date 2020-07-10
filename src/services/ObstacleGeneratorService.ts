@@ -1,37 +1,43 @@
-import { GameScript } from "../model/GameScript";
-import { Registry } from "../Registry";
-import { GameObject } from "../model/GameObject";
 import { Point } from "pixi.js";
+import { GameObject } from "../model/GameObject";
+import { Registry } from "../Registry";
+import { IListener } from "./EventService";
+import { SceneActions } from "./SceneService";
+import { IService, ServiceCapability } from "./IService";
 
-export class BalloonManagerService extends GameScript {
+export class ObstacleGeneratorService implements IListener, IService {
+    capabilities = [ServiceCapability.Listen];
+    private registry: Registry;
+
     constructor(registry: Registry) {
-        super(registry);
+        this.registry = registry;
     }
-
-    awake() {
-        let maxX = this.getMaxX(); 
-        while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
-            maxX = this.generateRandomBalloon([maxX, maxX + 200]);
+    
+    listen(action: string) {
+        switch(action) {
+            case SceneActions.SCENE_START:
+            case SceneActions.SCENE_UPDATE:
+                this.removeSpritesNotOnScreen();
+                this.generateNewSpritesIfNeeded();
+            break;
         }
     }
 
-    update() {
+    generateNewSpritesIfNeeded() {
         let maxX = this.getMaxX(); 
-        
-        if (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
-            this.generateRandomBalloon([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50]);
-        }
 
-        this.cleanupSprites();
+        while (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
+            maxX = this.generateRandomObstacle([maxX, maxX + 200]);
+        }
     }
 
-    private cleanupSprites() {
-        const invalidBalloons = this.registry.services.scene.balloons.filter(balloon => balloon.getPosition().x + balloon.getDimensions().width < 0);
-        this.registry.services.scene.balloons = this.registry.services.scene.balloons.filter(balloon => invalidBalloons.indexOf(balloon) === -1);
+    removeSpritesNotOnScreen() {
+        const invalidBalloons = this.registry.stores.game.balloons.filter(balloon => balloon.getPosition().x + balloon.getDimensions().width < 0);
+        this.registry.stores.game.balloons = this.registry.stores.game.balloons.filter(balloon => invalidBalloons.indexOf(balloon) === -1);
         this.registry.services.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.sprite));
     }
 
-    private generateRandomBalloon(xRange: [number, number]): number {
+    private generateRandomObstacle(xRange: [number, number]): number {
         const balloonRegistry = this.registry.services.scene.balloonRegistry;
         const gameObject = balloonRegistry[Math.floor(balloonRegistry.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
@@ -39,14 +45,10 @@ export class BalloonManagerService extends GameScript {
         gameObject.verticalLayer = Math.floor(Math.random() * 3);
 
         const layerBorders = this.registry.services.scene.layers[gameObject.verticalLayer];
-        // gameObject.setPosition(new Point(gameObject.getPosition().x, 500));
         gameObject.setPosition(new Point(gameObject.getPosition().x, layerBorders.toY - 10 - gameObject.getDimensions().height));
 
-
-        // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
-    
-        this.registry.services.scene.sprites.push(gameObject);
-        this.registry.services.scene.balloons.push(gameObject);
+        this.registry.stores.game.sprites.push(gameObject);
+        this.registry.stores.game.balloons.push(gameObject);
         this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
@@ -58,7 +60,7 @@ export class BalloonManagerService extends GameScript {
     }
 
     private getRightMostBalloon(): GameObject {
-        const balloons = this.registry.services.scene.balloons;
+        const balloons = this.registry.stores.game.balloons;
         balloons.sort((a: GameObject, b: GameObject) => a.getPosition().x - b.getPosition().x);
 
         return balloons.length > 0 ? balloons[balloons.length - 1] : undefined;

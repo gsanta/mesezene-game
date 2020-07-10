@@ -1,20 +1,39 @@
+import { AbstractStore } from "./AbstractStore";
+import { Registry } from "../Registry";
 
 
-export class ScoreStore {
+
+export enum ScoreStoreEvents {
+    SCORE_CHANGED = 'SCORE_CHANGED',
+    LIVES_CHANGED = 'LIBES_CHANGED'
+}
+
+export class ScoreStore extends AbstractStore { 
     private renderers: (() => void)[] = [];
 
-    collectedBalloons: number = 0;
-    hitPlatforms: number = 0;
-    maxHits = 3;
+    private scores: number = 0;
+    private lives: number = 3;
 
-    setCollectedBallons(collectedBalloons: number) {
-        this.collectedBalloons = collectedBalloons;
+    setScores(scores: number) {
+        this.scores = scores;
+
+        this.registry.services.event.dispatch(ScoreStoreEvents.SCORE_CHANGED);
         this.render();
     }
 
-    setHitPlatforms(hitPlatforms: number) {
-        this.hitPlatforms = hitPlatforms;
+    getScores(): number {
+        return this.scores;
+    }
+
+    setLives(lives: number) {
+        this.lives = lives;
+
+        this.registry.services.event.dispatch(ScoreStoreEvents.LIVES_CHANGED);
         this.render();
+    }
+
+    getLives(): number {
+        return this.lives;
     }
 
     render() {

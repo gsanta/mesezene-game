@@ -26,8 +26,8 @@ export class PlatformManagerService extends GameScript {
     }
 
     private cleanupSprites() {
-        const invalidPlatforms = this.registry.services.scene.platforms.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
-        this.registry.services.scene.platforms = this.registry.services.scene.platforms.filter(platform => invalidPlatforms.indexOf(platform) === -1);
+        const invalidPlatforms = this.registry.stores.game.platforms.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
+        this.registry.stores.game.platforms = this.registry.stores.game.platforms.filter(platform => invalidPlatforms.indexOf(platform) === -1);
         this.registry.services.scene.application.stage.removeChild(...invalidPlatforms.map(platform => platform.sprite));
     }
 
@@ -43,8 +43,8 @@ export class PlatformManagerService extends GameScript {
 
         // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
     
-        this.registry.services.scene.sprites.push(gameObject);
-        this.registry.services.scene.platforms.push(gameObject);
+        this.registry.stores.game.sprites.push(gameObject);
+        this.registry.stores.game.platforms.push(gameObject);
         this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
@@ -56,7 +56,7 @@ export class PlatformManagerService extends GameScript {
     }
 
     private getRightMostPlatform(): GameObject {
-        const platforms = this.registry.services.scene.platforms;
+        const platforms = this.registry.stores.game.platforms;
         platforms.sort((a: GameObject, b: GameObject) => a.getPosition().x - b.getPosition().x);
 
         return platforms.length > 0 ? platforms[platforms.length - 1] : undefined;

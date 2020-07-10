@@ -19,11 +19,11 @@ const TheEndStyled = styled.div`
 export class TheEnd extends React.Component<{registry: Registry}> {
 
     componentDidMount() {
-        this.props.registry.scoreStore.addRenderer(() => this.forceUpdate());
+        this.props.registry.stores.scoreStore.addRenderer(() => this.forceUpdate());
     }
 
     render(): JSX.Element {
-        if (this.props.registry.scoreStore.maxHits - this.props.registry.scoreStore.hitPlatforms > 0) {
+        if (this.props.registry.stores.scoreStore.getLives() > 0) {
             return null;
         }
 

@@ -53,7 +53,7 @@ module.exports = env => {
             filename: 'mesezene-bundle.js',
             library: 'mesezene',
             libraryTarget: 'var',
-            publicPath: '../wp-content/themes/cemetery-theme/assets/'
+            // publicPath: '../wp-content/themes/cemetery-theme/assets/'
         },
         context: __dirname,
         devtool: 'eval',

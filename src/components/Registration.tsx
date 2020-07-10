@@ -39,14 +39,14 @@ export function Registration(props: AppProps) {
                     </ButtonGui>
                     <LinkStyled
                         onClick={() => {
-                            props.registry.appStore.activeScreen = AppScreen.LoginScreen;
+                            props.registry.stores.appStore.activeScreen = AppScreen.LoginScreen;
                             props.registry.services.renderService.reRender();
                         }}
                     >
                         Vissza a belépéshez
                     </LinkStyled>
 
-                {props.registry.messageStore.validationError ? <ErrorStyled>{props.registry.messageStore.validationError}</ErrorStyled> : null}
+                {props.registry.stores.messageStore.validationError ? <ErrorStyled>{props.registry.stores.messageStore.validationError}</ErrorStyled> : null}
             </FooterStyled>
         </React.Fragment>
     );
