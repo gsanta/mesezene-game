@@ -166,17 +166,16 @@ export class SceneLoaderService extends GameScript {
                 if (spriteJson.frameName.startsWith('platform')) {
                     gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject.fromJson(spriteJson);
-                    this.registry.services.scene.platformRegistry.push(gameObject);    
+                    this.registry.stores.template.platformRegistry.push(gameObject);    
                 } else if (spriteJson.frameName.startsWith('balloon')) {
                     gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject.fromJson(spriteJson);
-                    this.registry.services.scene.balloonRegistry.push(gameObject);    
+                    this.registry.stores.template.balloonRegistry.push(gameObject);    
                 } else if (spriteJson.frameName.startsWith('player')) {
                     this.registry.stores.game.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject = this.registry.stores.game.player;
                     gameObject.fromJson(spriteJson);
                     this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
-                    // application.stage.addChild(gameObject.sprite);
                 }
             } else {
                 gameObject = new GameObject(new Sprite(this.loader.resources[`${mesezeneGlobals.urlPrefix}/${spriteJson.path}`].texture));
@@ -186,8 +185,5 @@ export class SceneLoaderService extends GameScript {
 
             this.registry.stores.game.sprites.push(gameObject);
         });
-
-    //     .add("assets/sprites/balloon2.png")
-    //     .load(setup);
     }
 }

@@ -18,28 +18,19 @@ export class SceneService extends GameScript {
 
     scroller: ScrollerObject;
     gameSpeed: number;
-
-    platformRegistry: GameObject[] = [];
-    balloonRegistry: GameObject[] = [];
-
+    
     backgroundContainer: Container;
     layerContainers: Container[];
     layers: {fromY: number, toY: number}[];
 
     private vertialBorders: [number, number];
     private horizontalBorders: [number, number];
-    private collider: CollisionService;
-
-    private hitPaused = false;
-
-    private prevHitItem: GameObject;
 
     constructor(registry: Registry) {
         super(registry);
 
         this.application = new Application({width: 256, height: 256});
         this.application.stage.sortableChildren = true;
-        this.collider = new CollisionService(registry);
 
         this.layerContainers = [
             new Container(),
@@ -88,24 +79,6 @@ export class SceneService extends GameScript {
 
         player.update();
         this.updateVerticalLayer(player);
-
-        const collision = this.collider.calculateCollision();
-        if (collision && collision.v !== 0 && collision.h !== 0) {
-            if (collision.gameObject.name.indexOf('balloon') !== -1) {
-                this.registry.stores.scoreStore.setScores(this.registry.stores.scoreStore.getScores() + 1);
-                balloons = balloons.filter(balloon => balloon !== collision.gameObject);
-                this.registry.stores.game.balloons = balloons;
-                this.layerContainers[collision.gameObject.verticalLayer].removeChild(collision.gameObject.sprite);
-                // this.hitPaused = true;
-                // setTimeout(() => {
-                //     this.hitPaused = false;
-                // }, 1000);        
-            } else if (collision.gameObject.name.indexOf('platform') !== -1 && collision.gameObject.isColliding) {
-                this.registry.stores.scoreStore.setLives(this.registry.stores.scoreStore.getLives() - 1);
-                collision.gameObject.isColliding = false;
-                this.hitPaused = true;
-            }
-        }
 
         this.registry.services.event.dispatch(SceneActions.SCENE_UPDATE);
     }

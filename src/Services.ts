@@ -3,12 +3,15 @@ import { GamepadService } from "./services/GamepadService";
 import { Registry } from "./Registry";
 import { SceneService } from "./services/SceneService";
 import { SceneLoaderService } from "./services/SceneLoaderService";
-import { PlatformManagerService } from "./services/PlatformManagerService";
-import { ObstacleGeneratorService } from "./services/ObstacleGeneratorService";
+import { BalloonGeneratorService } from "./services/BalloonGeneratorService";
 import { UserService } from "./services/UserService";
 import { RenderService } from "./services/RenderService";
 import { EventService, IListener } from "./services/EventService";
 import { IService, ServiceCapability } from "./services/IService";
+import { BalloonColliderService } from "./services/collision/BalloonColliderService";
+import { ObstacleColliderService } from "./services/collision/ObstacleColliderService";
+import { ObstacleGeneratorService } from "./services/ObstacleGeneratorService";
+import { CollisionService } from "./services/CollisionService";
 
 export class Services {
     private registry: Registry;
@@ -17,8 +20,7 @@ export class Services {
     gamepad: GamepadService;
     scene: SceneService;
     loader: SceneLoaderService;
-    platformManager: PlatformManagerService;
-    obstacle: ObstacleGeneratorService;
+    balloon: BalloonGeneratorService;
     loginService: UserService;
     renderService: RenderService;
     event: EventService;
@@ -32,12 +34,17 @@ export class Services {
         this.gamepad = new GamepadService(registry);
         this.scene = new SceneService(registry);
         this.loader = new SceneLoaderService(registry);
-        this.platformManager = new PlatformManagerService(registry);
-        this.obstacle = new ObstacleGeneratorService(registry);
+        this.balloon = new BalloonGeneratorService(registry);
         this.loginService = new UserService(registry);
         this.renderService = new RenderService();
 
-        this.services.push(this.obstacle);
+        this.services.push(
+            new CollisionService(this.registry),
+            this.balloon,
+            new BalloonColliderService(this.registry),
+            new ObstacleColliderService(this.registry),
+            new ObstacleGeneratorService(this.registry)
+        );
 
         this.setupListeners();
     }

@@ -1,9 +1,9 @@
-import { Point } from "pixi.js";
-import { GameObject } from "../model/GameObject";
 import { Registry } from "../Registry";
+import { GameObject } from "../model/GameObject";
+import { Point } from "pixi.js";
+import { ServiceCapability, IService } from "./IService";
 import { IListener } from "./EventService";
 import { SceneActions } from "./SceneService";
-import { IService, ServiceCapability } from "./IService";
 
 export class ObstacleGeneratorService implements IListener, IService {
     capabilities = [ServiceCapability.Listen];
@@ -12,7 +12,7 @@ export class ObstacleGeneratorService implements IListener, IService {
     constructor(registry: Registry) {
         this.registry = registry;
     }
-    
+
     listen(action: string) {
         switch(action) {
             case SceneActions.SCENE_START:
@@ -27,19 +27,37 @@ export class ObstacleGeneratorService implements IListener, IService {
         let maxX = this.getMaxX(); 
 
         while (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
-            maxX = this.generateRandomObstacle([maxX, maxX + 200]);
+            maxX = this.generateRandomPlatform([maxX, maxX + 200]);
         }
     }
 
-    removeSpritesNotOnScreen() {
-        const invalidBalloons = this.registry.stores.game.balloons.filter(balloon => balloon.getPosition().x + balloon.getDimensions().width < 0);
-        this.registry.stores.game.balloons = this.registry.stores.game.balloons.filter(balloon => invalidBalloons.indexOf(balloon) === -1);
-        this.registry.services.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.sprite));
+
+    // awake() {
+    //     let maxX = this.getMaxX(); 
+    //     while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
+    //         maxX = this.generateRandomPlatform([maxX, maxX + 200]);
+    //     }
+    // }
+
+    // update() {
+    //     let maxX = this.getMaxX(); 
+        
+    //     if (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
+    //         this.generateRandomPlatform([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50]);
+    //     }
+
+    //     this.cleanupSprites();
+    // }
+
+    private removeSpritesNotOnScreen() {
+        const invalidPlatforms = this.registry.stores.game.platforms.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
+        this.registry.stores.game.platforms = this.registry.stores.game.platforms.filter(platform => invalidPlatforms.indexOf(platform) === -1);
+        this.registry.services.scene.application.stage.removeChild(...invalidPlatforms.map(platform => platform.sprite));
     }
 
-    private generateRandomObstacle(xRange: [number, number]): number {
-        const balloonRegistry = this.registry.services.scene.balloonRegistry;
-        const gameObject = balloonRegistry[Math.floor(balloonRegistry.length * Math.random())].clone();
+    private generateRandomPlatform(xRange: [number, number]): number {
+        const platformRegistry = this.registry.stores.template.platformRegistry;
+        const gameObject = platformRegistry[Math.floor(platformRegistry.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
         gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
         gameObject.verticalLayer = Math.floor(Math.random() * 3);
@@ -47,22 +65,24 @@ export class ObstacleGeneratorService implements IListener, IService {
         const layerBorders = this.registry.services.scene.layers[gameObject.verticalLayer];
         gameObject.setPosition(new Point(gameObject.getPosition().x, layerBorders.toY - 10 - gameObject.getDimensions().height));
 
+        // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
+    
         this.registry.stores.game.sprites.push(gameObject);
-        this.registry.stores.game.balloons.push(gameObject);
+        this.registry.stores.game.platforms.push(gameObject);
         this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
 
     private getMaxX(): number {
-        const rightMostBalloon = this.getRightMostBalloon();
-        const maxX = rightMostBalloon ? rightMostBalloon.getPosition().x + rightMostBalloon.getDimensions().x : 0;
+        const rightMostPlatform = this.getRightMostPlatform();
+        const maxX = rightMostPlatform ? rightMostPlatform.getPosition().x + rightMostPlatform.getDimensions().x : 0;
         return maxX;
     }
 
-    private getRightMostBalloon(): GameObject {
-        const balloons = this.registry.stores.game.balloons;
-        balloons.sort((a: GameObject, b: GameObject) => a.getPosition().x - b.getPosition().x);
+    private getRightMostPlatform(): GameObject {
+        const platforms = this.registry.stores.game.platforms;
+        platforms.sort((a: GameObject, b: GameObject) => a.getPosition().x - b.getPosition().x);
 
-        return balloons.length > 0 ? balloons[balloons.length - 1] : undefined;
+        return platforms.length > 0 ? platforms[platforms.length - 1] : undefined;
     }
 }

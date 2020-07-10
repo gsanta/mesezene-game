@@ -29,7 +29,7 @@ export class GameObject {
     speed: Point;
     name: string;
     scale: Point = new Point(0, 0);
-    isColliding = true;
+    isCollided = false;
 
     verticalLayer: number;
     collisionBox: Rectangle;
