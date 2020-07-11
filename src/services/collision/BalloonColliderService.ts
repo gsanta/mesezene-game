@@ -2,6 +2,7 @@ import { IListener } from "../EventService";
 import { IService, ServiceCapability } from "../IService";
 import { CollisionActions } from "../CollisionService";
 import { Registry } from "../../Registry";
+import { GameObjectTag } from "../../model/GameObject";
 
 
 export class BalloonColliderService implements IListener, IService {
@@ -25,7 +26,7 @@ export class BalloonColliderService implements IListener, IService {
         let balloons = this.registry.stores.game.balloons; 
         this.registry.stores.scoreStore.setScores(this.registry.stores.scoreStore.getScores() + 1);
 
-        const collidedBalloons = balloons.filter(balloon => balloon.isCollided);
+        const collidedBalloons = balloons.filter(balloon => balloon.tags.has(GameObjectTag.Collided));
 
         this.registry.stores.game.balloons = balloons.filter(balloon => collidedBalloons.indexOf(balloon) === -1);
 

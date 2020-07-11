@@ -1,6 +1,6 @@
 import { CollisionRect, willCollideH, willCollideY, willCollideDiag } from "./collisions";
 import { Registry } from "../Registry";
-import { GameObject } from "../model/GameObject";
+import { GameObject, GameObjectTag } from "../model/GameObject";
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
 import { SceneActions } from "./SceneService";
@@ -55,18 +55,18 @@ export class CollisionService implements IListener, IService {
 
         const playerCollisionBox = player.getCollisionBox();
 
-        const collidableObjs = [...this.registry.stores.game.platforms, ...this.registry.stores.game.balloons];
+        const collidableObjs = [...this.registry.stores.game.obstacles, ...this.registry.stores.game.balloons];
 
         const collidedObj = collidableObjs
             .filter(obj => obj.verticalLayer === player.verticalLayer)
-            .filter(obj => !obj.isCollided)
+            .filter(obj => !obj.tags.has(GameObjectTag.Collided))
             .find(platform => {
                 const platformCollisionBox = platform.getCollisionBox();
 
                 const collision = this.getObjectCollision(playerCollisionBox, platformCollisionBox, 1, 1, platform);
 
                 if (collision && (collision.h || collision.v)) {
-                    collision.gameObject.isCollided = true;
+                    collision.gameObject.tags.add(GameObjectTag.Collided);
                     return true;
                 }
                 return false;

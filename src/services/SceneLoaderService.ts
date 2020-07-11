@@ -117,6 +117,18 @@ export const appJson: AppJson = {
             speedY: 0,
             viewportX: 32,
             viewportY: 470
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            path: "assets/sprites/kutya.png",
+            name: 'front-layer',
+            isTiling: false,
+            speedX: 0,
+            speedY: 0,
+            viewportX: 32,
+            viewportY: 470
         }
     ]
 }
@@ -183,7 +195,7 @@ export class SceneLoaderService extends GameScript {
                 application.stage.addChild(gameObject.sprite);
             }
 
-            this.registry.stores.game.sprites.push(gameObject);
+            this.registry.stores.game.gameObjects.push(gameObject);
         });
     }
 }

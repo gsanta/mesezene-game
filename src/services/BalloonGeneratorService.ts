@@ -47,7 +47,7 @@ export class BalloonGeneratorService implements IListener, IService {
         const layerBorders = this.registry.services.scene.layers[gameObject.verticalLayer];
         gameObject.setPosition(new Point(gameObject.getPosition().x, layerBorders.toY - 10 - gameObject.getDimensions().height));
 
-        this.registry.stores.game.sprites.push(gameObject);
+        this.registry.stores.game.gameObjects.push(gameObject);
         this.registry.stores.game.balloons.push(gameObject);
         this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
         return gameObject.getPosition().x + gameObject.getDimensions().x;

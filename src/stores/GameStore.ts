@@ -4,10 +4,10 @@ import { Player } from "../model/Player";
 
 
 export class GameStore extends AbstractStore {
-    sprites: GameObject[] = [];
+    gameObjects: GameObject[] = [];
     player: Player;
 
-    platforms: GameObject[] = [];
+    obstacles: GameObject[] = [];
     balloons: GameObject[] = [];
 
 }

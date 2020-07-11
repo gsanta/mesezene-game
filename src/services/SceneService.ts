@@ -44,7 +44,7 @@ export class SceneService extends GameScript {
     }
 
     awake() {
-        const scrollableSprites = this.registry.stores.game.sprites.filter(sprite => sprite !== this.registry.stores.game.player);
+        const scrollableSprites = this.registry.stores.game.gameObjects.filter(sprite => sprite !== this.registry.stores.game.player);
         this.scroller = new ScrollerObject(scrollableSprites);
         this.registry.services.scene.application.ticker.add(delta => {
             this.registry.gameScripts.forEach(script => script.update(delta));
@@ -64,7 +64,7 @@ export class SceneService extends GameScript {
 
     update() {
         const player = this.registry.stores.game.player;
-        const obstacles = this.registry.stores.game.platforms;
+        const obstacles = this.registry.stores.game.obstacles;
         let balloons = this.registry.stores.game.balloons; 
 
         this.scroller.move(new Point(this.gameSpeed, 0));

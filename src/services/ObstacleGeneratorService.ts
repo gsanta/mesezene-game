@@ -50,8 +50,8 @@ export class ObstacleGeneratorService implements IListener, IService {
     // }
 
     private removeSpritesNotOnScreen() {
-        const invalidPlatforms = this.registry.stores.game.platforms.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
-        this.registry.stores.game.platforms = this.registry.stores.game.platforms.filter(platform => invalidPlatforms.indexOf(platform) === -1);
+        const invalidPlatforms = this.registry.stores.game.obstacles.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
+        this.registry.stores.game.obstacles = this.registry.stores.game.obstacles.filter(platform => invalidPlatforms.indexOf(platform) === -1);
         this.registry.services.scene.application.stage.removeChild(...invalidPlatforms.map(platform => platform.sprite));
     }
 
@@ -67,8 +67,8 @@ export class ObstacleGeneratorService implements IListener, IService {
 
         // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
     
-        this.registry.stores.game.sprites.push(gameObject);
-        this.registry.stores.game.platforms.push(gameObject);
+        this.registry.stores.game.gameObjects.push(gameObject);
+        this.registry.stores.game.obstacles.push(gameObject);
         this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
@@ -80,7 +80,7 @@ export class ObstacleGeneratorService implements IListener, IService {
     }
 
     private getRightMostPlatform(): GameObject {
-        const platforms = this.registry.stores.game.platforms;
+        const platforms = this.registry.stores.game.obstacles;
         platforms.sort((a: GameObject, b: GameObject) => a.getPosition().x - b.getPosition().x);
 
         return platforms.length > 0 ? platforms[platforms.length - 1] : undefined;

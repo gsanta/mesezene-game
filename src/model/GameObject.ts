@@ -21,6 +21,11 @@ export enum GameObjectType {
     TilingGameObject = 'TilingGameObject'
 }
 
+export enum GameObjectTag {
+    Collided = 'Collided',
+    CollisionSuspended = 'CollisionSuspended'
+}
+
 export class GameObject {
     type: GameObjectType = GameObjectType.GameObject;
     sprite: Sprite;
@@ -29,7 +34,7 @@ export class GameObject {
     speed: Point;
     name: string;
     scale: Point = new Point(0, 0);
-    isCollided = false;
+    tags: Set<GameObjectTag> = new Set();
 
     verticalLayer: number;
     collisionBox: Rectangle;
@@ -63,7 +68,6 @@ export class GameObject {
 
         return this.getDimensions();
     }
-
 
     // setVelocity(velocity: Point) {
     //     this.velocity = velocity;
