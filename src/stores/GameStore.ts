@@ -3,7 +3,7 @@ import { GameObject } from "../model/GameObject";
 import { Player } from "../model/Player";
 
 
-export class GameStore extends AbstractStore {
+export class GameObjectStore extends AbstractStore {
     gameObjects: GameObject[] = [];
     player: Player;
 

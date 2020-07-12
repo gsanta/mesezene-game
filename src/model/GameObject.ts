@@ -8,7 +8,7 @@ export interface GameObjectJson {
     path?: string;
     frameName?: string;
     name: string;
-    isTiling: boolean;
+    isBackgroundImage: boolean;
     speedX: number;
     speedY: number;
     viewportX: number;
@@ -32,7 +32,7 @@ export class GameObject {
     protected viewportX: number = 0;
     viewportY: number = 0;
     speed: Point;
-    name: string;
+    id: string;
     scale: Point = new Point(0, 0);
     tags: Set<GameObjectTag> = new Set();
 
@@ -62,7 +62,7 @@ export class GameObject {
             return new Rectangle(x, y, width, height);
         }
 
-        if (this.name.indexOf('balloon') !== -1) {
+        if (this.id.indexOf('balloon') !== -1) {
             return new Rectangle(this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height / 4);
         }
 
@@ -118,7 +118,7 @@ export class GameObject {
         clone.viewportY = this.viewportY;
         clone.scale = this.scale ? new Point(this.scale.x, this.scale.y) : new Point(1, 1);
         clone.sprite.scale = this.scale;
-        clone.name = this.name;
+        clone.id = this.id;
 
         if (this.collisionBox) {
             clone.collisionBox =  this.collisionBox;
@@ -130,7 +130,7 @@ export class GameObject {
     fromJson(json: GameObjectJson) {
         this.scale = json.scale ? new Point(json.scale, json.scale) : new Point(1, 1);
         this.sprite.scale = this.scale;
-        this.name = json.frameName || json.name;
+        this.id = json.frameName || json.name;
         this.speed = new Point(json.speedX, json.speedY);
         this.viewportX = json.viewportX;
         this.viewportY = json.viewportY;

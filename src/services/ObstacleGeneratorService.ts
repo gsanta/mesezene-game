@@ -3,7 +3,7 @@ import { GameObject } from "../model/GameObject";
 import { Point } from "pixi.js";
 import { ServiceCapability, IService } from "./IService";
 import { IListener } from "./EventService";
-import { SceneActions } from "./SceneService";
+import { SceneActions } from "../actions/SceneActions";
 
 export class ObstacleGeneratorService implements IListener, IService {
     capabilities = [ServiceCapability.Listen];
@@ -69,7 +69,7 @@ export class ObstacleGeneratorService implements IListener, IService {
     
         this.registry.stores.game.gameObjects.push(gameObject);
         this.registry.stores.game.obstacles.push(gameObject);
-        this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
+        this.registry.stores.layer.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
 

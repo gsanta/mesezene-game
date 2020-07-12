@@ -3,7 +3,7 @@ import { Registry } from "../Registry";
 import { GameObject, GameObjectTag } from "../model/GameObject";
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
-import { SceneActions } from "./SceneService";
+import { SceneActions } from "../actions/SceneActions";
 
 export interface Collision {
     v: number;

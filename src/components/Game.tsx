@@ -33,7 +33,7 @@ export class Game extends React.Component<AppProps> {
         this.props.registry.gameWindow.htmlElement = this.ref.current;
         this.props.registry.gameWindow.resize();
         this.ref.current.focus();
-        this.props.registry.services.loader.load(appJson);
+        this.props.registry.services.scene.setup(appJson);
     }
 
     render() {

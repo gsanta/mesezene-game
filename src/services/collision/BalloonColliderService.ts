@@ -31,7 +31,7 @@ export class BalloonColliderService implements IListener, IService {
         this.registry.stores.game.balloons = balloons.filter(balloon => collidedBalloons.indexOf(balloon) === -1);
 
         collidedBalloons.forEach(balloon => {
-            this.registry.services.scene.layerContainers[balloon.verticalLayer].removeChild(balloon.sprite);
+            this.registry.stores.layer.layerContainers[balloon.verticalLayer].removeChild(balloon.sprite);
         });
     }
 }

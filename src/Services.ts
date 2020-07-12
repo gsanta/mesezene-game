@@ -43,7 +43,8 @@ export class Services {
             this.balloon,
             new BalloonColliderService(this.registry),
             new ObstacleColliderService(this.registry),
-            new ObstacleGeneratorService(this.registry)
+            new ObstacleGeneratorService(this.registry),
+            this.scene
         );
 
         this.setupListeners();

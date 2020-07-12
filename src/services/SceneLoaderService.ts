@@ -4,6 +4,7 @@ import { GameScript } from "../model/GameScript";
 import { MesezeneGlobals } from "../model/MesezeneGlobals";
 import { Player } from "../model/Player";
 import { TilingGameObject } from "../model/TilingGameObject";
+import { SceneActions } from "../actions/SceneActions";
 
 declare const mesezeneGlobals: MesezeneGlobals;
 
@@ -39,7 +40,7 @@ export const appJson: AppJson = {
             scale: 0.5,
             path: "assets/sprites/background.png",
             name: 'background-layer',
-            isTiling: true,
+            isBackgroundImage: true,
             speedX: -0.64,
             speedY: 0,
             viewportX: 0,
@@ -51,7 +52,7 @@ export const appJson: AppJson = {
             scale: 0.5,
             path: "assets/sprites/middle.png",
             name: 'middle-layer',
-            isTiling: true,
+            isBackgroundImage: true,
             speedX: -1.28,
             speedY: 0,
             viewportX: 0,
@@ -63,7 +64,7 @@ export const appJson: AppJson = {
             scale: 0.4,
             frameName: 'platform_01',
             name: 'front-layer',
-            isTiling: false,
+            isBackgroundImage: false,
             speedX: -1.28,
             speedY: 0,
             viewportX: 32,
@@ -75,7 +76,7 @@ export const appJson: AppJson = {
             scale: 0.4,
             frameName: 'platform_02',
             name: 'front-layer',
-            isTiling: false,
+            isBackgroundImage: false,
             speedX: -1.28,
             speedY: 0,
             viewportX: 32,
@@ -87,7 +88,7 @@ export const appJson: AppJson = {
             scale: 0.4,
             frameName: 'platform_03',
             name: 'front-layer',
-            isTiling: false,
+            isBackgroundImage: false,
             speedX: -1.28,
             speedY: 0,
             viewportX: 32,
@@ -99,7 +100,7 @@ export const appJson: AppJson = {
             scale: 0.5,
             frameName: 'balloon_01',
             name: 'front-layer',
-            isTiling: false,
+            isBackgroundImage: false,
             speedX: -1.28,
             speedY: 0,
             viewportX: 32,
@@ -112,7 +113,7 @@ export const appJson: AppJson = {
             scale: 0.5,
             frameName: 'player',
             name: 'front-layer',
-            isTiling: false,
+            isBackgroundImage: false,
             speedX: 0,
             speedY: 0,
             viewportX: 32,
@@ -124,7 +125,7 @@ export const appJson: AppJson = {
             scale: 0.5,
             path: "assets/sprites/kutya.png",
             name: 'front-layer',
-            isTiling: false,
+            isBackgroundImage: false,
             speedX: 0,
             speedY: 0,
             viewportX: 32,
@@ -136,29 +137,25 @@ export const appJson: AppJson = {
 export class SceneLoaderService extends GameScript {
     private loader: Loader;
 
-    load(appJson: AppJson) {
+    load(appJson: AppJson): Promise<void> {
         const application = this.registry.services.scene.application;
-
-        this.registry.gameWindow.htmlElement.appendChild(application.view);
-        this.loader = new Loader();
-
-        this.setupScene(appJson);
-
-        this.loader
-            .add(appJson.sprites.filter(sprite => sprite.path).map(sprite => `${mesezeneGlobals.urlPrefix}/${sprite.path}`))
-            .add(`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`)
-            .load(() => {
-                this.setupSprites(appJson);
-                this.registry.gameScripts.forEach(script => script.awake());
-            })
-            .on('error', (e) => console.log(e));
-    }
-
-    private setupScene(appJson: AppJson) {
-        this.registry.services.scene.sceneDimensions = new Point(appJson.width, appJson.height);
-
-        this.registry.services.scene.gameSpeed = appJson.gameSpeed;
-        this.registry.services.scene.application.renderer.resize(appJson.width, appJson.height);
+        
+        return new Promise((resolve, reject) => {
+            this.registry.gameWindow.htmlElement.appendChild(application.view);
+            this.loader = new Loader();
+    
+            this.loader
+                .add(appJson.sprites.filter(sprite => sprite.path).map(sprite => `${mesezeneGlobals.urlPrefix}/${sprite.path}`))
+                .add(`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`)
+                .load(() => {
+                    this.setupSprites(appJson);
+                    this.registry.services.event.dispatch(SceneActions.SCENE_LOADED);
+                })
+                .on('error', (e) => {
+                    this.registry.stores.messageStore.gameError = e.message;
+                    this.registry.services.event.dispatch(SceneActions.SCENE_LOADING_ERROR);
+                });
+        });
     }
 
     private setupSprites(appJson: AppJson) {
@@ -167,14 +164,14 @@ export class SceneLoaderService extends GameScript {
         appJson.sprites.forEach(spriteJson => {
             let gameObject: GameObject;
 
-            if (spriteJson.isTiling) {
+            if (spriteJson.isBackgroundImage) {
                 const texture = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${spriteJson.path}`].texture;
                 gameObject = new TilingGameObject(new TilingSprite(texture, texture.baseTexture.width, texture.baseTexture.height));
                 gameObject.fromJson(spriteJson);
-                this.registry.services.scene.backgroundContainer.addChild(gameObject.sprite);
+                this.registry.stores.layer.backgroundContainer.addChild(gameObject.sprite);
             } else if (spriteJson.frameName) {
                 const sheet = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`];
-                
+
                 if (spriteJson.frameName.startsWith('platform')) {
                     gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject.fromJson(spriteJson);
@@ -187,8 +184,9 @@ export class SceneLoaderService extends GameScript {
                     this.registry.stores.game.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject = this.registry.stores.game.player;
                     gameObject.fromJson(spriteJson);
-                    this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
+                    this.registry.stores.layer.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
                 }
+                this.registry.stores.template.addTemplate(gameObject);
             } else {
                 gameObject = new GameObject(new Sprite(this.loader.resources[`${mesezeneGlobals.urlPrefix}/${spriteJson.path}`].texture));
                 gameObject.fromJson(spriteJson);

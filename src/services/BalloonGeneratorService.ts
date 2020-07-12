@@ -2,8 +2,8 @@ import { Point } from "pixi.js";
 import { GameObject } from "../model/GameObject";
 import { Registry } from "../Registry";
 import { IListener } from "./EventService";
-import { SceneActions } from "./SceneService";
 import { IService, ServiceCapability } from "./IService";
+import { SceneActions } from "../actions/SceneActions";
 
 export class BalloonGeneratorService implements IListener, IService {
     capabilities = [ServiceCapability.Listen];
@@ -49,7 +49,7 @@ export class BalloonGeneratorService implements IListener, IService {
 
         this.registry.stores.game.gameObjects.push(gameObject);
         this.registry.stores.game.balloons.push(gameObject);
-        this.registry.services.scene.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
+        this.registry.stores.layer.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
 

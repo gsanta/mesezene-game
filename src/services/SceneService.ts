@@ -1,49 +1,64 @@
 import { Application, Container, Point } from "pixi.js";
+import { SceneActions } from "../actions/SceneActions";
 import { GameObject } from "../model/GameObject";
-import { GameScript } from "../model/GameScript";
 import { Player } from "../model/Player";
 import { ScrollerObject } from "../model/ScrollerObject";
 import { Registry } from "../Registry";
-import { CollisionService } from "./CollisionService";
 import { GamepadKey } from "./GamepadService";
+import { AppJson } from "./SceneLoaderService";
+import { IListener } from "./EventService";
+import { IService, ServiceCapability } from "./IService";
 
-export enum SceneActions {
-    SCENE_UPDATE = 'SCENE_UPDATE',
-    SCENE_START = 'SCENE_START'
-}
-
-export class SceneService extends GameScript {
+export class SceneService implements IListener, IService {
+    capabilities = [ServiceCapability.Listen];
     application: Application;
     sceneDimensions: Point;
 
     scroller: ScrollerObject;
     gameSpeed: number;
     
-    backgroundContainer: Container;
-    layerContainers: Container[];
     layers: {fromY: number, toY: number}[];
 
     private vertialBorders: [number, number];
     private horizontalBorders: [number, number];
 
+    private registry: Registry;
+
     constructor(registry: Registry) {
-        super(registry);
+        this.registry = registry;
 
         this.application = new Application({width: 256, height: 256});
         this.application.stage.sortableChildren = true;
 
-        this.layerContainers = [
+        this.registry.stores.layer.layerContainers = [
             new Container(),
             new Container(),
             new Container(),
             new Container()
         ];
-        this.backgroundContainer = new Container();
-        this.application.stage.addChild(this.backgroundContainer);
-        this.layerContainers.forEach(container => this.application.stage.addChild(container));
+        this.registry.stores.layer.backgroundContainer = new Container();
+        this.application.stage.addChild(this.registry.stores.layer.backgroundContainer);
+        this.registry.stores.layer.layerContainers.forEach(container => this.application.stage.addChild(container));
     }
 
-    awake() {
+    setup(appJson: AppJson) {
+        this.registry.services.scene.sceneDimensions = new Point(appJson.width, appJson.height);
+        this.registry.services.scene.gameSpeed = appJson.gameSpeed;
+        this.registry.services.scene.application.renderer.resize(appJson.width, appJson.height);
+
+        this.registry.services.loader.load(appJson);
+
+    }
+
+    listen(action: string) {
+        switch(action) {
+            case SceneActions.SCENE_LOADED:
+                this.start();
+            break;
+        }
+    }
+
+    private start() {
         const scrollableSprites = this.registry.stores.game.gameObjects.filter(sprite => sprite !== this.registry.stores.game.player);
         this.scroller = new ScrollerObject(scrollableSprites);
         this.registry.services.scene.application.ticker.add(delta => {
@@ -89,8 +104,8 @@ export class SceneService extends GameScript {
         const layerIndex = this.layers.findIndex(l => l.fromY <= y && l.toY >= y);
 
         if (layerIndex !== player.verticalLayer) {
-            this.layerContainers[player.verticalLayer].removeChild(player.sprite);
-            this.layerContainers[layerIndex].addChild(player.sprite);
+            this.registry.stores.layer.layerContainers[player.verticalLayer].removeChild(player.sprite);
+            this.registry.stores.layer.layerContainers[layerIndex].addChild(player.sprite);
             player.verticalLayer = layerIndex;
         }
     }

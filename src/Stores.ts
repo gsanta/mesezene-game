@@ -2,15 +2,17 @@ import { ScoreStore } from "./stores/ScoreStore";
 import { AppStore } from "./stores/AppStore";
 import { MessageStore } from "./stores/MessageStore";
 import { Registry } from "./Registry";
-import { GameStore } from "./stores/GameStore";
+import { GameObjectStore } from "./stores/GameStore";
 import { TemplateStore } from "./stores/TemplateStore";
+import { LayerStore } from "./stores/LayerStore";
 
 export class Stores {
     scoreStore: ScoreStore;
     appStore: AppStore;
     messageStore: MessageStore;
-    game: GameStore;
+    game: GameObjectStore;
     template: TemplateStore;
+    layer: LayerStore;
 
     private registry: Registry;
 
@@ -19,7 +21,8 @@ export class Stores {
         this.scoreStore = new ScoreStore(this.registry);
         this.appStore = new AppStore();
         this.messageStore = new MessageStore();
-        this.game = new GameStore(this.registry);
+        this.game = new GameObjectStore(this.registry);
         this.template = new TemplateStore(this.registry);
+        this.layer = new LayerStore(this.registry);
     }
 }
