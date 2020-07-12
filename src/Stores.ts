@@ -2,7 +2,7 @@ import { ScoreStore } from "./stores/ScoreStore";
 import { AppStore } from "./stores/AppStore";
 import { MessageStore } from "./stores/MessageStore";
 import { Registry } from "./Registry";
-import { GameObjectStore } from "./stores/GameStore";
+import { GameObjectStore } from "./stores/GameObjectStore";
 import { TemplateStore } from "./stores/TemplateStore";
 import { LayerStore } from "./stores/LayerStore";
 

@@ -20,18 +20,6 @@ export class ScrollerObject extends GameObject {
     //     this.children.forEach(child => child.setViewportX(viewportX));
     // }
 
-    getViewportX() {
-        return this.viewportX;
-    }
-
-    moveViewportXBy(speed: number) {
-        this.viewportX += speed;
-
-        // this.children.forEach(child => child.moveViewportXBy(speed));
-
-        // this.setViewportX(this.viewportX);
-    }
-
     move(delta: Point) {
         this.children.forEach(child => child.move(child.speed));
     }

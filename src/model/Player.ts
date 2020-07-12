@@ -11,7 +11,7 @@ export class Player extends GameObject {
 
     currentJumpY = 0;
     currentJumpSpeed = 0;
-    verticalLayer = 3;
+    layer = 'game-layer-3';
 
     config: PlayerConfig = {
         jumpSpeed: 8,

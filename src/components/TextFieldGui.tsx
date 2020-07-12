@@ -26,12 +26,10 @@ export function TextFieldGui(props: TextFieldProps) {
   
     return (
         <TextField 
-            InputProps={{ classes, disableUnderline: true }}
+            InputProps={{ classes: {root: classes.root}, disableUnderline: true }}
             InputLabelProps={{
                 classes: {
-                  root: classes.label,
-                  focused: classes.focusedLabel,
-                  error: classes.erroredLabel
+                  root: classes.label
                 }
             }}
             value={props.value}
@@ -75,7 +73,5 @@ const useStylesReddit = makeStyles((theme) => ({
         "&$erroredLabel": {
           color: "orange"
         }
-      },
-      focusedLabel: {},
-      erroredLabel: {},
+      }
 }));

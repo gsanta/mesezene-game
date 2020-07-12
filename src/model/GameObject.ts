@@ -14,6 +14,7 @@ export interface GameObjectJson {
     viewportX: number;
     viewportY: number;
     collisionBox?: string;
+    roles: string[];
 }
 
 export enum GameObjectType {
@@ -26,6 +27,13 @@ export enum GameObjectTag {
     CollisionSuspended = 'CollisionSuspended'
 }
 
+export enum GameObjectRole {
+    Obstacle = 'Obstacle',
+    Coin = 'Coin',
+    Player = 'Player',
+    Template = 'Template'
+}
+
 export class GameObject {
     type: GameObjectType = GameObjectType.GameObject;
     sprite: Sprite;
@@ -35,8 +43,9 @@ export class GameObject {
     id: string;
     scale: Point = new Point(0, 0);
     tags: Set<GameObjectTag> = new Set();
+    roles: Set<GameObjectRole> = new Set();
 
-    verticalLayer: number;
+    layer: string;
     collisionBox: Rectangle;
 
     constructor(sprite: Sprite) {
@@ -119,6 +128,8 @@ export class GameObject {
         clone.scale = this.scale ? new Point(this.scale.x, this.scale.y) : new Point(1, 1);
         clone.sprite.scale = this.scale;
         clone.id = this.id;
+        
+        Array.from(this.roles).forEach(role => clone.roles.add(role));
 
         if (this.collisionBox) {
             clone.collisionBox =  this.collisionBox;
@@ -134,6 +145,7 @@ export class GameObject {
         this.speed = new Point(json.speedX, json.speedY);
         this.viewportX = json.viewportX;
         this.viewportY = json.viewportY;
+        json.roles.forEach(role => this.roles.add(<GameObjectRole> role));
 
         if (this.type === GameObjectType.GameObject) {
             this.sprite.position.x = json.viewportX;

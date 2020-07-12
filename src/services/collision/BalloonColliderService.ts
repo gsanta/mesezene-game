@@ -2,7 +2,7 @@ import { IListener } from "../EventService";
 import { IService, ServiceCapability } from "../IService";
 import { CollisionActions } from "../CollisionService";
 import { Registry } from "../../Registry";
-import { GameObjectTag } from "../../model/GameObject";
+import { GameObjectTag, GameObjectRole } from "../../model/GameObject";
 
 
 export class BalloonColliderService implements IListener, IService {
@@ -23,15 +23,14 @@ export class BalloonColliderService implements IListener, IService {
     }
 
     removeBalloon() {
-        let balloons = this.registry.stores.game.balloons; 
+        let balloons = this.registry.stores.game.getByRole(GameObjectRole.Coin); 
         this.registry.stores.scoreStore.setScores(this.registry.stores.scoreStore.getScores() + 1);
 
         const collidedBalloons = balloons.filter(balloon => balloon.tags.has(GameObjectTag.Collided));
 
-        this.registry.stores.game.balloons = balloons.filter(balloon => collidedBalloons.indexOf(balloon) === -1);
-
-        collidedBalloons.forEach(balloon => {
-            this.registry.stores.layer.layerContainers[balloon.verticalLayer].removeChild(balloon.sprite);
+        collidedBalloons.forEach(coin => {
+            this.registry.stores.game.remove(coin);
+            this.registry.stores.layer.getLayerById(coin.layer).removeChild(coin);
         });
     }
 }

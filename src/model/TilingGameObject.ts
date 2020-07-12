@@ -5,7 +5,7 @@ import { TilingSprite, Point } from "pixi.js";
 export class TilingGameObject extends GameObject {
     type = GameObjectType.TilingGameObject;
     sprite: TilingSprite;
-    verticalLayer = -1;
+    layer = 'background-layer';
 
     setViewportX(newViewportX: number) {
         const distanceTravelled = newViewportX - this.viewportX;

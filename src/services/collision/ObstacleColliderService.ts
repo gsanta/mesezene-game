@@ -2,7 +2,7 @@ import { IListener } from "../EventService";
 import { IService, ServiceCapability } from "../IService";
 import { CollisionActions } from "../CollisionService";
 import { Registry } from "../../Registry";
-import { GameObjectTag } from "../../model/GameObject";
+import { GameObjectTag, GameObjectRole } from "../../model/GameObject";
 
 
 export class ObstacleColliderService implements IListener, IService {
@@ -17,7 +17,7 @@ export class ObstacleColliderService implements IListener, IService {
     listen(action: string) {
         switch(action) {
             case CollisionActions.PLAYER_COLLIDED:
-                const collidedObj = this.registry.stores.game.obstacles.find(obstacle => obstacle.tags.has(GameObjectTag.Collided)); 
+                const collidedObj = this.registry.stores.game.getByRole(GameObjectRole.Obstacle).find(obstacle => obstacle.tags.has(GameObjectTag.Collided)); 
                 if (collidedObj && !collidedObj.tags.has(GameObjectTag.CollisionSuspended)) {
                     collidedObj.tags.add(GameObjectTag.CollisionSuspended);
                     this.registry.stores.scoreStore.setLives(this.registry.stores.scoreStore.getLives() - 1);

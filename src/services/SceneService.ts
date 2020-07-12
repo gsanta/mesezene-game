@@ -1,6 +1,6 @@
 import { Application, Container, Point } from "pixi.js";
 import { SceneActions } from "../actions/SceneActions";
-import { GameObject } from "../model/GameObject";
+import { GameObject, GameObjectRole } from "../model/GameObject";
 import { Player } from "../model/Player";
 import { ScrollerObject } from "../model/ScrollerObject";
 import { Registry } from "../Registry";
@@ -8,16 +8,15 @@ import { GamepadKey } from "./GamepadService";
 import { AppJson } from "./SceneLoaderService";
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
+import { Layer } from "../stores/LayerStore";
 
 export class SceneService implements IListener, IService {
     capabilities = [ServiceCapability.Listen];
     application: Application;
     sceneDimensions: Point;
 
-    scroller: ScrollerObject;
     gameSpeed: number;
-    
-    layers: {fromY: number, toY: number}[];
+    gameLayerCount = 4;
 
     private vertialBorders: [number, number];
     private horizontalBorders: [number, number];
@@ -30,15 +29,11 @@ export class SceneService implements IListener, IService {
         this.application = new Application({width: 256, height: 256});
         this.application.stage.sortableChildren = true;
 
-        this.registry.stores.layer.layerContainers = [
-            new Container(),
-            new Container(),
-            new Container(),
-            new Container()
-        ];
-        this.registry.stores.layer.backgroundContainer = new Container();
-        this.application.stage.addChild(this.registry.stores.layer.backgroundContainer);
-        this.registry.stores.layer.layerContainers.forEach(container => this.application.stage.addChild(container));
+        this.registry.stores.layer.addLayer(new Layer('background-layer', [0, 0.73], this.application));
+        this.registry.stores.layer.addLayer(new Layer(`game-layer-1`, [0.73, 0.78], this.application))
+        this.registry.stores.layer.addLayer(new Layer(`game-layer-2`, [0.78, 0.83], this.application))
+        this.registry.stores.layer.addLayer(new Layer(`game-layer-3`, [0.83, 0.88], this.application))
+        this.registry.stores.layer.addLayer(new Layer(`game-layer-4`, [0.88, 0.93], this.application))
     }
 
     setup(appJson: AppJson) {
@@ -59,33 +54,27 @@ export class SceneService implements IListener, IService {
     }
 
     private start() {
-        const scrollableSprites = this.registry.stores.game.gameObjects.filter(sprite => sprite !== this.registry.stores.game.player);
-        this.scroller = new ScrollerObject(scrollableSprites);
         this.registry.services.scene.application.ticker.add(delta => {
-            this.registry.gameScripts.forEach(script => script.update(delta));
+            this.update();
         });
 
         this.vertialBorders = [405, 510];
         this.horizontalBorders = [0, this.registry.services.scene.sceneDimensions.x];
-        this.layers = [
-            {fromY: 510, toY: 545},
-            {fromY: 545, toY: 580},
-            {fromY: 580, toY: 615},
-            {fromY: 615, toY: 650}
-        ];
 
         this.registry.services.event.dispatch(SceneActions.SCENE_START);
     }
 
     update() {
         const player = this.registry.stores.game.player;
-        const obstacles = this.registry.stores.game.obstacles;
-        let balloons = this.registry.stores.game.balloons; 
+        const obstacles = this.registry.stores.game.getByRole(GameObjectRole.Obstacle);
+        const coins = this.registry.stores.game.getByRole(GameObjectRole.Coin);
 
-        this.scroller.move(new Point(this.gameSpeed, 0));
+        const scrollableSprites = this.registry.stores.game.getAll().filter(gameObject => !gameObject.roles.has(GameObjectRole.Player));
+        const deltaMove = new Point(-this.gameSpeed, 0);
+        //scrollableSprites.forEach(gameObject => gameObject.move(deltaMove));
 
-        obstacles.forEach(platform => platform.move(platform.speed))
-        balloons.forEach(platform => platform.move(platform.speed))
+        //obstacles.forEach(platform => platform.move(platform.speed))
+        //coins.forEach(platform => platform.move(platform.speed))
         this.moveWithConstrains(player);
 
         if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
@@ -100,13 +89,14 @@ export class SceneService implements IListener, IService {
 
     private updateVerticalLayer(player: Player) {
         const y = player.sprite.y + player.currentJumpY + player.sprite.height;
+        const normalizedY = y / this.sceneDimensions.y;
 
-        const layerIndex = this.layers.findIndex(l => l.fromY <= y && l.toY >= y);
+        const newLayer = this.registry.stores.layer.layers.find(l => l.range[0] <= normalizedY && l.range[1] >= normalizedY);
 
-        if (layerIndex !== player.verticalLayer) {
-            this.registry.stores.layer.layerContainers[player.verticalLayer].removeChild(player.sprite);
-            this.registry.stores.layer.layerContainers[layerIndex].addChild(player.sprite);
-            player.verticalLayer = layerIndex;
+        if (newLayer.id !== player.layer) {
+            this.registry.stores.layer.getLayerById(player.layer).removeChild(player);
+            this.registry.stores.layer.getLayerById(newLayer.id).addChild(player);
+            player.layer = newLayer.id;
         }
     }
 

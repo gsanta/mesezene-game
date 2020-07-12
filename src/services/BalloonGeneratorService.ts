@@ -1,5 +1,5 @@
 import { Point } from "pixi.js";
-import { GameObject } from "../model/GameObject";
+import { GameObject, GameObjectRole } from "../model/GameObject";
 import { Registry } from "../Registry";
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
@@ -32,8 +32,12 @@ export class BalloonGeneratorService implements IListener, IService {
     }
 
     removeSpritesNotOnScreen() {
-        const invalidBalloons = this.registry.stores.game.balloons.filter(balloon => balloon.getPosition().x + balloon.getDimensions().width < 0);
-        this.registry.stores.game.balloons = this.registry.stores.game.balloons.filter(balloon => invalidBalloons.indexOf(balloon) === -1);
+        const invalidBalloons = this.registry.stores.game.getByRole(GameObjectRole.Coin).filter(balloon => balloon.getPosition().x + balloon.getDimensions().width < 0);
+        invalidBalloons.forEach(removable => {
+            this.registry.stores.game.remove(removable);
+            this.registry.stores.layer.getLayerById(removable.layer).removeChild(removable);
+        });
+
         this.registry.services.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.sprite));
     }
 
@@ -42,14 +46,14 @@ export class BalloonGeneratorService implements IListener, IService {
         const gameObject = balloonRegistry[Math.floor(balloonRegistry.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
         gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
-        gameObject.verticalLayer = Math.floor(Math.random() * 3);
+        const layerIndex = Math.floor(Math.random() * 3) + 1;
+        gameObject.layer = `game-layer-${layerIndex}`; 
 
-        const layerBorders = this.registry.services.scene.layers[gameObject.verticalLayer];
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layerBorders.toY - 10 - gameObject.getDimensions().height));
+        const layer = this.registry.stores.layer.getLayerById(gameObject.layer);
+        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] - 10 - gameObject.getDimensions().height));
 
-        this.registry.stores.game.gameObjects.push(gameObject);
-        this.registry.stores.game.balloons.push(gameObject);
-        this.registry.stores.layer.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
+        this.registry.stores.game.add(gameObject);
+        layer.addChild(gameObject);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
 
@@ -60,7 +64,7 @@ export class BalloonGeneratorService implements IListener, IService {
     }
 
     private getRightMostBalloon(): GameObject {
-        const balloons = this.registry.stores.game.balloons;
+        const balloons = this.registry.stores.game.getByRole(GameObjectRole.Coin);
         balloons.sort((a: GameObject, b: GameObject) => a.getPosition().x - b.getPosition().x);
 
         return balloons.length > 0 ? balloons[balloons.length - 1] : undefined;

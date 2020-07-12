@@ -1,5 +1,5 @@
 import { Loader, Point, Sprite, TilingSprite } from "pixi.js";
-import { GameObject, GameObjectJson } from "../model/GameObject";
+import { GameObject, GameObjectJson, GameObjectRole } from "../model/GameObject";
 import { GameScript } from "../model/GameScript";
 import { MesezeneGlobals } from "../model/MesezeneGlobals";
 import { Player } from "../model/Player";
@@ -44,7 +44,8 @@ export const appJson: AppJson = {
             speedX: -0.64,
             speedY: 0,
             viewportX: 0,
-            viewportY: 0
+            viewportY: 0,
+            roles: []
         },
         {
             x: 0,
@@ -56,7 +57,8 @@ export const appJson: AppJson = {
             speedX: -1.28,
             speedY: 0,
             viewportX: 0,
-            viewportY: 0
+            viewportY: 0,
+            roles: []
         },
         {
             x: 0,
@@ -68,7 +70,8 @@ export const appJson: AppJson = {
             speedX: -1.28,
             speedY: 0,
             viewportX: 32,
-            viewportY: 470
+            viewportY: 470,
+            roles: [GameObjectRole.Obstacle, GameObjectRole.Template]
         },
         {
             x: 0,
@@ -80,7 +83,8 @@ export const appJson: AppJson = {
             speedX: -1.28,
             speedY: 0,
             viewportX: 32,
-            viewportY: 470
+            viewportY: 470,
+            roles: [GameObjectRole.Obstacle, GameObjectRole.Template]
         },
         {
             x: 0,
@@ -92,7 +96,8 @@ export const appJson: AppJson = {
             speedX: -1.28,
             speedY: 0,
             viewportX: 32,
-            viewportY: 470
+            viewportY: 470,
+            roles: [GameObjectRole.Obstacle, GameObjectRole.Template]
         },
         {
             x: 0,
@@ -105,6 +110,7 @@ export const appJson: AppJson = {
             speedY: 0,
             viewportX: 32,
             viewportY: 470,
+            roles: [GameObjectRole.Coin, GameObjectRole.Template]
             // collisionBox: "0 0 67 80"
         },
         {
@@ -117,7 +123,8 @@ export const appJson: AppJson = {
             speedX: 0,
             speedY: 0,
             viewportX: 32,
-            viewportY: 470
+            viewportY: 470,
+            roles: [GameObjectRole.Player]
         },
         {
             x: 0,
@@ -129,7 +136,8 @@ export const appJson: AppJson = {
             speedX: 0,
             speedY: 0,
             viewportX: 32,
-            viewportY: 470
+            viewportY: 470,
+            roles: []
         }
     ]
 }
@@ -168,7 +176,7 @@ export class SceneLoaderService extends GameScript {
                 const texture = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${spriteJson.path}`].texture;
                 gameObject = new TilingGameObject(new TilingSprite(texture, texture.baseTexture.width, texture.baseTexture.height));
                 gameObject.fromJson(spriteJson);
-                this.registry.stores.layer.backgroundContainer.addChild(gameObject.sprite);
+                this.registry.stores.layer.getLayerById(gameObject.layer).addChild(gameObject);
             } else if (spriteJson.frameName) {
                 const sheet = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`];
 
@@ -184,7 +192,7 @@ export class SceneLoaderService extends GameScript {
                     this.registry.stores.game.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));
                     gameObject = this.registry.stores.game.player;
                     gameObject.fromJson(spriteJson);
-                    this.registry.stores.layer.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
+                    this.registry.stores.layer.getLayerById(gameObject.layer).addChild(gameObject);
                 }
                 this.registry.stores.template.addTemplate(gameObject);
             } else {
@@ -193,7 +201,11 @@ export class SceneLoaderService extends GameScript {
                 application.stage.addChild(gameObject.sprite);
             }
 
-            this.registry.stores.game.gameObjects.push(gameObject);
+            if (gameObject.roles.has(GameObjectRole.Template)) {
+                this.registry.stores.template.addTemplate(gameObject);
+            } else {
+                this.registry.stores.game.add(gameObject);
+            }
         });
     }
 }

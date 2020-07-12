@@ -1,5 +1,5 @@
 import { Registry } from "../Registry";
-import { GameObject } from "../model/GameObject";
+import { GameObject, GameObjectRole } from "../model/GameObject";
 import { Point } from "pixi.js";
 import { ServiceCapability, IService } from "./IService";
 import { IListener } from "./EventService";
@@ -50,9 +50,12 @@ export class ObstacleGeneratorService implements IListener, IService {
     // }
 
     private removeSpritesNotOnScreen() {
-        const invalidPlatforms = this.registry.stores.game.obstacles.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
-        this.registry.stores.game.obstacles = this.registry.stores.game.obstacles.filter(platform => invalidPlatforms.indexOf(platform) === -1);
-        this.registry.services.scene.application.stage.removeChild(...invalidPlatforms.map(platform => platform.sprite));
+        const obstacles = this.registry.stores.game.getByRole(GameObjectRole.Obstacle);
+        const invalidPlatforms = obstacles.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
+        obstacles.forEach(obstacle => {
+            this.registry.stores.game.remove(obstacle);
+            this.registry.stores.layer.getLayerById(obstacle.layer).removeChild(obstacle);
+        });
     }
 
     private generateRandomPlatform(xRange: [number, number]): number {
@@ -60,16 +63,16 @@ export class ObstacleGeneratorService implements IListener, IService {
         const gameObject = platformRegistry[Math.floor(platformRegistry.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
         gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
-        gameObject.verticalLayer = Math.floor(Math.random() * 3);
+        const layerIndex = Math.floor(Math.random() * 3) + 1;
+        gameObject.layer = `game-layer-${layerIndex}`
 
-        const layerBorders = this.registry.services.scene.layers[gameObject.verticalLayer];
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layerBorders.toY - 10 - gameObject.getDimensions().height));
+        const layer = this.registry.stores.layer.getLayerById(gameObject.layer);
+        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] - 10 - gameObject.getDimensions().height));
 
         // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
-    
-        this.registry.stores.game.gameObjects.push(gameObject);
-        this.registry.stores.game.obstacles.push(gameObject);
-        this.registry.stores.layer.layerContainers[gameObject.verticalLayer].addChild(gameObject.sprite);
+
+        this.registry.stores.game.add(gameObject);
+        layer.addChild(gameObject);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
 
@@ -80,7 +83,7 @@ export class ObstacleGeneratorService implements IListener, IService {
     }
 
     private getRightMostPlatform(): GameObject {
-        const platforms = this.registry.stores.game.obstacles;
+        const platforms = this.registry.stores.game.getByRole(GameObjectRole.Obstacle);
         platforms.sort((a: GameObject, b: GameObject) => a.getPosition().x - b.getPosition().x);
 
         return platforms.length > 0 ? platforms[platforms.length - 1] : undefined;
