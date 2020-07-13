@@ -1,25 +1,15 @@
-import { IListener } from "../EventService";
-import { IService, ServiceCapability } from "../IService";
-import { CollisionActions } from "../CollisionService";
-import { Registry } from "../../Registry";
-import { GameObjectTag, GameObjectRole } from "../../model/SpriteObject";
+import { GameObjectRole, GameObjectTag } from "../../../model/SpriteObject";
+import { Registry } from "../../../Registry";
 
-
-export class BalloonColliderService implements IListener, IService {
-    capabilities = [ServiceCapability.Listen];
-
+export class CoinCollider {
     private registry: Registry;
 
     constructor(registry: Registry) {
         this.registry = registry;
     }
-
-    listen(action: string) {
-        switch(action) {
-            case CollisionActions.PLAYER_COLLIDED:
-                this.removeBalloon();
-            break;
-        }
+    
+    checkCollisions() {
+        this.removeBalloon();
     }
 
     removeBalloon() {

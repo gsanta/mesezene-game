@@ -1,32 +1,26 @@
 import { Point } from "pixi.js";
-import { SpriteObject, GameObjectRole } from "../model/SpriteObject";
-import { Registry } from "../Registry";
-import { IListener } from "./EventService";
-import { IService, ServiceCapability } from "./IService";
-import { SceneActions } from "../actions/SceneActions";
+import { GameObjectRole, SpriteObject } from "../../../model/SpriteObject";
+import { Registry } from "../../../Registry";
+import { GameScene } from "../GameScene";
 
-export class BalloonGeneratorService implements IListener, IService {
-    capabilities = [ServiceCapability.Listen];
+export class CoinGenerator {
     private registry: Registry;
+    private scene: GameScene;
 
-    constructor(registry: Registry) {
+    constructor(scene: GameScene, registry: Registry) {
+        this.scene = scene;
         this.registry = registry;
     }
-    
-    listen(action: string) {
-        switch(action) {
-            case SceneActions.SCENE_START:
-            case SceneActions.SCENE_UPDATE:
-                this.removeSpritesNotOnScreen();
-                this.generateNewSpritesIfNeeded();
-            break;
-        }
+
+    update() {
+        this.removeSpritesNotOnScreen();
+        this.generateNewSpritesIfNeeded();
     }
 
     generateNewSpritesIfNeeded() {
         let maxX = this.getMaxX(); 
 
-        while (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
+        while (maxX < this.scene.sceneDimensions.x - 320) {
             maxX = this.generateRandomObstacle([maxX, maxX + 200]);
         }
     }
@@ -38,7 +32,7 @@ export class BalloonGeneratorService implements IListener, IService {
             this.registry.stores.layer.getLayerById(removable.layer).removeChild(removable);
         });
 
-        this.registry.services.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.sprite));
+        this.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.sprite));
     }
 
     private generateRandomObstacle(xRange: [number, number]): number {
@@ -50,7 +44,7 @@ export class BalloonGeneratorService implements IListener, IService {
         gameObject.layer = `game-layer-${layerIndex}`; 
 
         const layer = this.registry.stores.layer.getLayerById(gameObject.layer);
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.registry.services.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
+        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
 
         this.registry.stores.game.add(gameObject);
         layer.addChild(gameObject);
