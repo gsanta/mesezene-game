@@ -77,15 +77,11 @@ export class SceneService extends AbstractScene implements IListener, IService {
 
     update() {
         const player = <PlayerSprite> this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
-        const obstacles = this.registry.stores.game.getByRole(GameObjectRole.Obstacle);
-        const coins = this.registry.stores.game.getByRole(GameObjectRole.Coin);
 
         const scrollableSprites = this.registry.stores.game.getAll().filter(gameObject => !gameObject.roles.has(GameObjectRole.Player));
         const deltaMove = new Point(-this.gameSpeed, 0);
-        //scrollableSprites.forEach(gameObject => gameObject.move(deltaMove));
+        scrollableSprites.forEach(gameObject => gameObject.move(deltaMove));
 
-        //obstacles.forEach(platform => platform.move(platform.speed))
-        //coins.forEach(platform => platform.move(platform.speed))
         this.moveWithConstrains(player);
 
         if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {

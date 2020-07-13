@@ -52,7 +52,7 @@ export class ObstacleGeneratorService implements IListener, IService {
     private removeSpritesNotOnScreen() {
         const obstacles = this.registry.stores.game.getByRole(GameObjectRole.Obstacle);
         const invalidPlatforms = obstacles.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
-        obstacles.forEach(obstacle => {
+        invalidPlatforms.forEach(obstacle => {
             this.registry.stores.game.remove(obstacle);
             this.registry.stores.layer.getLayerById(obstacle.layer).removeChild(obstacle);
         });
