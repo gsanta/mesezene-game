@@ -2,7 +2,7 @@ import { KeyboardService } from "./services/KeyboardService";
 import { GamepadService } from "./services/GamepadService";
 import { Registry } from "./Registry";
 import { SceneService } from "./services/SceneService";
-import { SceneLoaderService } from "./services/SceneLoaderService";
+import { SceneLoader } from "./scenes/SceneLoader";
 import { BalloonGeneratorService } from "./services/BalloonGeneratorService";
 import { UserService } from "./services/UserService";
 import { RenderService } from "./services/RenderService";
@@ -19,7 +19,6 @@ export class Services {
     keyboard: KeyboardService;
     gamepad: GamepadService;
     scene: SceneService;
-    loader: SceneLoaderService;
     balloon: BalloonGeneratorService;
     loginService: UserService;
     renderService: RenderService;
@@ -33,7 +32,6 @@ export class Services {
         this.keyboard = new KeyboardService(registry);
         this.gamepad = new GamepadService(registry);
         this.scene = new SceneService(registry);
-        this.loader = new SceneLoaderService(registry);
         this.balloon = new BalloonGeneratorService(registry);
         this.loginService = new UserService(registry);
         this.renderService = new RenderService();

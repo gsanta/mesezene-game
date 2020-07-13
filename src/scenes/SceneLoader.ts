@@ -1,10 +1,12 @@
 import { Loader, Point, Sprite, TilingSprite } from "pixi.js";
-import { GameObject, GameObjectJson, GameObjectRole } from "../model/GameObject";
+import { SpriteObject, SpriteObjectJson, GameObjectRole } from "../model/SpriteObject";
 import { GameScript } from "../model/GameScript";
 import { MesezeneGlobals } from "../model/MesezeneGlobals";
-import { Player } from "../model/Player";
+import { PlayerSprite } from "./game_scene/PlayerSprite";
 import { TilingGameObject } from "../model/TilingGameObject";
 import { SceneActions } from "../actions/SceneActions";
+import { AbstractScene } from "./AbstractScene";
+import { Registry } from "../Registry";
 
 declare const mesezeneGlobals: MesezeneGlobals;
 
@@ -13,7 +15,7 @@ export interface AppJson {
     height: number;
     gameSpeed: number;
     spriteSheet: string;
-    sprites: GameObjectJson[];
+    sprites: SpriteObjectJson[];
 }
 
 export const appJson: AppJson = {
@@ -45,7 +47,7 @@ export const appJson: AppJson = {
             speedY: 0,
             viewportX: 0,
             viewportY: 0,
-            roles: []
+            roles: [GameObjectRole.Background]
         },
         {
             x: 0,
@@ -58,7 +60,7 @@ export const appJson: AppJson = {
             speedY: 0,
             viewportX: 0,
             viewportY: 0,
-            roles: []
+            roles: [GameObjectRole.Background]
         },
         {
             x: 0,
@@ -126,83 +128,68 @@ export const appJson: AppJson = {
             viewportY: 470,
             roles: [GameObjectRole.Player]
         },
-        {
-            x: 0,
-            y: 0,
-            scale: 0.5,
-            path: "assets/sprites/kutya.png",
-            name: 'front-layer',
-            isBackgroundImage: false,
-            speedX: 0,
-            speedY: 0,
-            viewportX: 32,
-            viewportY: 470,
-            roles: []
-        }
+        // {
+        //     x: 0,
+        //     y: 0,
+        //     scale: 0.5,
+        //     path: "assets/sprites/kutya.png",
+        //     name: 'front-layer',
+        //     isBackgroundImage: false,
+        //     speedX: 0,
+        //     speedY: 0,
+        //     viewportX: 32,
+        //     viewportY: 470,
+        //     roles: []
+        // }
     ]
 }
 
-export class SceneLoaderService extends GameScript {
+export class SceneLoader {
     private loader: Loader;
+    private scene: AbstractScene;
+    private registry: Registry;
 
-    load(appJson: AppJson): Promise<void> {
-        const application = this.registry.services.scene.application;
+    constructor(scene: AbstractScene, registry: Registry) {
+        this.scene = scene;
+        this.registry = registry;
+    }
+
+    load(appJson: AppJson): void {
+        const application = this.scene.application;
         
-        return new Promise((resolve, reject) => {
-            this.registry.gameWindow.htmlElement.appendChild(application.view);
-            this.loader = new Loader();
-    
-            this.loader
-                .add(appJson.sprites.filter(sprite => sprite.path).map(sprite => `${mesezeneGlobals.urlPrefix}/${sprite.path}`))
-                .add(`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`)
-                .load(() => {
-                    this.setupSprites(appJson);
-                    this.registry.services.event.dispatch(SceneActions.SCENE_LOADED);
-                })
-                .on('error', (e) => {
-                    this.registry.stores.messageStore.gameError = e.message;
-                    this.registry.services.event.dispatch(SceneActions.SCENE_LOADING_ERROR);
-                });
-        });
+        this.registry.gameWindow.htmlElement.appendChild(application.view);
+        this.loader = new Loader();
+
+        this.loader
+            .add(appJson.sprites.filter(sprite => sprite.path).map(sprite => `${mesezeneGlobals.urlPrefix}/${sprite.path}`))
+            .add(`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`)
+            .load(() => {
+                this.setupSprites(appJson);
+                this.registry.services.event.dispatch(SceneActions.SCENE_LOADED);
+            })
+            .on('error', (e) => {
+                this.registry.stores.messageStore.gameError = e.message;
+                this.registry.services.event.dispatch(SceneActions.SCENE_LOADING_ERROR);
+            });
     }
 
     private setupSprites(appJson: AppJson) {
-        const application = this.registry.services.scene.application;
-
         appJson.sprites.forEach(spriteJson => {
-            let gameObject: GameObject;
+            let gameObject: SpriteObject;
+            let sprite: Sprite;
 
-            if (spriteJson.isBackgroundImage) {
+            if (spriteJson.roles.indexOf(GameObjectRole.Background) !== -1) {
                 const texture = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${spriteJson.path}`].texture;
-                gameObject = new TilingGameObject(new TilingSprite(texture, texture.baseTexture.width, texture.baseTexture.height));
-                gameObject.fromJson(spriteJson);
-                this.registry.stores.layer.getLayerById(gameObject.layer).addChild(gameObject);
+                sprite = new TilingSprite(texture, texture.baseTexture.width, texture.baseTexture.height);
             } else if (spriteJson.frameName) {
                 const sheet = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`];
-
-                if (spriteJson.frameName.startsWith('platform')) {
-                    gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
-                    gameObject.fromJson(spriteJson);
-                    this.registry.stores.template.platformRegistry.push(gameObject);    
-                } else if (spriteJson.frameName.startsWith('balloon')) {
-                    gameObject = new GameObject(new Sprite(sheet.textures[spriteJson.frameName]));
-                    gameObject.fromJson(spriteJson);
-                    this.registry.stores.template.balloonRegistry.push(gameObject);    
-                } else if (spriteJson.frameName.startsWith('player')) {
-                    this.registry.stores.game.player = new Player(new Sprite(sheet.textures[spriteJson.frameName]));
-                    gameObject = this.registry.stores.game.player;
-                    gameObject.fromJson(spriteJson);
-                    this.registry.stores.layer.getLayerById(gameObject.layer).addChild(gameObject);
-                }
-                this.registry.stores.template.addTemplate(gameObject);
-            } else {
-                gameObject = new GameObject(new Sprite(this.loader.resources[`${mesezeneGlobals.urlPrefix}/${spriteJson.path}`].texture));
-                gameObject.fromJson(spriteJson);
-                application.stage.addChild(gameObject.sprite);
+                sprite = new Sprite(sheet.textures[spriteJson.frameName]);
             }
 
+            gameObject = this.scene.factory.getInstance(spriteJson, sprite);
+
             if (gameObject.roles.has(GameObjectRole.Template)) {
-                this.registry.stores.template.addTemplate(gameObject);
+                this.registry.stores.template.add(gameObject);
             } else {
                 this.registry.stores.game.add(gameObject);
             }

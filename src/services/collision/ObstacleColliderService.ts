@@ -2,7 +2,7 @@ import { IListener } from "../EventService";
 import { IService, ServiceCapability } from "../IService";
 import { CollisionActions } from "../CollisionService";
 import { Registry } from "../../Registry";
-import { GameObjectTag, GameObjectRole } from "../../model/GameObject";
+import { GameObjectTag, GameObjectRole } from "../../model/SpriteObject";
 
 
 export class ObstacleColliderService implements IListener, IService {

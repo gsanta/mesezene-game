@@ -1,16 +1,16 @@
-import { GameObject } from "./GameObject";
+import { SpriteObject } from "./SpriteObject";
 import { Point } from "pixi.js";
 
 
-export class ScrollerObject extends GameObject {
-    private children: GameObject[];
+export class ScrollerObject extends SpriteObject {
+    private children: SpriteObject[];
 
-    constructor(children: GameObject[]) {
+    constructor(children: SpriteObject[]) {
         super(null);
         this.children = children;
     }
 
-    addChild(gameObject: GameObject) {
+    addChild(gameObject: SpriteObject) {
         this.children.push(gameObject);
     }
 

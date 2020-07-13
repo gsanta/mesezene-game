@@ -1,7 +1,7 @@
 import { Point, Sprite, TilingSprite } from "pixi.js";
 import { Rectangle } from "./primitives/Rectangle";
 
-export interface GameObjectJson {
+export interface SpriteObjectJson {
     x: number;
     y: number;
     scale: number;
@@ -31,10 +31,11 @@ export enum GameObjectRole {
     Obstacle = 'Obstacle',
     Coin = 'Coin',
     Player = 'Player',
-    Template = 'Template'
+    Template = 'Template',
+    Background = 'Background'
 }
 
-export class GameObject {
+export class SpriteObject {
     type: GameObjectType = GameObjectType.GameObject;
     sprite: Sprite;
     protected viewportX: number = 0;
@@ -78,27 +79,6 @@ export class GameObject {
         return this.getDimensions();
     }
 
-    // setVelocity(velocity: Point) {
-    //     this.velocity = velocity;
-    // }
-
-    // moveWithVelocity() {
-
-    //     this.sprite.x += this.velocity.x;
-    //     this.sprite.y += this.velocity.y;
-    // }
-
-    // move() {
-    //     (this.sprite as TilingSprite).tilePosition.x += this.velocity.x;
-    //     (this.sprite as TilingSprite).tilePosition.y += this.velocity.y;
-    // }
-
-    // setViewportX(newViewportX: number) {
-    //     const distanceTravelled = newViewportX - this.viewportX;
-    //     this.viewportX = newViewportX;
-    //     this.sprite.position.x -= (distanceTravelled * this.speed.x);
-    // }
-
     getViewportX() {
         return this.viewportX;
     }
@@ -117,8 +97,8 @@ export class GameObject {
         }
     }
 
-    clone(): GameObject {
-        const clone = new GameObject(new Sprite(this.sprite.texture));
+    clone(): SpriteObject {
+        const clone = new SpriteObject(new Sprite(this.sprite.texture));
         clone.speed = this.speed;
 
         clone.sprite.x = this.sprite.x;
@@ -138,7 +118,7 @@ export class GameObject {
         return clone;
     }
 
-    fromJson(json: GameObjectJson) {
+    fromJson(json: SpriteObjectJson) {
         this.scale = json.scale ? new Point(json.scale, json.scale) : new Point(1, 1);
         this.sprite.scale = this.scale;
         this.id = json.frameName || json.name;

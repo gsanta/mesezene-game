@@ -1,6 +1,6 @@
 import { CollisionRect, willCollideH, willCollideY, willCollideDiag } from "./collisions";
 import { Registry } from "../Registry";
-import { GameObject, GameObjectTag, GameObjectRole } from "../model/GameObject";
+import { SpriteObject, GameObjectTag, GameObjectRole } from "../model/SpriteObject";
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
 import { SceneActions } from "../actions/SceneActions";
@@ -8,7 +8,7 @@ import { SceneActions } from "../actions/SceneActions";
 export interface Collision {
     v: number;
     h: number;
-    gameObject: GameObject;
+    gameObject: SpriteObject;
 }
 
 export interface CharacterCollisions {
@@ -51,11 +51,8 @@ export class CollisionService implements IListener, IService {
     }
 
     calculateCollision(): void {
-        const player = this.registry.stores.game.player;
-
+        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
         const playerCollisionBox = player.getCollisionBox();
-
-
 
         const collidableObjs = [...this.registry.stores.game.getByRole(GameObjectRole.Coin), ...this.registry.stores.game.getByRole(GameObjectRole.Obstacle)];
 
@@ -79,7 +76,7 @@ export class CollisionService implements IListener, IService {
         }
     }
 
-    private getObjectCollision(box1: CollisionRect, box2: CollisionRect, predictedVx: number, predictedVy: number, gameObject: GameObject): Collision {
+    private getObjectCollision(box1: CollisionRect, box2: CollisionRect, predictedVx: number, predictedVy: number, gameObject: SpriteObject): Collision {
         const horizontal = willCollideH(box1, box2, predictedVx);
         const vertical = willCollideY(box1, box2, predictedVy);
         const diag = willCollideDiag(box1, box2, predictedVx, predictedVy);

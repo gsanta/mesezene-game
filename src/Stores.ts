@@ -11,7 +11,7 @@ export class Stores {
     appStore: AppStore;
     messageStore: MessageStore;
     game: GameObjectStore;
-    template: TemplateStore;
+    template: GameObjectStore;
     layer: LayerStore;
 
     private registry: Registry;
@@ -22,7 +22,7 @@ export class Stores {
         this.appStore = new AppStore();
         this.messageStore = new MessageStore();
         this.game = new GameObjectStore(this.registry);
-        this.template = new TemplateStore(this.registry);
+        this.template = new GameObjectStore(this.registry);
         this.layer = new LayerStore(this.registry);
     }
 }

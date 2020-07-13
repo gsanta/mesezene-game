@@ -1,7 +1,7 @@
+import { Rectangle } from "pixi.js";
 import { GameScript } from "../model/GameScript";
 import { Registry } from "../Registry";
-import { Point, Rectangle } from "pixi.js";
-import { GameObject } from "../model/GameObject";
+import { GameObjectRole } from "../model/SpriteObject";
 
 export enum GamepadKey {
     Left = 'Left',
@@ -31,7 +31,7 @@ export class GamepadService extends GameScript {
     }
 
     left(release: boolean) {
-        const player = this.registry.stores.game.player;
+        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Left);
             player.speed.x = -2;
@@ -45,7 +45,7 @@ export class GamepadService extends GameScript {
     }
 
     up(release: boolean) {
-        const player = this.registry.stores.game.player;
+        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Up);
             player.speed.y = -2;
@@ -59,7 +59,7 @@ export class GamepadService extends GameScript {
     }
 
     right(release: boolean) {
-        const player = this.registry.stores.game.player;
+        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Right);
             player.speed.x = 2;
@@ -73,7 +73,7 @@ export class GamepadService extends GameScript {
     }
 
     down(release: boolean) {
-        const player = this.registry.stores.game.player;
+        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Down);
             player.speed.y = 2;

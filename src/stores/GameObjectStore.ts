@@ -1,21 +1,20 @@
 import { AbstractStore } from "./AbstractStore";
-import { GameObject, GameObjectRole } from "../model/GameObject";
-import { Player } from "../model/Player";
+import { SpriteObject, GameObjectRole } from "../model/SpriteObject";
+import { PlayerSprite } from "../scenes/game_scene/PlayerSprite";
 
 
 export class GameObjectStore extends AbstractStore {
-    private gameObjects: GameObject[] = [];
-    player: Player;
+    private gameObjects: SpriteObject[] = [];
 
-    getByRole(role: GameObjectRole): GameObject[] {
+    getByRole(role: GameObjectRole): SpriteObject[] {
         return this.gameObjects.filter(gameObject => gameObject.roles.has(role));
     }
 
-    add(gameObject: GameObject) {
+    add(gameObject: SpriteObject) {
         this.gameObjects.push(gameObject);
     }
 
-    remove(gameObject: GameObject) {
+    remove(gameObject: SpriteObject) {
         this.gameObjects = this.gameObjects.filter(g => g !== gameObject);
     }
 

@@ -1,8 +1,8 @@
-import { GameObject, GameObjectType } from "./GameObject";
+import { SpriteObject, GameObjectType } from "./SpriteObject";
 import { TilingSprite, Point } from "pixi.js";
 
 
-export class TilingGameObject extends GameObject {
+export class TilingGameObject extends SpriteObject {
     type = GameObjectType.TilingGameObject;
     sprite: TilingSprite;
     layer = 'background-layer';

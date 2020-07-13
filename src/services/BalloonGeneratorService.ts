@@ -1,5 +1,5 @@
 import { Point } from "pixi.js";
-import { GameObject, GameObjectRole } from "../model/GameObject";
+import { SpriteObject, GameObjectRole } from "../model/SpriteObject";
 import { Registry } from "../Registry";
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
@@ -42,15 +42,15 @@ export class BalloonGeneratorService implements IListener, IService {
     }
 
     private generateRandomObstacle(xRange: [number, number]): number {
-        const balloonRegistry = this.registry.stores.template.balloonRegistry;
-        const gameObject = balloonRegistry[Math.floor(balloonRegistry.length * Math.random())].clone();
+        const obstacleTemplates = this.registry.stores.template.getByRole(GameObjectRole.Coin);
+        const gameObject = obstacleTemplates[Math.floor(obstacleTemplates.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
         gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
         const layerIndex = Math.floor(Math.random() * 3) + 1;
         gameObject.layer = `game-layer-${layerIndex}`; 
 
         const layer = this.registry.stores.layer.getLayerById(gameObject.layer);
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] - 10 - gameObject.getDimensions().height));
+        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.registry.services.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
 
         this.registry.stores.game.add(gameObject);
         layer.addChild(gameObject);
@@ -63,9 +63,9 @@ export class BalloonGeneratorService implements IListener, IService {
         return maxX;
     }
 
-    private getRightMostBalloon(): GameObject {
+    private getRightMostBalloon(): SpriteObject {
         const balloons = this.registry.stores.game.getByRole(GameObjectRole.Coin);
-        balloons.sort((a: GameObject, b: GameObject) => a.getPosition().x - b.getPosition().x);
+        balloons.sort((a: SpriteObject, b: SpriteObject) => a.getPosition().x - b.getPosition().x);
 
         return balloons.length > 0 ? balloons[balloons.length - 1] : undefined;
     }

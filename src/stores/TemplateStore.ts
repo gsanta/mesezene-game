@@ -1,12 +1,14 @@
 import { AbstractStore } from "./AbstractStore";
-import { GameObject } from "../model/GameObject";
+import { SpriteObject, GameObjectRole } from "../model/SpriteObject";
 
-export class TemplateStore extends AbstractStore { 
-    platformRegistry: GameObject[] = [];
-    balloonRegistry: GameObject[] = [];
+export class TemplateStore extends AbstractStore {
+    private gameObjects: SpriteObject[] = [];
 
+    getByRole(role: GameObjectRole): SpriteObject[] {
+        return this.gameObjects.filter(gameObject => gameObject.roles.has(role));
+    }
 
-    addTemplate(gameObject: GameObject) {
+    addTemplate(gameObject: SpriteObject) {
         1;
 
         if (gameObject.id.startsWith('platform')) {

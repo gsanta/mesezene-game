@@ -1,12 +1,12 @@
 import { AbstractStore } from "./AbstractStore";
 import { Container, Application } from "pixi.js";
-import { GameObject } from "../model/GameObject";
+import { SpriteObject } from "../model/SpriteObject";
 
 export class Layer {
     id: string;
     range: [number, number]
     private container: Container;
-    private gameObjects: GameObject[] = [];
+    private gameObjects: SpriteObject[] = [];
 
     constructor(id: string, range: [number, number], application: Application) {
         this.id = id;
@@ -15,12 +15,12 @@ export class Layer {
         application.stage.addChild(this.container);
     }
 
-    addChild(gameObject: GameObject) {
+    addChild(gameObject: SpriteObject) {
         this.gameObjects.push(gameObject);
         this.container.addChild(gameObject.sprite);
     }
 
-    removeChild(gameObject: GameObject) {
+    removeChild(gameObject: SpriteObject) {
         this.gameObjects = this.gameObjects.filter(go => go !== gameObject);
         this.container.removeChild(gameObject.sprite);
     }

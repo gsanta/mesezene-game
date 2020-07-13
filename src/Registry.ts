@@ -1,9 +1,6 @@
 import { GameWindow } from "./GameWindow";
-import { Services } from "./Services";
 import { GameScript } from "./model/GameScript";
-import { ScoreStore } from "./stores/ScoreStore";
-import { AppStore } from "./stores/AppStore";
-import { MessageStore } from "./stores/MessageStore";
+import { Services } from "./Services";
 import { Stores } from "./Stores";
 
 export class Registry {

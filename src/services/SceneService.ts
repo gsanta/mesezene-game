@@ -1,16 +1,17 @@
-import { Application, Container, Point } from "pixi.js";
+import { Application, Point } from "pixi.js";
 import { SceneActions } from "../actions/SceneActions";
-import { GameObject, GameObjectRole } from "../model/GameObject";
-import { Player } from "../model/Player";
-import { ScrollerObject } from "../model/ScrollerObject";
+import { SpriteObject, GameObjectRole } from "../model/SpriteObject";
+import { PlayerSprite } from "../scenes/game_scene/PlayerSprite";
 import { Registry } from "../Registry";
-import { GamepadKey } from "./GamepadService";
-import { AppJson } from "./SceneLoaderService";
-import { IListener } from "./EventService";
-import { IService, ServiceCapability } from "./IService";
 import { Layer } from "../stores/LayerStore";
+import { IListener } from "./EventService";
+import { GamepadKey } from "./GamepadService";
+import { IService, ServiceCapability } from "./IService";
+import { AppJson, SceneLoader } from "../scenes/SceneLoader";
+import { AbstractScene } from "../scenes/AbstractScene";
+import { GameSpriteFactory } from "../scenes/game_scene/GameSpriteFactory";
 
-export class SceneService implements IListener, IService {
+export class SceneService extends AbstractScene implements IListener, IService {
     capabilities = [ServiceCapability.Listen];
     application: Application;
     sceneDimensions: Point;
@@ -24,9 +25,14 @@ export class SceneService implements IListener, IService {
     private registry: Registry;
 
     constructor(registry: Registry) {
+        super();
         this.registry = registry;
 
         this.application = new Application({width: 256, height: 256});
+        this.loader = new SceneLoader(this, this.registry);
+        this.factory = new GameSpriteFactory();
+        
+
         this.application.stage.sortableChildren = true;
 
         this.registry.stores.layer.addLayer(new Layer('background-layer', [0, 0.73], this.application));
@@ -41,8 +47,7 @@ export class SceneService implements IListener, IService {
         this.registry.services.scene.gameSpeed = appJson.gameSpeed;
         this.registry.services.scene.application.renderer.resize(appJson.width, appJson.height);
 
-        this.registry.services.loader.load(appJson);
-
+        this.loader.load(appJson);
     }
 
     listen(action: string) {
@@ -58,6 +63,12 @@ export class SceneService implements IListener, IService {
             this.update();
         });
 
+        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
+        this.registry.stores.layer.getLayerById('game-layer-3').addChild(player);
+
+        const backgroundSprites = this.registry.stores.game.getByRole(GameObjectRole.Background);
+        backgroundSprites.forEach(sprite => this.registry.stores.layer.getLayerById('background-layer').addChild(sprite));
+
         this.vertialBorders = [405, 510];
         this.horizontalBorders = [0, this.registry.services.scene.sceneDimensions.x];
 
@@ -65,7 +76,7 @@ export class SceneService implements IListener, IService {
     }
 
     update() {
-        const player = this.registry.stores.game.player;
+        const player = <PlayerSprite> this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
         const obstacles = this.registry.stores.game.getByRole(GameObjectRole.Obstacle);
         const coins = this.registry.stores.game.getByRole(GameObjectRole.Coin);
 
@@ -87,7 +98,7 @@ export class SceneService implements IListener, IService {
         this.registry.services.event.dispatch(SceneActions.SCENE_UPDATE);
     }
 
-    private updateVerticalLayer(player: Player) {
+    private updateVerticalLayer(player: PlayerSprite) {
         const y = player.sprite.y + player.currentJumpY + player.sprite.height;
         const normalizedY = y / this.sceneDimensions.y;
 
@@ -101,7 +112,7 @@ export class SceneService implements IListener, IService {
     }
 
 
-    private moveWithConstrains(player: GameObject) {
+    private moveWithConstrains(player: SpriteObject) {
         let speed = new Point(player.speed.x, player.speed.y);
 
         if (player.sprite.x < this.horizontalBorders[0] && player.speed.x < 0) {

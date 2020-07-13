@@ -1,5 +1,5 @@
 import { Registry } from "../Registry";
-import { GameObject, GameObjectRole } from "../model/GameObject";
+import { SpriteObject, GameObjectRole } from "../model/SpriteObject";
 import { Point } from "pixi.js";
 import { ServiceCapability, IService } from "./IService";
 import { IListener } from "./EventService";
@@ -59,15 +59,15 @@ export class ObstacleGeneratorService implements IListener, IService {
     }
 
     private generateRandomPlatform(xRange: [number, number]): number {
-        const platformRegistry = this.registry.stores.template.platformRegistry;
-        const gameObject = platformRegistry[Math.floor(platformRegistry.length * Math.random())].clone();
+        const obstacleTemplates = this.registry.stores.template.getByRole(GameObjectRole.Obstacle);
+        const gameObject = obstacleTemplates[Math.floor(obstacleTemplates.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
         gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
         const layerIndex = Math.floor(Math.random() * 3) + 1;
         gameObject.layer = `game-layer-${layerIndex}`
 
         const layer = this.registry.stores.layer.getLayerById(gameObject.layer);
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] - 10 - gameObject.getDimensions().height));
+        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.registry.services.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
 
         // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
 
@@ -82,9 +82,9 @@ export class ObstacleGeneratorService implements IListener, IService {
         return maxX;
     }
 
-    private getRightMostPlatform(): GameObject {
+    private getRightMostPlatform(): SpriteObject {
         const platforms = this.registry.stores.game.getByRole(GameObjectRole.Obstacle);
-        platforms.sort((a: GameObject, b: GameObject) => a.getPosition().x - b.getPosition().x);
+        platforms.sort((a: SpriteObject, b: SpriteObject) => a.getPosition().x - b.getPosition().x);
 
         return platforms.length > 0 ? platforms[platforms.length - 1] : undefined;
     }

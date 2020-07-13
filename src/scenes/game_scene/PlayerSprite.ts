@@ -1,4 +1,4 @@
-import { GameObject } from "./GameObject";
+import { SpriteObject } from "../../model/SpriteObject";
 import { Point } from "pixi.js";
 
 export interface PlayerConfig {
@@ -6,7 +6,7 @@ export interface PlayerConfig {
     jumpMax: number;
 }
 
-export class Player extends GameObject {
+export class PlayerSprite extends SpriteObject {
     state: Set<'jumping' | 'moving'> = new Set();
 
     currentJumpY = 0;
@@ -29,10 +29,6 @@ export class Player extends GameObject {
         if (this.state.has('jumping')) {
             this.updateJump()
         }
-    }
-
-    move(delta: Point) {
-        super.move(delta);
     }
 
     updateJump() {
