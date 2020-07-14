@@ -1,0 +1,16 @@
+{
+    "frames": {
+
+        "vonat":
+        {
+            "frame": {"x":13,"y":14,"w":293,"h":194}
+        }
+   },
+    "meta": {
+        "version": "1.0",
+        "image": "./sprite-sheet.png",
+        "format": "RGBA8888",
+        "size": {"w":1000,"h":1500},
+        "scale": "1"
+    }
+}

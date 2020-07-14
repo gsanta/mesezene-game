@@ -32,7 +32,8 @@ export enum GameObjectRole {
     Coin = 'Coin',
     Player = 'Player',
     Template = 'Template',
-    Background = 'Background'
+    Background = 'Background',
+    Character = 'Character'
 }
 
 export class SpriteObject {
