@@ -8,7 +8,8 @@ export class SceneService {
     runningScene: AbstractScene;
 
     constructor(registry: Registry) {
-        this.scenes.push(new GameScene(registry));
+        // this.scenes.push(new GameScene(registry));
+        this.scenes.push(null)
         this.scenes.push(new ScoreScene(registry))
     }
 

@@ -4,11 +4,19 @@
         "vonat":
         {
             "frame": {"x":13,"y":14,"w":293,"h":194}
+        },
+        "kigyo":
+        {
+            "frame": {"x":42,"y":230,"w":215,"h":258}
+        },
+        "kutya":
+        {
+            "frame": {"x":42,"y":500,"w":235,"h":234}
         }
    },
     "meta": {
         "version": "1.0",
-        "image": "./sprite-sheet.png",
+        "image": "./sprite-sheet-characters.png",
         "format": "RGBA8888",
         "size": {"w":1000,"h":1500},
         "scale": "1"

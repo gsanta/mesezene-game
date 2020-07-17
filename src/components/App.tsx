@@ -29,14 +29,17 @@ export class App extends React.Component<AppProps> {
         let screen: JSX.Element;
 
         switch(this.props.registry.stores.appStore.activeScreen) {
-            case AppScreen.GameScreen: 
+            // case AppScreen.GameScreen: 
+            //     screen = <Game registry={this.props.registry}/>;
+            // break;
+            // case AppScreen.RegistrationScreen:
+            //     screen = <Registration registry={this.props.registry}/>;
+            // break;
+            // case AppScreen.LoginScreen:
+            //     screen = <Login registry={this.props.registry}/>;
+            // break;
+            default:
                 screen = <Game registry={this.props.registry}/>;
-            break;
-            case AppScreen.RegistrationScreen:
-                screen = <Registration registry={this.props.registry}/>;
-            break;
-            case AppScreen.LoginScreen:
-                screen = <Login registry={this.props.registry}/>;
             break;
         }
 
