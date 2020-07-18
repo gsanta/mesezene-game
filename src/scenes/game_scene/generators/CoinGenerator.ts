@@ -26,10 +26,10 @@ export class CoinGenerator {
     }
 
     removeSpritesNotOnScreen() {
-        const invalidBalloons = this.registry.stores.game.getByRole(GameObjectRole.Coin).filter(balloon => balloon.getPosition().x + balloon.getDimensions().width < 0);
+        const invalidBalloons = this.scene.spriteStore.getByRole(GameObjectRole.Coin).filter(balloon => balloon.getPosition().x + balloon.getDimensions().width < 0);
         invalidBalloons.forEach(removable => {
-            this.registry.stores.game.remove(removable);
-            this.registry.stores.layer.getLayerById(removable.layer).removeChild(removable);
+            this.scene.spriteStore.remove(removable);
+            this.scene.layerStore.getLayerById(removable.layer).removeChild(removable);
         });
 
         this.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.sprite));
@@ -43,10 +43,10 @@ export class CoinGenerator {
         const layerIndex = Math.floor(Math.random() * 3) + 1;
         gameObject.layer = `game-layer-${layerIndex}`; 
 
-        const layer = this.registry.stores.layer.getLayerById(gameObject.layer);
+        const layer = this.scene.layerStore.getLayerById(gameObject.layer);
         gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
 
-        this.registry.stores.game.add(gameObject);
+        this.scene.spriteStore.add(gameObject);
         layer.addChild(gameObject);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
@@ -58,7 +58,7 @@ export class CoinGenerator {
     }
 
     private getRightMostBalloon(): SpriteObject {
-        const balloons = this.registry.stores.game.getByRole(GameObjectRole.Coin);
+        const balloons = this.scene.spriteStore.getByRole(GameObjectRole.Coin);
         balloons.sort((a: SpriteObject, b: SpriteObject) => a.getPosition().x - b.getPosition().x);
 
         return balloons.length > 0 ? balloons[balloons.length - 1] : undefined;

@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { AppProps } from './AppProps';
-import { appJson } from '../scenes/SceneLoader';
+import { defaultAppJson } from '../scenes/SceneLoader';
 import styled from 'styled-components';
 import { Header } from './Header';
 import { TheEnd } from './TheEnd';
+import { ScoreSceneId } from '../scenes/score_scene/ScoreScene';
+import { GameSceneId } from '../scenes/game_scene/GameScene';
 
 const AppStyled = styled.div`
     display: flex;
@@ -20,6 +22,7 @@ const CanvasContainerStyled = styled.div`
     position: relative;
 `;
 
+
 export class Game extends React.Component<AppProps> {
     private ref: React.RefObject<HTMLDivElement>;
 
@@ -33,8 +36,9 @@ export class Game extends React.Component<AppProps> {
         this.props.registry.gameWindow.htmlElement = this.ref.current;
         this.props.registry.gameWindow.resize();
         this.ref.current.focus();
+        this.props.registry.services.scene.sceneHtmlElement = this.ref.current;
         // this.props.registry.services.scene.runScene(this.props.registry.services.scene.scenes[0]);
-        this.props.registry.services.scene.runScene(this.props.registry.services.scene.scenes[1]);
+        this.props.registry.services.scene.runScene(this.props.registry.services.scene.scenes[0]);
     }
 
     render() {
@@ -46,10 +50,19 @@ export class Game extends React.Component<AppProps> {
                     onKeyUp={(e) => this.props.registry.services.keyboard.onKeyUp(e.nativeEvent)}
                     ref={this.ref}
                 >
-                    <Header registry={this.props.registry}/>
+                    {this.renderSceneHeader()}
                     <TheEnd registry={this.props.registry}/>
                 </CanvasContainerStyled>
             </AppStyled>
         )
+    }
+
+    private renderSceneHeader() {
+        switch(this.props.registry.services.scene.runningScene.id) {
+            case GameSceneId:
+                return <Header registry={this.props.registry}/>
+            case ScoreSceneId:
+                return null;
+        }
     }
 }

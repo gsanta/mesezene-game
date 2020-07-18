@@ -18,7 +18,7 @@ export interface AppJson {
     sprites: SpriteObjectJson[];
 }
 
-export const appJson: AppJson = {
+export const defaultAppJson: AppJson = {
     width: 700,
     height: 700,
     gameSpeed: 2,
@@ -191,7 +191,7 @@ export class SceneLoader {
             if (gameObject.roles.has(GameObjectRole.Template)) {
                 this.registry.stores.template.add(gameObject);
             } else {
-                this.registry.stores.game.add(gameObject);
+                this.scene.spriteStore.add(gameObject);
             }
         });
     }

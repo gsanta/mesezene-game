@@ -1,11 +1,14 @@
 import { GameObjectRole, GameObjectTag } from "../../../model/SpriteObject";
 import { Registry } from "../../../Registry";
+import { GameScene } from "../GameScene";
 
 export class CoinCollider {
     private registry: Registry;
+    private scene: GameScene;
 
-    constructor(registry: Registry) {
+    constructor(scene: GameScene, registry: Registry) {
         this.registry = registry;
+        this.scene = scene;
     }
     
     checkCollisions() {
@@ -13,14 +16,14 @@ export class CoinCollider {
     }
 
     removeBalloon() {
-        let balloons = this.registry.stores.game.getByRole(GameObjectRole.Coin); 
+        let balloons = this.scene.spriteStore.getByRole(GameObjectRole.Coin); 
         this.registry.stores.scoreStore.setScores(this.registry.stores.scoreStore.getScores() + 1);
 
         const collidedBalloons = balloons.filter(balloon => balloon.tags.has(GameObjectTag.Collided));
 
         collidedBalloons.forEach(coin => {
-            this.registry.stores.game.remove(coin);
-            this.registry.stores.layer.getLayerById(coin.layer).removeChild(coin);
+            this.scene.spriteStore.remove(coin);
+            this.scene.layerStore.getLayerById(coin.layer).removeChild(coin);
         });
     }
 }

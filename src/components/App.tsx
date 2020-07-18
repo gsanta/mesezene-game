@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Registry } from '../Registry';
-import { appJson } from '../scenes/SceneLoader';
+import { defaultAppJson } from '../scenes/SceneLoader';
 import { Header } from './Header';
 import { TheEnd } from './TheEnd';
 import styled from 'styled-components';

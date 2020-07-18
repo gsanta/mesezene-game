@@ -31,7 +31,7 @@ export class GamepadService extends GameScript {
     }
 
     left(release: boolean) {
-        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
+        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Left);
             player.speed.x = -2;
@@ -45,7 +45,7 @@ export class GamepadService extends GameScript {
     }
 
     up(release: boolean) {
-        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
+        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Up);
             player.speed.y = -2;
@@ -59,7 +59,7 @@ export class GamepadService extends GameScript {
     }
 
     right(release: boolean) {
-        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
+        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Right);
             player.speed.x = 2;
@@ -73,7 +73,7 @@ export class GamepadService extends GameScript {
     }
 
     down(release: boolean) {
-        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
+        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Down);
             player.speed.y = 2;

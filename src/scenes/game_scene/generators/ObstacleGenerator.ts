@@ -44,11 +44,11 @@ export class ObstacleGenerator {
     // }
 
     private removeSpritesNotOnScreen() {
-        const obstacles = this.registry.stores.game.getByRole(GameObjectRole.Obstacle);
+        const obstacles = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle);
         const invalidPlatforms = obstacles.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
         invalidPlatforms.forEach(obstacle => {
-            this.registry.stores.game.remove(obstacle);
-            this.registry.stores.layer.getLayerById(obstacle.layer).removeChild(obstacle);
+            this.scene.spriteStore.remove(obstacle);
+            this.scene.layerStore.getLayerById(obstacle.layer).removeChild(obstacle);
         });
     }
 
@@ -60,12 +60,12 @@ export class ObstacleGenerator {
         const layerIndex = Math.floor(Math.random() * 3) + 1;
         gameObject.layer = `game-layer-${layerIndex}`
 
-        const layer = this.registry.stores.layer.getLayerById(gameObject.layer);
+        const layer = this.scene.layerStore.getLayerById(gameObject.layer);
         gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
 
         // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
 
-        this.registry.stores.game.add(gameObject);
+        this.scene.spriteStore.add(gameObject);
         layer.addChild(gameObject);
         return gameObject.getPosition().x + gameObject.getDimensions().x;
     }
@@ -77,7 +77,7 @@ export class ObstacleGenerator {
     }
 
     private getRightMostPlatform(): SpriteObject {
-        const platforms = this.registry.stores.game.getByRole(GameObjectRole.Obstacle);
+        const platforms = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle);
         platforms.sort((a: SpriteObject, b: SpriteObject) => a.getPosition().x - b.getPosition().x);
 
         return platforms.length > 0 ? platforms[platforms.length - 1] : undefined;

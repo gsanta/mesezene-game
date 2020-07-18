@@ -35,6 +35,7 @@ export enum CollisionActions {
 
 export class CollisionService implements IListener, IService {
     capabilities = [ServiceCapability.Listen];
+    private isStopped = false;
 
     private registry: Registry;
 
@@ -45,16 +46,22 @@ export class CollisionService implements IListener, IService {
     listen(action: string) {
         switch (action) {
             case SceneActions.SCENE_UPDATE:
-                this.calculateCollision();
+                if (!this.isStopped) {
+                    this.calculateCollision();
+                }
             break;
         }
     }
 
+    stop() {
+        this.isStopped = true;
+    }
+
     calculateCollision(): void {
-        const player = this.registry.stores.game.getByRole(GameObjectRole.Player)[0];
+        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
         const playerCollisionBox = player.getCollisionBox();
 
-        const collidableObjs = [...this.registry.stores.game.getByRole(GameObjectRole.Coin), ...this.registry.stores.game.getByRole(GameObjectRole.Obstacle)];
+        const collidableObjs = [...this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Coin), ...this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Obstacle)];
 
         const collidedObj = collidableObjs
             .filter(obj => obj.layer === player.layer)
