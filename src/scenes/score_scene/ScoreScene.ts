@@ -6,7 +6,7 @@ import { Registry } from "../../Registry";
 import { ServiceCapability, IService } from "../../services/IService";
 import { SceneActions } from "../../actions/SceneActions";
 import { IListener } from "../../services/EventService";
-import { Layer, LayerStore } from "../../stores/LayerStore";
+import { Layer, LayerContainer } from "../../stores/LayerContainer";
 import { GameSpriteFactory } from "../game_scene/GameSpriteFactory";
 import { GameObjectStore } from "../../stores/GameObjectStore";
 
@@ -101,10 +101,9 @@ export const ScoreSceneId = 'score-scene';
 export class ScoreScene extends AbstractScene implements IListener, IService {
     id = ScoreSceneId;
     capabilities = [ServiceCapability.Listen];
-    
-    application: Application;
-    sceneDimensions: Point;
 
+    private containerId = 'score-container';
+    
     private registry: Registry;
 
     constructor(registry: Registry) {
@@ -113,7 +112,6 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
         this.loader = new SceneLoader(this, this.registry);
         this.factory = new GameSpriteFactory();
 
-        this.layerStore = new LayerStore(this.registry);
         this.spriteStore = new GameObjectStore(this.registry);
     }
 
@@ -125,26 +123,26 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
         }
     }
 
+    run() {
+        const application = this.registry.services.scene.application;
+        this.registry.stores.layer.addContainer(new LayerContainer(this.containerId));
+    }
+
     setup(sceneHtmlElement: HTMLDivElement) {
         super.setup(sceneHtmlElement);
 
-        this.application = new Application({width: 256, height: 256});
-
         const appJson = scoreSceneJson;
-        this.sceneDimensions = new Point(appJson.width, appJson.height);
-        this.application.renderer.resize(appJson.width, appJson.height);
 
         this.registry.services.event.addListener(this);
 
-        this.layerStore.addLayer(new Layer('background-layer2', [0, 1], this.application));
+        const application = this.registry.services.scene.application;
+
+        this.registry.stores.layer.getContainer(this.containerId).addLayer(new Layer('background-layer2', [0, 1], application));
 
         this.loader.load(appJson);
     }
 
     start() {
-        this.application.ticker.add(delta => {
-            this.update();
-        });
 
         // var bg = new Sprite(Texture.WHITE);
         // bg.width = this.sceneDimensions.x;
@@ -153,22 +151,25 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
         // this.layerStore.getLayerById('background-layer2').addChild(new SpriteObject(bg));
 
         const background = this.spriteStore.getByRole(GameObjectRole.Background)[0];
-        this.layerStore.getLayerById('background-layer2').addChild(background);
+        
+        const backgroundLayer = this.registry.stores.layer.getContainer(this.containerId).getLayerById('background-layer2');
+        
+        backgroundLayer.addChild(background);
 
         const vonat = this.spriteStore.getByRole(GameObjectRole.Character)[0];
-        this.layerStore.getLayerById('background-layer2').addChild(vonat);
+        backgroundLayer.addChild(vonat);
 
         const kigyo = this.spriteStore.getByRole(GameObjectRole.Character)[1];
-        this.layerStore.getLayerById('background-layer2').addChild(kigyo);
+        backgroundLayer.addChild(kigyo);
 
         const kutya = this.spriteStore.getByRole(GameObjectRole.Character)[2];
-        this.layerStore.getLayerById('background-layer2').addChild(kutya);
+        backgroundLayer.addChild(kutya);
 
         const lud = this.spriteStore.getByRole(GameObjectRole.Character)[3];
-        this.layerStore.getLayerById('background-layer2').addChild(lud);
+        backgroundLayer.addChild(lud);
 
         const eger = this.spriteStore.getByRole(GameObjectRole.Character)[4];
-        this.layerStore.getLayerById('background-layer2').addChild(eger);
+        backgroundLayer.addChild(eger);
 
         this.registry.services.event.dispatch(SceneActions.SCENE_START);
     }

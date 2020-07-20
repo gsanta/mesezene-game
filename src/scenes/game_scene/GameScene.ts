@@ -6,7 +6,7 @@ import { IListener } from "../../services/EventService";
 import { GamepadKey } from "../../services/GamepadService";
 import { IService, ServiceCapability } from "../../services/IService";
 import { GameObjectStore } from "../../stores/GameObjectStore";
-import { Layer, LayerStore } from "../../stores/LayerStore";
+import { Layer, LayerContainer } from "../../stores/LayerContainer";
 import { AbstractScene } from "../AbstractScene";
 import { defaultAppJson, SceneLoader } from "../SceneLoader";
 import { CoinCollider } from "./colliders/CoinCollider";
@@ -20,8 +20,8 @@ export const GameSceneId = 'game-scene';
 export class GameScene extends AbstractScene implements IListener, IService {
     id = GameSceneId;
     capabilities = [ServiceCapability.Listen];
-    application: Application;
-    sceneDimensions: Point;
+
+    private containerId = 'game-container';
 
     private obstacleGenerator: ObstacleGenerator;
     private coinGenerator: CoinGenerator;
@@ -47,27 +47,31 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.obstacleCollider = new ObstacleCollider(this, registry);
         this.coinCollider = new CoinCollider(this, registry);
 
-        this.layerStore = new LayerStore(this.registry);
         this.spriteStore = new GameObjectStore(this.registry);
+    }
+
+    run() {
+        const application = this.registry.services.scene.application;
+        this.registry.stores.layer.addContainer(new LayerContainer(this.containerId));
     }
 
     setup(sceneHtmlElement: HTMLDivElement) {
         super.setup(sceneHtmlElement);
 
-        this.application = new Application({width: 256, height: 256});
-        this.application.stage.sortableChildren = true;
+        const application = this.registry.services.scene.application;
+        
+        const gameContainer = this.registry.stores.layer.getContainer(this.containerId);
 
 
-        this.layerStore.addLayer(new Layer('background-layer', [0, 0.73], this.application));
-        this.layerStore.addLayer(new Layer(`game-layer-1`, [0.73, 0.78], this.application))
-        this.layerStore.addLayer(new Layer(`game-layer-2`, [0.78, 0.83], this.application))
-        this.layerStore.addLayer(new Layer(`game-layer-3`, [0.83, 0.88], this.application))
-        this.layerStore.addLayer(new Layer(`game-layer-4`, [0.88, 0.93], this.application))
+        gameContainer.addLayer(new Layer('background-layer', [0, 0.73], application));
+        gameContainer.addLayer(new Layer(`game-layer-1`, [0.73, 0.78], application))
+        gameContainer.addLayer(new Layer(`game-layer-2`, [0.78, 0.83], application))
+        gameContainer.addLayer(new Layer(`game-layer-3`, [0.83, 0.88], application))
+        gameContainer.addLayer(new Layer(`game-layer-4`, [0.88, 0.93], application))
+        gameContainer.addLayer(new Layer('menu-layer', [0, 1], application));
 
         const appJson = defaultAppJson;
-        this.sceneDimensions = new Point(appJson.width, appJson.height);
         this.gameSpeed = appJson.gameSpeed;
-        this.application.renderer.resize(appJson.width, appJson.height);
 
         this.registry.services.event.addListener(this);
 
@@ -75,22 +79,21 @@ export class GameScene extends AbstractScene implements IListener, IService {
     }
 
     destroy() {
+        super.destroy();
         this.registry.services.collision.stop();
     }
 
     listen(action: string) {
         switch(action) {
             case SceneActions.SCENE_LOADED:
-                this.start();
+                if (this.registry.services.scene.runningScene === this) {
+                    this.start();
+                }
             break;
         }
     }
 
     start() {
-        this.application.ticker.add(delta => {
-            this.update();
-        });
-
         const player = this.spriteStore.getByRole(GameObjectRole.Player)[0];
         this.layerStore.getLayerById('game-layer-3').addChild(player);
 
