@@ -20,7 +20,7 @@ export class CoinGenerator {
     generateNewSpritesIfNeeded() {
         let maxX = this.getMaxX(); 
 
-        while (maxX < this.scene.sceneDimensions.x - 320) {
+        while (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
             maxX = this.generateRandomObstacle([maxX, maxX + 200]);
         }
     }
@@ -29,10 +29,10 @@ export class CoinGenerator {
         const invalidBalloons = this.scene.spriteStore.getByRole(GameObjectRole.Coin).filter(balloon => balloon.getPosition().x + balloon.getDimensions().width < 0);
         invalidBalloons.forEach(removable => {
             this.scene.spriteStore.remove(removable);
-            this.scene.layerStore.getLayerById(removable.layer).removeChild(removable);
+            this.scene.getLayerContainer().getLayerById(removable.layer).removeChild(removable);
         });
 
-        this.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.sprite));
+        this.registry.services.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.sprite));
     }
 
     private generateRandomObstacle(xRange: [number, number]): number {
@@ -43,8 +43,8 @@ export class CoinGenerator {
         const layerIndex = Math.floor(Math.random() * 3) + 1;
         gameObject.layer = `game-layer-${layerIndex}`; 
 
-        const layer = this.scene.layerStore.getLayerById(gameObject.layer);
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
+        const layer = this.scene.getLayerContainer().getLayerById(gameObject.layer);
+        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.registry.services.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
 
         this.scene.spriteStore.add(gameObject);
         layer.addChild(gameObject);

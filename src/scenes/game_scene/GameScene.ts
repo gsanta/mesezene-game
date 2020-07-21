@@ -21,8 +21,6 @@ export class GameScene extends AbstractScene implements IListener, IService {
     id = GameSceneId;
     capabilities = [ServiceCapability.Listen];
 
-    private containerId = 'game-container';
-
     private obstacleGenerator: ObstacleGenerator;
     private coinGenerator: CoinGenerator;
     private obstacleCollider: ObstacleCollider;
@@ -34,10 +32,8 @@ export class GameScene extends AbstractScene implements IListener, IService {
     private vertialBorders: [number, number];
     private horizontalBorders: [number, number];
 
-    private registry: Registry;
-
     constructor(registry: Registry) {
-        super();
+        super(registry);
         this.registry = registry;
 
         this.loader = new SceneLoader(this, this.registry);
@@ -51,17 +47,12 @@ export class GameScene extends AbstractScene implements IListener, IService {
     }
 
     run() {
-        const application = this.registry.services.scene.application;
-        this.registry.stores.layer.addContainer(new LayerContainer(this.containerId));
     }
-
-    setup(sceneHtmlElement: HTMLDivElement) {
-        super.setup(sceneHtmlElement);
-
+    
+    setup() {
         const application = this.registry.services.scene.application;
         
-        const gameContainer = this.registry.stores.layer.getContainer(this.containerId);
-
+        const gameContainer = this.registry.stores.layer.getContainer(this.id);
 
         gameContainer.addLayer(new Layer('background-layer', [0, 0.73], application));
         gameContainer.addLayer(new Layer(`game-layer-1`, [0.73, 0.78], application))
@@ -95,13 +86,15 @@ export class GameScene extends AbstractScene implements IListener, IService {
 
     start() {
         const player = this.spriteStore.getByRole(GameObjectRole.Player)[0];
-        this.layerStore.getLayerById('game-layer-3').addChild(player);
+
+        const gameContainer = this.registry.stores.layer.getContainer(this.id);
+        gameContainer.getLayerById('game-layer-3').addChild(player);
 
         const backgroundSprites = this.spriteStore.getByRole(GameObjectRole.Background);
-        backgroundSprites.forEach(sprite => this.layerStore.getLayerById('background-layer').addChild(sprite));
+        backgroundSprites.forEach(sprite => gameContainer.getLayerById('background-layer').addChild(sprite));
 
         this.vertialBorders = [405, 510];
-        this.horizontalBorders = [0, this.sceneDimensions.x];
+        this.horizontalBorders = [0, this.registry.services.scene.sceneDimensions.x];
 
         this.obstacleGenerator.update();
         this.coinGenerator.update();
@@ -134,14 +127,16 @@ export class GameScene extends AbstractScene implements IListener, IService {
     }
 
     private updateVerticalLayer(player: PlayerSprite) {
-        const y = player.sprite.y + player.currentJumpY + player.sprite.height;
-        const normalizedY = y / this.sceneDimensions.y;
+        const gameContainer = this.registry.stores.layer.getContainer(this.id);
 
-        const newLayer = this.layerStore.layers.find(l => l.range[0] <= normalizedY && l.range[1] >= normalizedY);
+        const y = player.sprite.y + player.currentJumpY + player.sprite.height;
+        const normalizedY = y / this.registry.services.scene.sceneDimensions.y;
+
+        const newLayer = gameContainer.layers.find(l => l.range[0] <= normalizedY && l.range[1] >= normalizedY);
 
         if (newLayer.id !== player.layer) {
-            this.layerStore.getLayerById(player.layer).removeChild(player);
-            this.layerStore.getLayerById(newLayer.id).addChild(player);
+            gameContainer.getLayerById(player.layer).removeChild(player);
+            gameContainer.getLayerById(newLayer.id).addChild(player);
             player.layer = newLayer.id;
         }
     }

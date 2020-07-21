@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Registry } from '../Registry';
 import styled from 'styled-components';
+const homeIcon = require('../../assets/icons/home-icon.png');
 
 const HeaderStyled = styled.div`
     display: flex;
@@ -12,6 +13,15 @@ const HeaderStyled = styled.div`
     justify-content: space-between;
     padding: 5px;
     font-size: 20px;
+
+    .home-icon {
+        width: 60px;
+        height: 60px;
+
+        background-image: url(${homeIcon});
+        background-size: contain;
+        cursor: pointer;
+    }
 `;
 
 export class Header extends React.Component<{registry: Registry}> {
@@ -24,6 +34,7 @@ export class Header extends React.Component<{registry: Registry}> {
 
         return (
             <HeaderStyled>
+                <div className="home-icon"></div>
                 <div>Lufik: {this.props.registry.stores.scoreStore.getScores()}</div>
                 <div>Életek: {this.props.registry.stores.scoreStore.getLives()}</div>
             </HeaderStyled>

@@ -23,7 +23,8 @@ export class CoinCollider {
 
         collidedBalloons.forEach(coin => {
             this.scene.spriteStore.remove(coin);
-            this.scene.layerStore.getLayerById(coin.layer).removeChild(coin);
+            const layerContainer = this.registry.stores.layer.getContainer(this.scene.id);
+            layerContainer.getLayerById(coin.layer).removeChild(coin);
         });
     }
 }

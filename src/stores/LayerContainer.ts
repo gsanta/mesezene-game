@@ -1,23 +1,28 @@
 import { AbstractStore } from "./AbstractStore";
-import { Container, Application } from "pixi.js";
+import { Container, Application, Graphics } from "pixi.js";
 import { SpriteObject } from "../model/SpriteObject";
+import { Registry } from "../Registry";
 
 export class Layer {
     id: string;
     range: [number, number]
-    private container: Container;
+    container: Container;
     private gameObjects: SpriteObject[] = [];
 
     constructor(id: string, range: [number, number], application: Application) {
         this.id = id;
         this.range = range;
         this.container = new Container();
-        application.stage.addChild(this.container);
+        // application.stage.addChild(this.container);
     }
 
     addChild(gameObject: SpriteObject) {
         this.gameObjects.push(gameObject);
         this.container.addChild(gameObject.sprite);
+    }
+
+    addGraphics(graphics: Graphics) {
+        this.container.addChild(graphics);
     }
 
     removeChild(gameObject: SpriteObject) {
@@ -30,9 +35,12 @@ export class Layer {
 export class LayerContainer {
     layers: Layer[] = [];
     id: string;
+    container: Container;
 
-    constructor(id: string) {
+    constructor(id: string, registry: Registry) {
         this.id = id;
+        this.container = new Container();
+        registry.services.scene.application.stage.addChild(this.container);
     }
 
     getLayerById(id: string): Layer {
@@ -40,6 +48,7 @@ export class LayerContainer {
     }
 
     addLayer(layer: Layer) {
+        this.container.addChild(layer.container);
         this.layers.push(layer);
     }
 }

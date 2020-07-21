@@ -1,12 +1,9 @@
-import { Loader, Point, Sprite, TilingSprite } from "pixi.js";
-import { SpriteObject, SpriteObjectJson, GameObjectRole } from "../model/SpriteObject";
-import { GameScript } from "../model/GameScript";
-import { MesezeneGlobals } from "../model/MesezeneGlobals";
-import { PlayerSprite } from "./game_scene/PlayerSprite";
-import { TilingGameObject } from "../model/TilingGameObject";
+import { Loader, Sprite, TilingSprite } from "pixi.js";
 import { SceneActions } from "../actions/SceneActions";
-import { AbstractScene } from "./AbstractScene";
+import { MesezeneGlobals } from "../model/MesezeneGlobals";
+import { GameObjectRole, SpriteObject, SpriteObjectJson } from "../model/SpriteObject";
 import { Registry } from "../Registry";
+import { AbstractScene } from "./AbstractScene";
 
 declare const mesezeneGlobals: MesezeneGlobals;
 
@@ -154,10 +151,7 @@ export class SceneLoader {
         this.registry = registry;
     }
 
-    load(appJson: AppJson): void {
-        const application = this.scene.application;
-        
-        this.registry.gameWindow.htmlElement.appendChild(application.view);
+    load(appJson: AppJson): void {        
         this.loader = new Loader();
 
         this.loader

@@ -1,14 +1,13 @@
-import { AbstractScene } from "../AbstractScene";
-import { AppJson, SceneLoader } from "../SceneLoader";
-import { GameObjectRole, SpriteObject } from "../../model/SpriteObject";
-import { Application, Point, Sprite, Texture } from "pixi.js";
-import { Registry } from "../../Registry";
-import { ServiceCapability, IService } from "../../services/IService";
 import { SceneActions } from "../../actions/SceneActions";
+import { GameObjectRole } from "../../model/SpriteObject";
+import { Registry } from "../../Registry";
 import { IListener } from "../../services/EventService";
-import { Layer, LayerContainer } from "../../stores/LayerContainer";
-import { GameSpriteFactory } from "../game_scene/GameSpriteFactory";
+import { IService, ServiceCapability } from "../../services/IService";
 import { GameObjectStore } from "../../stores/GameObjectStore";
+import { Layer } from "../../stores/LayerContainer";
+import { AbstractScene } from "../AbstractScene";
+import { GameSpriteFactory } from "../game_scene/GameSpriteFactory";
+import { AppJson, SceneLoader } from "../SceneLoader";
 
 export const scoreSceneJson: AppJson = {
     width: 700,
@@ -102,12 +101,8 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
     id = ScoreSceneId;
     capabilities = [ServiceCapability.Listen];
 
-    private containerId = 'score-container';
-    
-    private registry: Registry;
-
     constructor(registry: Registry) {
-        super();
+        super(registry);
         this.registry = registry;
         this.loader = new SceneLoader(this, this.registry);
         this.factory = new GameSpriteFactory();
@@ -123,36 +118,22 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
         }
     }
 
-    run() {
-        const application = this.registry.services.scene.application;
-        this.registry.stores.layer.addContainer(new LayerContainer(this.containerId));
-    }
-
-    setup(sceneHtmlElement: HTMLDivElement) {
-        super.setup(sceneHtmlElement);
-
+    setup() {
         const appJson = scoreSceneJson;
 
         this.registry.services.event.addListener(this);
 
         const application = this.registry.services.scene.application;
 
-        this.registry.stores.layer.getContainer(this.containerId).addLayer(new Layer('background-layer2', [0, 1], application));
+        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer2', [0, 1], application));
 
         this.loader.load(appJson);
     }
 
     start() {
-
-        // var bg = new Sprite(Texture.WHITE);
-        // bg.width = this.sceneDimensions.x;
-        // bg.height = this.sceneDimensions.y;
-        // bg.tint = 0xffff00;
-        // this.layerStore.getLayerById('background-layer2').addChild(new SpriteObject(bg));
-
         const background = this.spriteStore.getByRole(GameObjectRole.Background)[0];
         
-        const backgroundLayer = this.registry.stores.layer.getContainer(this.containerId).getLayerById('background-layer2');
+        const backgroundLayer = this.registry.stores.layer.getContainer(this.id).getLayerById('background-layer2');
         
         backgroundLayer.addChild(background);
 

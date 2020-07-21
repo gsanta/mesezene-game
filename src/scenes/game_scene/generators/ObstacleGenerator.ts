@@ -20,7 +20,7 @@ export class ObstacleGenerator {
     generateNewSpritesIfNeeded() {
         let maxX = this.getMaxX(); 
 
-        while (maxX < this.scene.sceneDimensions.x - 320) {
+        while (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
             maxX = this.generateRandomPlatform([maxX, maxX + 200]);
         }
     }
@@ -48,7 +48,7 @@ export class ObstacleGenerator {
         const invalidPlatforms = obstacles.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
         invalidPlatforms.forEach(obstacle => {
             this.scene.spriteStore.remove(obstacle);
-            this.scene.layerStore.getLayerById(obstacle.layer).removeChild(obstacle);
+            this.scene.getLayerContainer().getLayerById(obstacle.layer).removeChild(obstacle);
         });
     }
 
@@ -60,8 +60,8 @@ export class ObstacleGenerator {
         const layerIndex = Math.floor(Math.random() * 3) + 1;
         gameObject.layer = `game-layer-${layerIndex}`
 
-        const layer = this.scene.layerStore.getLayerById(gameObject.layer);
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
+        const layer = this.scene.getLayerContainer().getLayerById(gameObject.layer);
+        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.registry.services.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
 
         // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
 
