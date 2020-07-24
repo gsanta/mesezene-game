@@ -3,21 +3,38 @@ import { Application, Graphics, Point, TextStyle, Text } from "pixi.js";
 import { Registry } from "../../Registry";
 import { LayerContainer, Layer } from "../../stores/LayerContainer";
 
-const style = new TextStyle({
+const colors = {
+    darkGreen: '#50863b',
+    lightGreen: '#91bd80'
+}
+
+export const toHexNumber = (hexString: string): number => {
+    return parseInt(hexString.replace(/^#/, ''), 16);
+}
+
+const redTextStyle = new TextStyle({
     fontFamily: 'Arial',
     fontSize: 36,
     fontStyle: 'italic',
     fontWeight: 'bold',
-    fill: ['#ffffff', '#00ff99'], // gradient
+    fill: ['#fba192', '#e26b58'], // gradient
     stroke: '#4a1850',
     strokeThickness: 5,
-    dropShadow: true,
-    dropShadowColor: '#000000',
-    dropShadowBlur: 4,
-    dropShadowAngle: Math.PI / 6,
-    dropShadowDistance: 6,
     wordWrap: true,
     wordWrapWidth: 440,
+});
+
+const greenTextStyle = new TextStyle({
+    fontFamily: 'Arial',
+    fontSize: 36,
+    // fontStyle: 'italic',
+    fontWeight: 'bold',
+    fill: [colors.lightGreen, colors.darkGreen],
+    stroke: '#4a1850',
+    strokeThickness: 3,
+    wordWrap: true,
+    wordWrapWidth: 440,
+    textBaseline: 'center'
 });
 
 export class MenuScene extends AbstractScene {
@@ -45,16 +62,17 @@ export class MenuScene extends AbstractScene {
         // };
 
         this.drawPlayButton();
+        this.drawMapButton();
     }
 
     private drawPlayButton(): void {
         const dimensions = this.registry.services.scene.sceneDimensions;
-        const size = new Point(300, 40);
+        const size = new Point(200, 40);
         const position = new Point(dimensions.x / 2 - size.x / 2, 100)
 
         const graphics = new Graphics();
-        graphics.lineStyle(2, 0xFEEB77, 1);
-        graphics.beginFill(0x650A5A);
+        graphics.lineStyle(2, 0xe26b58, 1);
+        graphics.beginFill(0xffffff);
         graphics.drawRect(position.x, position.y, size.x, size.y);
         graphics.endFill();
 
@@ -63,8 +81,8 @@ export class MenuScene extends AbstractScene {
         graphics.on('mouseover', () => {
             graphics.clear();
 
-            graphics.lineStyle(2, 0xFEEB77, 1);
-            graphics.beginFill(0xFEEB77);
+            graphics.lineStyle(2, 0xe26b58, 1);
+            graphics.beginFill(0xfba192);
             graphics.drawRect(position.x, position.y, size.x, size.y);
             graphics.endFill();
         });
@@ -72,18 +90,68 @@ export class MenuScene extends AbstractScene {
         graphics.on('mouseout', () => {
             graphics.clear();
 
-            graphics.lineStyle(2, 0xFEEB77, 1);
-            graphics.beginFill(0x650A5A);
+            graphics.lineStyle(2, 0xe26b58, 1);
+            graphics.beginFill(0xffffff);
             graphics.drawRect(position.x, position.y, size.x, size.y);
             graphics.endFill();
         });
 
-        const richText = new Text('Play', style);
-        richText.x = position.x;
-        richText.y = position.y;
+        graphics.on('click', () => {
+            this.registry.services.scene.runScene(this.registry.services.scene.scenes[1]);
+        });
+
+        const textOffsetX = 50;
+        const textOffsetY = -2;
+        const richText = new Text('Játék', redTextStyle);
+        richText.x = position.x + textOffsetX;
+        richText.y = position.y + textOffsetY;
 
         this.getLayerContainer().getLayerById('main').addGraphics(graphics);
         graphics.addChild(richText);
-        // this.getLayerContainer().getLayerById('main').addGraphics(richText);
+    }
+
+    private drawMapButton(): void {
+        const dimensions = this.registry.services.scene.sceneDimensions;
+        const size = new Point(200, 40);
+        const position = new Point(dimensions.x / 2 - size.x / 2, 300)
+
+        const graphics = new Graphics();
+        graphics.lineStyle(2, toHexNumber(colors.darkGreen), 1);
+        graphics.beginFill(0xffffff);
+        graphics.drawRect(position.x, position.y, size.x, size.y);
+        graphics.endFill();
+
+        graphics.interactive = true;
+
+        graphics.on('mouseover', () => {
+            graphics.clear();
+
+            graphics.lineStyle(2, toHexNumber(colors.darkGreen), 1);
+            graphics.beginFill(toHexNumber(colors.lightGreen));
+            graphics.drawRect(position.x, position.y, size.x, size.y);
+            graphics.endFill();
+        });
+
+        graphics.on('mouseout', () => {
+            graphics.clear();
+
+            graphics.lineStyle(2, toHexNumber(colors.darkGreen), 1);
+            graphics.beginFill(0xffffff);
+            graphics.drawRect(position.x, position.y, size.x, size.y);
+            graphics.endFill();
+        });
+
+        graphics.on('click', () => {
+            this.registry.services.scene.runScene(this.registry.services.scene.scenes[3]);
+        });
+
+        const textOffsetX = 25;
+        const textOffsetY = -4;
+        const richText = new Text('Lufivilág', greenTextStyle);
+        richText.x = position.x + textOffsetX;
+        richText.y = position.y + textOffsetY;
+
+        this.getLayerContainer().getLayerById('main').addGraphics(graphics);
+        graphics.addChild(richText);
     }
 }

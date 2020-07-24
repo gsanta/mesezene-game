@@ -9,6 +9,7 @@ import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
 import { MenuScene } from "../scenes/menu_scene/MenuScene";
 import { LayerContainer } from "../stores/LayerContainer";
+import { MapSceneId, MapScene } from "../scenes/map_scene/MapScene";
 
 export class SceneService implements IService, IListener {
     capabilities = [ServiceCapability.Listen];
@@ -29,6 +30,7 @@ export class SceneService implements IService, IListener {
         this.scenes.push(new GameScene(registry));
         this.scenes.push(new ScoreScene(registry));
         this.scenes.push(new MenuScene(registry));
+        this.scenes.push(new MapScene(registry));
         this.runningScene = this.scenes[0];
 
         this.registry.registerControlledObject(this);
