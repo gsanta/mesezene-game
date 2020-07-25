@@ -2,6 +2,7 @@ import { Rectangle } from "pixi.js";
 import { GameScript } from "../model/GameScript";
 import { Registry } from "../Registry";
 import { GameObjectRole } from "../model/SpriteObject";
+import { GameSceneId } from "../scenes/game_scene/GameScene";
 
 export enum GamepadKey {
     Left = 'Left',
@@ -31,7 +32,9 @@ export class GamepadService extends GameScript {
     }
 
     left(release: boolean) {
-        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
+        if (!this.registry.services.scene.isActiveScene(GameSceneId)) { return }
+
+        const player = this.registry.services.scene.getSceneById(GameSceneId).spriteStore.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Left);
             player.speed.x = -2;
@@ -45,7 +48,9 @@ export class GamepadService extends GameScript {
     }
 
     up(release: boolean) {
-        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
+        if (!this.registry.services.scene.isActiveScene(GameSceneId)) { return }
+
+        const player = this.registry.services.scene.getSceneById(GameSceneId).spriteStore.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Up);
             player.speed.y = -2;
@@ -59,7 +64,9 @@ export class GamepadService extends GameScript {
     }
 
     right(release: boolean) {
-        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
+        if (!this.registry.services.scene.isActiveScene(GameSceneId)) { return }
+
+        const player = this.registry.services.scene.getSceneById(GameSceneId).spriteStore.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Right);
             player.speed.x = 2;
@@ -73,7 +80,9 @@ export class GamepadService extends GameScript {
     }
 
     down(release: boolean) {
-        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
+        if (!this.registry.services.scene.isActiveScene(GameSceneId)) { return }
+
+        const player = this.registry.services.scene.getSceneById(GameSceneId).spriteStore.getByRole(GameObjectRole.Player)[0];
         if (!release) {
             this.downKeys.add(GamepadKey.Down);
             player.speed.y = 2;

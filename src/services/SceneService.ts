@@ -1,20 +1,20 @@
 import { Application, Point } from "pixi.js";
 import { Registry } from "../Registry";
 import { AbstractScene } from "../scenes/AbstractScene";
-import { GameScene } from "../scenes/game_scene/GameScene";
+import { GameScene, GameSceneId } from "../scenes/game_scene/GameScene";
 import { AppJson, defaultAppJson } from "../scenes/SceneLoader";
 import { ScoreScene as ScoreScene } from "../scenes/score_scene/ScoreScene";
 import { ScoreStoreEvents } from "../stores/ScoreStore";
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
-import { MenuScene } from "../scenes/menu_scene/MenuScene";
+import { MenuScene, MenuSceneId } from "../scenes/menu_scene/MenuScene";
 import { LayerContainer } from "../stores/LayerContainer";
 import { MapSceneId, MapScene } from "../scenes/map_scene/MapScene";
 
 export class SceneService implements IService, IListener {
     capabilities = [ServiceCapability.Listen];
     scenes: AbstractScene[] = [];
-    runningScene: AbstractScene;
+    private overlayScenes: Set<AbstractScene> = new Set();
 
     sceneHtmlElement: HTMLDivElement;
 
@@ -23,17 +23,52 @@ export class SceneService implements IService, IListener {
 
     private registry: Registry;
 
+    private activeScene: AbstractScene;
+    private activeOverlayScene: AbstractScene;
+
     constructor(registry: Registry) {        
         this.registry = registry;
         this.application = new Application({width: 256, height: 256});
 
-        this.scenes.push(new GameScene(registry));
-        this.scenes.push(new ScoreScene(registry));
-        this.scenes.push(new MenuScene(registry));
-        this.scenes.push(new MapScene(registry));
-        this.runningScene = this.scenes[0];
+        this.registerScene(new GameScene(registry), false);
+        this.registerScene(new ScoreScene(registry), false);
+        this.registerScene(new MapScene(registry), false);
+        this.registerScene(new MenuScene(registry), true);
 
         this.registry.registerControlledObject(this);
+    }
+
+    registerScene(scene: AbstractScene, isOverlay: boolean) {
+        this.scenes.indexOf(scene) === -1 && this.scenes.push(scene);
+        isOverlay && this.overlayScenes.add(scene);
+    }
+
+    activateScene(sceneId: string) {
+        const scene = this.scenes.find(scene => scene.id === sceneId);
+
+        if (!scene) { throw new Error(`Scene '${sceneId}' not registered, so can not be activated.`);}
+
+        if (this.overlayScenes.has(scene)) {
+            this.activeOverlayScene = scene;
+        } else {
+            if (this.activeScene !== scene) {
+                this.activeScene && this.activeScene.destroy();
+                this.activeScene = scene;
+            }
+        }
+
+        scene.load();
+    }
+
+    getActiveScene(isOverlay: boolean): AbstractScene {
+        return isOverlay ? this.activeOverlayScene : this.activeScene;
+    }
+
+    isActiveScene(sceneId: string): boolean {
+        const scene = this.scenes.find(scene => scene.id === sceneId);
+        if (!scene) { return false }
+
+        return this.activeScene === scene || this.activeOverlayScene === scene;
     }
 
     init(htmlElement: HTMLDivElement) {
@@ -41,8 +76,6 @@ export class SceneService implements IService, IListener {
         this.sceneDimensions = new Point(defaultAppJson.width, defaultAppJson.height);
         
         this.scenes.forEach(scene => this.registry.stores.layer.addContainer(new LayerContainer(scene.id, this.registry)));
-        this.scenes[2].setup();
-
         this.application.renderer.resize(defaultAppJson.width, defaultAppJson.height);
 
         this.application.ticker.add(delta => {
@@ -58,10 +91,9 @@ export class SceneService implements IService, IListener {
         switch(action) {
             case ScoreStoreEvents.LIVES_CHANGED:
                 if (this.registry.stores.scoreStore.getLives() <= 1) {
-                    if (this.runningScene !== this.scenes[1]) {
-                        this.runningScene.destroy();
-                        this.runningScene = this.scenes[1];
-                        this.runningScene.setup();
+                    if (this.getActiveScene(false) && this.getActiveScene(false).id === GameSceneId) {
+                        this.getActiveScene(false).stop();
+                        this.getActiveScene(true).show();
                         this.registry.services.renderService.reRender();
                     }
                 }
@@ -69,8 +101,7 @@ export class SceneService implements IService, IListener {
         }
     }
 
-    runScene(scene: AbstractScene) {
-        this.runningScene = scene;
-        this.runningScene.setup();
+    getSceneById(id: string) {
+        return this.scenes.find(scene => scene.id === id);
     }
 }

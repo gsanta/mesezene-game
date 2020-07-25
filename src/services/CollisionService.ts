@@ -4,6 +4,7 @@ import { SpriteObject, GameObjectTag, GameObjectRole } from "../model/SpriteObje
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
 import { SceneActions } from "../actions/SceneActions";
+import { GameSceneId } from "../scenes/game_scene/GameScene";
 
 export interface Collision {
     v: number;
@@ -58,10 +59,12 @@ export class CollisionService implements IListener, IService {
     }
 
     calculateCollision(): void {
-        const player = this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Player)[0];
+        if (!this.registry.services.scene.isActiveScene(GameSceneId)) { return; }
+    
+        const player = this.registry.services.scene.getActiveScene(false).spriteStore.getByRole(GameObjectRole.Player)[0];
         const playerCollisionBox = player.getCollisionBox();
 
-        const collidableObjs = [...this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Coin), ...this.registry.services.scene.runningScene.spriteStore.getByRole(GameObjectRole.Obstacle)];
+        const collidableObjs = [...this.registry.services.scene.getActiveScene(false).spriteStore.getByRole(GameObjectRole.Coin), ...this.registry.services.scene.getActiveScene(false).spriteStore.getByRole(GameObjectRole.Obstacle)];
 
         const collidedObj = collidableObjs
             .filter(obj => obj.layer === player.layer)

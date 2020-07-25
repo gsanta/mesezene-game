@@ -1,4 +1,4 @@
-import { Application, Point } from "pixi.js";
+import { Point } from "pixi.js";
 import { SceneActions } from "../../actions/SceneActions";
 import { GameObjectRole, SpriteObject } from "../../model/SpriteObject";
 import { Registry } from "../../Registry";
@@ -6,7 +6,7 @@ import { IListener } from "../../services/EventService";
 import { GamepadKey } from "../../services/GamepadService";
 import { IService, ServiceCapability } from "../../services/IService";
 import { GameObjectStore } from "../../stores/GameObjectStore";
-import { Layer, LayerContainer } from "../../stores/LayerContainer";
+import { Layer } from "../../stores/LayerContainer";
 import { AbstractScene } from "../AbstractScene";
 import { defaultAppJson, SceneLoader } from "../SceneLoader";
 import { CoinCollider } from "./colliders/CoinCollider";
@@ -33,7 +33,7 @@ export class GameScene extends AbstractScene implements IListener, IService {
     private horizontalBorders: [number, number];
 
     constructor(registry: Registry) {
-        super(registry);
+        super(registry, defaultAppJson);
         this.registry = registry;
 
         this.loader = new SceneLoader(this, this.registry);
@@ -46,48 +46,23 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.spriteStore = new GameObjectStore(this.registry);
     }
 
-    run() {
-    }
-    
-    setup() {
+    protected doInit() {
         const application = this.registry.services.scene.application;
         
         const gameContainer = this.registry.stores.layer.getContainer(this.id);
-
+    
         gameContainer.addLayer(new Layer('background-layer', [0, 0.73], application));
         gameContainer.addLayer(new Layer(`game-layer-1`, [0.73, 0.78], application))
         gameContainer.addLayer(new Layer(`game-layer-2`, [0.78, 0.83], application))
         gameContainer.addLayer(new Layer(`game-layer-3`, [0.83, 0.88], application))
         gameContainer.addLayer(new Layer(`game-layer-4`, [0.88, 0.93], application))
         gameContainer.addLayer(new Layer('menu-layer', [0, 1], application));
-
+    
         const appJson = defaultAppJson;
         this.gameSpeed = appJson.gameSpeed;
-
-        this.registry.services.event.addListener(this);
-
-        this.loader.load(appJson);
-    }
-
-    destroy() {
-        super.destroy();
-        this.registry.services.collision.stop();
-    }
-
-    listen(action: string) {
-        switch(action) {
-            case SceneActions.SCENE_LOADED:
-                if (this.registry.services.scene.runningScene === this) {
-                    this.start();
-                }
-            break;
-        }
-    }
-
-    start() {
+    
         const player = this.spriteStore.getByRole(GameObjectRole.Player)[0];
 
-        const gameContainer = this.registry.stores.layer.getContainer(this.id);
         gameContainer.getLayerById('game-layer-3').addChild(player);
 
         const backgroundSprites = this.spriteStore.getByRole(GameObjectRole.Background);
@@ -102,7 +77,13 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.registry.services.event.dispatch(SceneActions.SCENE_START);
     }
 
-    update() {
+    listen() {}
+
+    doDestroy() {
+        this.registry.services.collision.stop();
+    }
+
+    protected doUpdate() {
         const player = <PlayerSprite> this.spriteStore.getByRole(GameObjectRole.Player)[0];
 
         const scrollableSprites = this.spriteStore.getAll().filter(gameObject => !gameObject.roles.has(GameObjectRole.Player));

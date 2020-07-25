@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Registry } from '../Registry';
 import styled from 'styled-components';
+import { MenuSceneId } from '../scenes/menu_scene/MenuScene';
 const homeIcon = require('../../assets/icons/home-icon.png');
 
 const HeaderStyled = styled.div`
@@ -34,7 +35,16 @@ export class Header extends React.Component<{registry: Registry}> {
 
         return (
             <HeaderStyled>
-                <div className="home-icon"></div>
+                <div
+                    className="home-icon"
+                    onClick={() => {
+                        const menuScene = this.props.registry.services.scene.getSceneById(MenuSceneId);
+                        
+                        menuScene.isHidden() ? menuScene.show() : menuScene.hide();
+                    }}
+                >
+
+                </div>
                 <div>Lufik: {this.props.registry.stores.scoreStore.getScores()}</div>
                 <div>Életek: {this.props.registry.stores.scoreStore.getLives()}</div>
             </HeaderStyled>

@@ -98,6 +98,10 @@ export class SpriteObject {
         }
     }
 
+    destroy() {
+        this.sprite.destroy({children: true, texture: true});
+    }
+
     clone(): SpriteObject {
         const clone = new SpriteObject(new Sprite(this.sprite.texture));
         clone.speed = this.speed;

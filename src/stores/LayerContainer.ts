@@ -51,4 +51,8 @@ export class LayerContainer {
         this.container.addChild(layer.container);
         this.layers.push(layer);
     }
+
+    removeAllLayers() {
+        this.layers = [];
+    }
 }

@@ -102,7 +102,7 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
     capabilities = [ServiceCapability.Listen];
 
     constructor(registry: Registry) {
-        super(registry);
+        super(registry, scoreSceneJson);
         this.registry = registry;
         this.loader = new SceneLoader(this, this.registry);
         this.factory = new GameSpriteFactory();
@@ -110,15 +110,9 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
         this.spriteStore = new GameObjectStore(this.registry);
     }
 
-    listen(action: string) {
-        switch(action) {
-            case SceneActions.SCENE_LOADED:
-                this.start();
-            break;
-        }
-    }
+    listen(action: string) {}
 
-    setup() {
+    doInit() {
         const appJson = scoreSceneJson;
 
         this.registry.services.event.addListener(this);
@@ -127,35 +121,30 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
 
         this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer2', [0, 1], application));
 
-        this.loader.load(appJson);
-    }
-
-    start() {
         const background = this.spriteStore.getByRole(GameObjectRole.Background)[0];
         
         const backgroundLayer = this.registry.stores.layer.getContainer(this.id).getLayerById('background-layer2');
         
         backgroundLayer.addChild(background);
-
+    
         const vonat = this.spriteStore.getByRole(GameObjectRole.Character)[0];
         backgroundLayer.addChild(vonat);
-
+    
         const kigyo = this.spriteStore.getByRole(GameObjectRole.Character)[1];
         backgroundLayer.addChild(kigyo);
-
+    
         const kutya = this.spriteStore.getByRole(GameObjectRole.Character)[2];
         backgroundLayer.addChild(kutya);
-
+    
         const lud = this.spriteStore.getByRole(GameObjectRole.Character)[3];
         backgroundLayer.addChild(lud);
-
+    
         const eger = this.spriteStore.getByRole(GameObjectRole.Character)[4];
         backgroundLayer.addChild(eger);
-
+    
         this.registry.services.event.dispatch(SceneActions.SCENE_START);
     }
 
-    update() {
-
-    }
+    doDestroy() {}
+    doUpdate() {}
 }

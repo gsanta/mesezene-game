@@ -37,7 +37,7 @@ export class MapScene extends AbstractScene implements IListener, IService {
     capabilities = [ServiceCapability.Listen];
 
     constructor(registry: Registry) {
-        super(registry);
+        super(registry, mapSceneJson);
         this.registry = registry;
         this.loader = new SceneLoader(this, this.registry);
         this.factory = new GameSpriteFactory();
@@ -45,37 +45,29 @@ export class MapScene extends AbstractScene implements IListener, IService {
         this.spriteStore = new GameObjectStore(this.registry);
     }
 
-    listen(action: string) {
-        switch(action) {
-            case SceneActions.SCENE_LOADED:
-                this.start();
-            break;
-        }
-    }
+    listen(action: string) {}
 
-    setup() {
-        const appJson = mapSceneJson;
-
+    doInit() {
         this.registry.services.event.addListener(this);
 
         const application = this.registry.services.scene.application;
 
         this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer', [0, 1], application));
 
-        this.loader.load(appJson);
-    }
-
-    start() {
         const background = this.spriteStore.getByRole(GameObjectRole.Background)[0];
-
+    
         const backgroundLayer = this.registry.stores.layer.getContainer(this.id).getLayerById('background-layer');
         
         backgroundLayer.addChild(background);
-
+    
         this.registry.services.event.dispatch(SceneActions.SCENE_START);
     }
 
-    update() {
+    doDestroy() {
+
+    }
+
+    doUpdate() {
 
     }
 }

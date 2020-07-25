@@ -2,6 +2,9 @@ import { AbstractScene } from "../AbstractScene";
 import { Application, Graphics, Point, TextStyle, Text } from "pixi.js";
 import { Registry } from "../../Registry";
 import { LayerContainer, Layer } from "../../stores/LayerContainer";
+import { AppJson, SceneLoader } from "../SceneLoader";
+import { GameSceneId } from "../game_scene/GameScene";
+import { MapSceneId } from "../map_scene/MapScene";
 
 const colors = {
     darkGreen: '#50863b',
@@ -37,20 +40,29 @@ const greenTextStyle = new TextStyle({
     textBaseline: 'center'
 });
 
+export const appJson: AppJson = {
+    width: 700,
+    height: 700,
+    spriteSheet: undefined,
+    sprites: []
+}
+
+export const MenuSceneId = 'menu-scene';
 export class MenuScene extends AbstractScene {
-    id = 'menu-scene';
+    id = MenuSceneId;
     private application: Application;
 
     constructor(registry: Registry) {
-        super(registry);
+        super(registry, appJson);
+
+        this.loader = new SceneLoader(this, this.registry);
         // this.application = application;
     }
 
-    load() {
+    doDestroy() {}
+    doUpdate() {}
 
-    }
-
-    setup() {
+    doInit() {
         const container = new LayerContainer(this.id, this.registry);
         this.registry.stores.layer.addContainer(container);
         const application = this.registry.services.scene.application;
@@ -97,7 +109,7 @@ export class MenuScene extends AbstractScene {
         });
 
         graphics.on('click', () => {
-            this.registry.services.scene.runScene(this.registry.services.scene.scenes[1]);
+            this.registry.services.scene.activateScene(GameSceneId);
         });
 
         const textOffsetX = 50;
@@ -142,7 +154,7 @@ export class MenuScene extends AbstractScene {
         });
 
         graphics.on('click', () => {
-            this.registry.services.scene.runScene(this.registry.services.scene.scenes[3]);
+            this.registry.services.scene.activateScene(MapSceneId);
         });
 
         const textOffsetX = 25;

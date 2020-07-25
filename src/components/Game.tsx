@@ -6,6 +6,8 @@ import { Header } from './Header';
 import { TheEnd } from './TheEnd';
 import { ScoreSceneId } from '../scenes/score_scene/ScoreScene';
 import { GameSceneId } from '../scenes/game_scene/GameScene';
+import { MapSceneId } from '../scenes/map_scene/MapScene';
+import { MenuSceneId } from '../scenes/menu_scene/MenuScene';
 
 const AppStyled = styled.div`
     display: flex;
@@ -38,7 +40,8 @@ export class Game extends React.Component<AppProps> {
         this.ref.current.focus();
         this.props.registry.services.scene.sceneHtmlElement = this.ref.current;
         this.props.registry.services.scene.init(this.ref.current);
-        this.props.registry.services.scene.runScene(this.props.registry.services.scene.scenes[1]);
+        this.props.registry.services.scene.activateScene(MapSceneId);
+        this.props.registry.services.scene.activateScene(MenuSceneId);
     }
 
     render() {
@@ -58,11 +61,10 @@ export class Game extends React.Component<AppProps> {
     }
 
     private renderSceneHeader() {
-        switch(this.props.registry.services.scene.runningScene.id) {
-            case GameSceneId:
-                return <Header registry={this.props.registry}/>
-            case ScoreSceneId:
-                return null;
+        if (this.props.registry.services.scene.isActiveScene(GameSceneId)) {
+            return <Header registry={this.props.registry}/>
+        } else {
+            return null;
         }
     }
 }

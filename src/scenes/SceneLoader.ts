@@ -10,7 +10,7 @@ declare const mesezeneGlobals: MesezeneGlobals;
 export interface AppJson {
     width: number;
     height: number;
-    gameSpeed: number;
+    gameSpeed?: number;
     spriteSheet: string;
     sprites: SpriteObjectJson[];
 }
@@ -151,20 +151,30 @@ export class SceneLoader {
         this.registry = registry;
     }
 
-    load(appJson: AppJson): void {        
+    load(appJson: AppJson): Promise<void> {        
         this.loader = new Loader();
 
-        this.loader
-            .add(appJson.sprites.filter(sprite => sprite.path).map(sprite => `${mesezeneGlobals.urlPrefix}/${sprite.path}`))
-            .add(`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`)
+        return new Promise((resolve, reject) => {
+
+            this.loader.add(appJson.sprites.filter(sprite => sprite.path).map(sprite => `${mesezeneGlobals.urlPrefix}/${sprite.path}`))
+
+            if (appJson.spriteSheet) {
+                this.loader.add(`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`);
+            }
+            
+            this.loader
             .load(() => {
                 this.setupSprites(appJson);
+                resolve();
                 this.registry.services.event.dispatch(SceneActions.SCENE_LOADED);
             })
             .on('error', (e) => {
                 this.registry.stores.messageStore.gameError = e.message;
+                reject(e);
                 this.registry.services.event.dispatch(SceneActions.SCENE_LOADING_ERROR);
             });
+        });
+
     }
 
     private setupSprites(appJson: AppJson) {
