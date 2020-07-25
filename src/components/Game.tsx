@@ -61,10 +61,10 @@ export class Game extends React.Component<AppProps> {
     }
 
     private renderSceneHeader() {
-        if (this.props.registry.services.scene.isActiveScene(GameSceneId)) {
-            return <Header registry={this.props.registry}/>
-        } else {
-            return null;
-        }
+        // if (this.props.registry.services.scene.isActiveScene(GameSceneId)) {
+        // } else {
+        //     return null;
+        // }
+        return <Header registry={this.props.registry}/>
     }
 }

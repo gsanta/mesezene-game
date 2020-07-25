@@ -5,6 +5,7 @@ import { LayerContainer, Layer } from "../../stores/LayerContainer";
 import { AppJson, SceneLoader } from "../SceneLoader";
 import { GameSceneId } from "../game_scene/GameScene";
 import { MapSceneId } from "../map_scene/MapScene";
+import { MenuItemGraphics } from "./MenuItemGraphics";
 
 const colors = {
     darkGreen: '#50863b',
@@ -17,10 +18,11 @@ export const toHexNumber = (hexString: string): number => {
 
 const redTextStyle = new TextStyle({
     fontFamily: 'Arial',
-    fontSize: 36,
+    fontSize: 50,
     fontStyle: 'italic',
     fontWeight: 'bold',
-    fill: ['#fba192', '#e26b58'], // gradient
+    // fill: ['#fba192', '#e26b58'], // gradient
+    fill: ['#ffffff', '#ffffff'], // gradient
     stroke: '#4a1850',
     strokeThickness: 5,
     wordWrap: true,
@@ -29,15 +31,14 @@ const redTextStyle = new TextStyle({
 
 const greenTextStyle = new TextStyle({
     fontFamily: 'Arial',
-    fontSize: 36,
+    fontSize: 50,
     // fontStyle: 'italic',
     fontWeight: 'bold',
-    fill: [colors.lightGreen, colors.darkGreen],
+    fill: ['#ffffff', '#ffffff'], // gradient
     stroke: '#4a1850',
     strokeThickness: 3,
     wordWrap: true,
     wordWrapWidth: 440,
-    textBaseline: 'center'
 });
 
 export const appJson: AppJson = {
@@ -72,48 +73,72 @@ export class MenuScene extends AbstractScene {
         // = function(e) {
         //     console.log(e.global.x, e.global.y);
         // };
-
+        this.drawBackground();
         this.drawPlayButton();
         this.drawMapButton();
     }
 
+    private drawBackground(): void {
+        const dimensions = this.registry.services.scene.sceneDimensions;
+        const size = new Point(700, 700);
+        let position = new Point(dimensions.x / 2 - size.x / 2, 0);
+
+        const graphics = new Graphics();
+        graphics.lineStyle(4, 0x424a3f, 1);
+        graphics.beginFill(0x000000, 0.5);
+        graphics.drawRect(position.x, position.y, size.x, size.y);
+        graphics.endFill();
+
+        this.getLayerContainer().getLayerById('main').addGraphics(graphics);
+
+        position.y += 95;
+        let menuItem = new MenuItemGraphics(position, size.x);
+        this.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw());
+
+        position = menuItem.position;
+        position.y += 15;
+
+        menuItem = new MenuItemGraphics(position, size.x);
+        this.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw());
+    }
+    
     private drawPlayButton(): void {
         const dimensions = this.registry.services.scene.sceneDimensions;
         const size = new Point(200, 40);
-        const position = new Point(dimensions.x / 2 - size.x / 2, 100)
+        const position = new Point(dimensions.x / 2 - size.x / 2, 95)
 
         const graphics = new Graphics();
-        graphics.lineStyle(2, 0xe26b58, 1);
-        graphics.beginFill(0xffffff);
+        // graphics.lineStyle(2, 0xe26b58, 1);
+        // graphics.beginFill(0xffffff);
         graphics.drawRect(position.x, position.y, size.x, size.y);
-        graphics.endFill();
+        // graphics.endFill();
 
         graphics.interactive = true;
 
         graphics.on('mouseover', () => {
             graphics.clear();
 
-            graphics.lineStyle(2, 0xe26b58, 1);
-            graphics.beginFill(0xfba192);
-            graphics.drawRect(position.x, position.y, size.x, size.y);
-            graphics.endFill();
+            // graphics.lineStyle(2, 0xe26b58, 1);
+            // graphics.beginFill(0xfba192);
+            // graphics.drawRect(position.x, position.y, size.x, size.y);
+            // graphics.endFill();
         });
 
         graphics.on('mouseout', () => {
             graphics.clear();
 
-            graphics.lineStyle(2, 0xe26b58, 1);
-            graphics.beginFill(0xffffff);
-            graphics.drawRect(position.x, position.y, size.x, size.y);
-            graphics.endFill();
+            // graphics.lineStyle(2, 0xe26b58, 1);
+            // graphics.beginFill(0xffffff);
+            // graphics.drawRect(position.x, position.y, size.x, size.y);
+            // graphics.endFill();
         });
 
         graphics.on('click', () => {
             this.registry.services.scene.activateScene(GameSceneId);
         });
 
-        const textOffsetX = 50;
-        const textOffsetY = -2;
+        const textOffsetX = 25;
+        const textOffsetY = 0;
         const richText = new Text('Játék', redTextStyle);
         richText.x = position.x + textOffsetX;
         richText.y = position.y + textOffsetY;
@@ -125,40 +150,40 @@ export class MenuScene extends AbstractScene {
     private drawMapButton(): void {
         const dimensions = this.registry.services.scene.sceneDimensions;
         const size = new Point(200, 40);
-        const position = new Point(dimensions.x / 2 - size.x / 2, 300)
+        const position = new Point(dimensions.x / 2 - size.x / 2, 182)
 
         const graphics = new Graphics();
-        graphics.lineStyle(2, toHexNumber(colors.darkGreen), 1);
-        graphics.beginFill(0xffffff);
-        graphics.drawRect(position.x, position.y, size.x, size.y);
-        graphics.endFill();
+        // graphics.lineStyle(2, toHexNumber(colors.darkGreen), 1);
+        // graphics.beginFill(0xffffff);
+        // graphics.drawRect(position.x, position.y, size.x, size.y);
+        // graphics.endFill();
 
         graphics.interactive = true;
 
         graphics.on('mouseover', () => {
-            graphics.clear();
+            // graphics.clear();
 
-            graphics.lineStyle(2, toHexNumber(colors.darkGreen), 1);
-            graphics.beginFill(toHexNumber(colors.lightGreen));
-            graphics.drawRect(position.x, position.y, size.x, size.y);
-            graphics.endFill();
+            // graphics.lineStyle(2, toHexNumber(colors.darkGreen), 1);
+            // graphics.beginFill(toHexNumber(colors.lightGreen));
+            // graphics.drawRect(position.x, position.y, size.x, size.y);
+            // graphics.endFill();
         });
 
         graphics.on('mouseout', () => {
             graphics.clear();
 
-            graphics.lineStyle(2, toHexNumber(colors.darkGreen), 1);
-            graphics.beginFill(0xffffff);
-            graphics.drawRect(position.x, position.y, size.x, size.y);
-            graphics.endFill();
+            // graphics.lineStyle(2, toHexNumber(colors.darkGreen), 1);
+            // graphics.beginFill(0xffffff);
+            // graphics.drawRect(position.x, position.y, size.x, size.y);
+            // graphics.endFill();
         });
 
         graphics.on('click', () => {
             this.registry.services.scene.activateScene(MapSceneId);
         });
 
-        const textOffsetX = 25;
-        const textOffsetY = -4;
+        const textOffsetX = 0;
+        const textOffsetY = 0;
         const richText = new Text('Lufivilág', greenTextStyle);
         richText.x = position.x + textOffsetX;
         richText.y = position.y + textOffsetY;
