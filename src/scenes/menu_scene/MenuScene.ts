@@ -61,7 +61,9 @@ export class MenuScene extends AbstractScene {
     }
 
     doDestroy() {}
-    doUpdate() {}
+    doUpdate() {
+        
+    }
 
     doInit() {
         const container = new LayerContainer(this.id, this.registry);
@@ -74,8 +76,8 @@ export class MenuScene extends AbstractScene {
         //     console.log(e.global.x, e.global.y);
         // };
         this.drawBackground();
-        this.drawPlayButton();
-        this.drawMapButton();
+        // this.drawPlayButton();
+        // this.drawMapButton();
     }
 
     private drawBackground(): void {
@@ -92,13 +94,13 @@ export class MenuScene extends AbstractScene {
         this.getLayerContainer().getLayerById('main').addGraphics(graphics);
 
         position.y += 95;
-        let menuItem = new MenuItemGraphics(position, size.x);
+        let menuItem = new MenuItemGraphics(position, size.x, {color: '#ffffff', hoveredColor: '#e26b58', label: 'Játék'});
         this.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw());
 
-        position = menuItem.position;
-        position.y += 15;
+        position.y += menuItem.size.y;
+        position.y += 30;
 
-        menuItem = new MenuItemGraphics(position, size.x);
+        menuItem = new MenuItemGraphics(position, size.x, {color: '#ffffff', hoveredColor: '#50863b', label: 'Lufivilág'});
         this.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw());
     }
     

@@ -84,7 +84,6 @@ export class SceneService implements IService, IListener {
     }
 
     update() {
-
     }
 
     listen(action: string): void {
