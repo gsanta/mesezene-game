@@ -72,12 +72,7 @@ export class MenuScene extends AbstractScene {
 
         container.addLayer(new Layer('main', [0, 1], application));
 
-        // = function(e) {
-        //     console.log(e.global.x, e.global.y);
-        // };
         this.drawBackground();
-        // this.drawPlayButton();
-        // this.drawMapButton();
     }
 
     private drawBackground(): void {
@@ -94,13 +89,35 @@ export class MenuScene extends AbstractScene {
         this.getLayerContainer().getLayerById('main').addGraphics(graphics);
 
         position.y += 95;
-        let menuItem = new MenuItemGraphics(position, size.x, {color: '#ffffff', hoveredColor: '#e26b58', label: 'Játék'});
+        let menuItem = new MenuItemGraphics(
+            position,
+            size.x,
+            {
+                color: '#ffffff',
+                hoveredColor: '#e26b58',
+                label: 'Játék',
+                action: () => {
+                    this.registry.services.scene.activateScene(GameSceneId);
+                }
+            }
+        );
         this.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw());
 
         position.y += menuItem.size.y;
         position.y += 30;
 
-        menuItem = new MenuItemGraphics(position, size.x, {color: '#ffffff', hoveredColor: '#50863b', label: 'Lufivilág'});
+        menuItem = new MenuItemGraphics(
+            position,
+            size.x,
+            {
+                color: '#ffffff',
+                hoveredColor: '#50863b',
+                label: 'Lufivilág',
+                action: () => {
+                    this.registry.services.scene.activateScene(MapSceneId);
+                }
+            }
+        );
         this.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw());
     }
     

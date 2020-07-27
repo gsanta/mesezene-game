@@ -5,6 +5,7 @@ export interface MenuItemGraphicsConfig {
     color: string;
     hoveredColor: string;
     label: string;
+    action: () => void;
 }
 
 const textStyle = new TextStyle({
@@ -49,12 +50,30 @@ export class MenuItemGraphics {
     }
 
     draw(): Graphics {
+        this.addEventHandlers();
         return this.drawMenuItem();
     }
 
     update() {
         this.graphics.clear();
         this.drawMenuItem();
+    }
+
+    private addEventHandlers() {
+        this.graphics.on('mouseover', () => {
+            this.hovered = true;
+            this.update();
+            console.log('update')
+        });
+
+        this.graphics.on('mouseout', () => {
+            this.hovered = false;
+            this.update();
+        });
+        
+        this.graphics.on('click', () => {
+            this.config.action();
+        });
     }
 
     private drawMenuItem() {
@@ -83,16 +102,6 @@ export class MenuItemGraphics {
         this.graphics.drawRect(position.x + PADDING_X, startY + 1, 1, (LINES - 1) * LINE_DIST - 1);
         this.graphics.drawRect(position.x + this.len - PADDING_X, startY + 1, 1, (LINES - 1) * LINE_DIST - 1);
 
-
-        this.graphics.on('mouseover', () => {
-            this.hovered = true;
-            this.update();
-        });
-
-        this.graphics.on('mouseout', () => {
-            this.hovered = false;
-            this.update();
-        });
 
         this.size = new Point(this.len, (LINES - 1) * LINE_DIST - 1);
 

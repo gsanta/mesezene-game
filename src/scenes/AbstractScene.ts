@@ -3,7 +3,7 @@ import { GameObjectStore } from "../stores/GameObjectStore";
 import { ISpriteFactory } from "./ISpriteFactory";
 import { SceneLoader, AppJson } from "./SceneLoader";
 
-export enum SceneState {
+export enum SceneStateLegacy {
     Loading = 'Loading',
     Ready = 'Ready',
     Running = 'Running',
@@ -29,7 +29,7 @@ export abstract class AbstractScene {
         this.sceneJson = sceneJson;
     }
 
-    state: SceneState = SceneState.Destroyed;
+    state: SceneStateLegacy = SceneStateLegacy.Destroyed;
 
     getLayerContainer() {
         return this.registry.stores.layer.getContainer(this.id);
@@ -40,11 +40,11 @@ export abstract class AbstractScene {
     }
 
     stop() {
-        this.state = SceneState.Stopped;
+        this.state = SceneStateLegacy.Stopped;
     }
 
     destroy() {
-        this.state = SceneState.Destroyed;
+        this.state = SceneStateLegacy.Destroyed;
         // this.spriteStore.getAll().forEach(spriteObject => spriteObject.destroy());
         this.registry.stores.layer.getContainer(this.id).container.removeChildren();
         this.getLayerContainer().removeAllLayers();
@@ -53,10 +53,10 @@ export abstract class AbstractScene {
     }
 
     load() {
-        this.state = SceneState.Loading;
+        this.state = SceneStateLegacy.Loading;
         this.loader.load(this.sceneJson)
             .then(() => {
-                this.state = SceneState.Ready;
+                this.state = SceneStateLegacy.Ready;
                 this.doInit();
             })
             .catch((e) => {
@@ -65,9 +65,13 @@ export abstract class AbstractScene {
     }
 
     update() {
-        if (this.state === SceneState.Running) {
+        if (this.state === SceneStateLegacy.Running) {
             this.doUpdate();
         }
+    }
+
+    run() {
+        this.state = SceneStateLegacy.Running;
     }
 
     hide() {

@@ -1,6 +1,6 @@
 import { Application, Point } from "pixi.js";
 import { Registry } from "../Registry";
-import { AbstractScene } from "../scenes/AbstractScene";
+import { AbstractScene, SceneStateLegacy } from "../scenes/AbstractScene";
 import { GameScene, GameSceneId } from "../scenes/game_scene/GameScene";
 import { AppJson, defaultAppJson } from "../scenes/SceneLoader";
 import { ScoreScene as ScoreScene } from "../scenes/score_scene/ScoreScene";
@@ -43,7 +43,7 @@ export class SceneService implements IService, IListener {
         isOverlay && this.overlayScenes.add(scene);
     }
 
-    activateScene(sceneId: string) {
+    activateScene(sceneId: string, run = false) {
         const scene = this.scenes.find(scene => scene.id === sceneId);
 
         if (!scene) { throw new Error(`Scene '${sceneId}' not registered, so can not be activated.`);}
@@ -57,7 +57,7 @@ export class SceneService implements IService, IListener {
             }
         }
 
-        scene.load();
+        scene.load()
     }
 
     getActiveScene(isOverlay: boolean): AbstractScene {
@@ -84,6 +84,11 @@ export class SceneService implements IService, IListener {
     }
 
     update() {
+    this.registry.services.stateTransition.update();
+
+        if (this.activeScene.getState() === SceneStateLegacy.Running) {
+            this.activeScene.update();
+        }
     }
 
     listen(action: string): void {

@@ -1,6 +1,4 @@
 import { AbstractStore } from "./AbstractStore";
-import { Registry } from "../Registry";
-
 
 
 export enum ScoreStoreEvents {

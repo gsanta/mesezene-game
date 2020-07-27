@@ -7,6 +7,7 @@ import { KeyboardService } from "./services/KeyboardService";
 import { RenderService } from "./services/RenderService";
 import { SceneService } from "./services/SceneService";
 import { UserService } from "./services/UserService";
+import { StateTransitionService } from "./services/StateTransitionService";
 
 export class Services {
     private registry: Registry;
@@ -18,6 +19,7 @@ export class Services {
     renderService: RenderService;
     event: EventService;
     collision: CollisionService;
+    stateTransition: StateTransitionService;
 
     services: IService[] = [];
 
@@ -29,6 +31,7 @@ export class Services {
         this.scene = new SceneService(registry);
         this.loginService = new UserService(registry);
         this.renderService = new RenderService();
+        this.stateTransition = new StateTransitionService(this.registry);
 
         this.collision = new CollisionService(this.registry);
         this.services.push(
