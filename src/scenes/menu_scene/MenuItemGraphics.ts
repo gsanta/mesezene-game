@@ -27,7 +27,6 @@ export class MenuItemGraphics {
     private readonly LINE_DIST = 12;
 
     private readonly len: number;
-    position: Point;
     size: Point;
 
     private graphics: Graphics = new Graphics();
@@ -36,10 +35,10 @@ export class MenuItemGraphics {
 
     private textStyle: TextStyle;
     private hoverTextStyle: TextStyle;
+    private position: Point;
 
-    constructor(position: Point, len: number, config: MenuItemGraphicsConfig) {
+    constructor(len: number, config: MenuItemGraphicsConfig) {
         this.config = config;
-        this.position = new Point(position.x, position.y);
         this.len = len;
 
         this.textStyle = textStyle.clone();
@@ -49,7 +48,8 @@ export class MenuItemGraphics {
         this.hoverTextStyle.fill = config.hoveredColor;
     }
 
-    draw(): Graphics {
+    draw(position: Point): Graphics {
+        this.position = position;
         this.addEventHandlers();
         return this.drawMenuItem();
     }

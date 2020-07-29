@@ -11,11 +11,37 @@ export enum SceneStateLegacy {
     Destroyed = 'Destroyed'
 }
 
-export abstract class AbstractScene {
+export class StateDescription<T extends string> {
+    stateId: T;
+
+    overlay: {
+        overlayStateId: string;
+    }
+
+    apply(scene: AbstractScene) {
+
+    }
+}
+
+export class SceneStates {
+    private sceneStatesMap: Map<string, StateDescription<string>> = new Map();
+
+    registerStates<T extends string>(states: StateDescription<T>[]) {
+        states.forEach(state => this.sceneStatesMap.set(state.stateId, state));
+    }
+
+    getSateById<T extends string>(sceneState: T): StateDescription<T> {
+        return <StateDescription<T>> this.sceneStatesMap.get(sceneState);
+    }
+}
+
+
+export abstract class AbstractScene<T extends string = null> {
     id: string;
     // application: Application;
     factory: ISpriteFactory;
     loader: SceneLoader;
+    states: SceneStates = new SceneStates();
 
     private hidden = false;
     

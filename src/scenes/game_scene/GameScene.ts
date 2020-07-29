@@ -7,7 +7,7 @@ import { GamepadKey } from "../../services/GamepadService";
 import { IService, ServiceCapability } from "../../services/IService";
 import { GameObjectStore } from "../../stores/GameObjectStore";
 import { Layer } from "../../stores/LayerContainer";
-import { AbstractScene } from "../AbstractScene";
+import { AbstractScene, SceneStates, StateDescription } from "../AbstractScene";
 import { defaultAppJson, SceneLoader } from "../SceneLoader";
 import { CoinCollider } from "./colliders/CoinCollider";
 import { ObstacleCollider } from "./colliders/ObstacleCollider";
@@ -15,6 +15,26 @@ import { GameSpriteFactory } from "./GameSpriteFactory";
 import { CoinGenerator } from "./generators/CoinGenerator";
 import { ObstacleGenerator } from "./generators/ObstacleGenerator";
 import { PlayerSprite } from "./PlayerSprite";
+import { MenuSceneStates } from "../menu_scene/MenuScene";
+
+export enum GameSceneStates {
+    Running = 'Running',
+    GameOver = 'GameOver',
+    Paused = 'Paused'
+}
+
+const gameStates: StateDescription<GameSceneStates>[] = [
+    {
+        stateId: GameSceneStates.Running,
+        overlay: null,
+
+        apply() {
+            
+        }
+    }
+]
+
+
 
 export const GameSceneId = 'game-scene';
 export class GameScene extends AbstractScene implements IListener, IService {
@@ -44,6 +64,8 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.coinCollider = new CoinCollider(this, registry);
 
         this.spriteStore = new GameObjectStore(this.registry);
+
+        this.states.registerState()
     }
 
     protected doInit() {
