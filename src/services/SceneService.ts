@@ -1,15 +1,16 @@
 import { Application, Point } from "pixi.js";
 import { Registry } from "../Registry";
 import { AbstractScene, SceneStateLegacy } from "../scenes/AbstractScene";
-import { GameScene, GameSceneId } from "../scenes/game_scene/GameScene";
+import { GameScene } from "../scenes/game_scene/GameScene";
 import { AppJson, defaultAppJson } from "../scenes/SceneLoader";
 import { ScoreScene as ScoreScene } from "../scenes/score_scene/ScoreScene";
 import { ScoreStoreEvents } from "../stores/ScoreStore";
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
-import { MenuScene, MenuSceneId } from "../scenes/menu_scene/MenuScene";
+import { MenuScene } from "../scenes/menu_scene/MenuScene";
 import { LayerContainer } from "../stores/LayerContainer";
 import { MapSceneId, MapScene } from "../scenes/map_scene/MapScene";
+import { GameSceneId } from "../scenes/game_scene/GameSceneState";
 
 export class SceneService implements IService, IListener {
     capabilities = [ServiceCapability.Listen];
@@ -23,8 +24,8 @@ export class SceneService implements IService, IListener {
 
     private registry: Registry;
 
-    private activeScene: AbstractScene;
-    private activeOverlayScene: AbstractScene;
+    activeScene: AbstractScene;
+    overlayScene: AbstractScene;
 
     constructor(registry: Registry) {        
         this.registry = registry;
@@ -49,7 +50,7 @@ export class SceneService implements IService, IListener {
         if (!scene) { throw new Error(`Scene '${sceneId}' not registered, so can not be activated.`);}
 
         if (this.overlayScenes.has(scene)) {
-            this.activeOverlayScene = scene;
+            this.overlayScene = scene;
         } else {
             if (this.activeScene !== scene) {
                 this.activeScene && this.activeScene.destroy();
@@ -61,14 +62,14 @@ export class SceneService implements IService, IListener {
     }
 
     getActiveScene(isOverlay: boolean): AbstractScene {
-        return isOverlay ? this.activeOverlayScene : this.activeScene;
+        return isOverlay ? this.overlayScene : this.activeScene;
     }
 
     isActiveScene(sceneId: string): boolean {
         const scene = this.scenes.find(scene => scene.id === sceneId);
         if (!scene) { return false }
 
-        return this.activeScene === scene || this.activeOverlayScene === scene;
+        return this.activeScene === scene || this.overlayScene === scene;
     }
 
     init(htmlElement: HTMLDivElement) {
@@ -84,11 +85,9 @@ export class SceneService implements IService, IListener {
     }
 
     update() {
-    this.registry.services.stateTransition.update();
+        // this.registry.services.stateTransition.update();
 
-        if (this.activeScene.getState() === SceneStateLegacy.Running) {
-            this.activeScene.update();
-        }
+        this.activeScene.update();
     }
 
     listen(action: string): void {

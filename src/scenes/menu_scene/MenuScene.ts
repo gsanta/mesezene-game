@@ -3,34 +3,54 @@ import { Application, Graphics, Point, TextStyle, Text } from "pixi.js";
 import { Registry } from "../../Registry";
 import { LayerContainer, Layer } from "../../stores/LayerContainer";
 import { AppJson, SceneLoader } from "../SceneLoader";
-import { GameSceneId } from "../game_scene/GameScene";
 import { MapSceneId } from "../map_scene/MapScene";
 import { MenuItemGraphics } from "./MenuItemGraphics";
-
-export enum MenuSceneStates {
-    GameOver = 'GameOver'
-}
+import { MenuSceneState, MenuSceneId } from "./MenuSceneState";
+import { GameSceneId, GameSceneState } from "../game_scene/GameSceneState";
 
 export enum MenuItemId {
-    GameResume = 'GameRestart',
+    GameResume = 'GameResume',
     GameExit = 'GameExit',
-    Game = 'Game',
+    GameStart = 'GameStart',
     WorldMap = 'WorldMap'
 }
 
-const gameStates: StateDescription<MenuSceneStates>[] = [
-    {
-        stateId: MenuSceneStates.GameOver,
-        overlay: null,
+const menuStates: StateDescription<MenuSceneState>[] = [
+    new StateDescription(MenuSceneId, MenuSceneState.WorldMapState)
+        .onDraw((menuScene: MenuScene, registry: Registry) => {
+            const dimensions = registry.services.scene.sceneDimensions;
+            let position = new Point(dimensions.x / 2 - menuScene.size.x / 2, 0);
 
-        apply(menuScene: MenuScene) {
+            position.y += 95;
 
             menuScene.activeMenuItems = [
                 menuScene.menuItems.get(MenuItemId.GameResume),
                 menuScene.menuItems.get(MenuItemId.GameExit),
-            ]
-        }
-    }
+            ];
+            
+            menuScene.activeMenuItems.forEach(menuItem => {
+                menuScene.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw(position));
+                position.y += menuItem.size.y;
+                position.y += 30;
+            });
+        }),
+    new StateDescription(MenuSceneId, MenuSceneState.WorldMapState)
+        .onDraw((menuScene: MenuScene, registry: Registry) => {
+            const dimensions = registry.services.scene.sceneDimensions;
+            let position = new Point(dimensions.x / 2 - menuScene.size.x / 2, 0);
+
+            position.y += 95;
+
+            menuScene.activeMenuItems = [
+                menuScene.menuItems.get(MenuItemId.GameStart)
+            ];
+            
+            menuScene.activeMenuItems.forEach(menuItem => {
+                menuScene.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw(position));
+                position.y += menuItem.size.y;
+                position.y += 30;
+            });
+        }),
 ];
 
 export const toHexNumber = (hexString: string): number => {
@@ -44,11 +64,11 @@ export const appJson: AppJson = {
     sprites: []
 }
 
-export const MenuSceneId = 'menu-scene';
 export class MenuScene extends AbstractScene {
     id = MenuSceneId;
+    isOverlay = true;
     private application: Application;
-    private size = new Point(700, 700);
+    size = new Point(700, 700);
 
     menuItems: Map<MenuItemId, MenuItemGraphics> = new Map();
     activeMenuItems: MenuItemGraphics[] = [];
@@ -58,13 +78,14 @@ export class MenuScene extends AbstractScene {
 
         this.loader = new SceneLoader(this, this.registry);
 
-        this.menuItems.set(MenuItemId.Game, new MenuItemGraphics(
+        this.menuItems.set(MenuItemId.GameStart, new MenuItemGraphics(
             this.size.x,
             {
                 color: '#ffffff',
                 hoveredColor: '#e26b58',
                 label: 'Játék',
                 action: () => {
+                    this.registry.services.scene.getSceneById(GameSceneId).activeStateId = GameSceneState.Running;
                     this.registry.services.scene.activateScene(GameSceneId);
                 }
             }
@@ -105,6 +126,8 @@ export class MenuScene extends AbstractScene {
                 }
             }
         ));
+
+        this.states.registerStates(menuStates);
     }
 
     doDestroy() {}
@@ -112,7 +135,7 @@ export class MenuScene extends AbstractScene {
         
     }
 
-    doInit() {
+    doDraw() {
         const container = new LayerContainer(this.id, this.registry);
         this.registry.stores.layer.addContainer(container);
         const application = this.registry.services.scene.application;
@@ -120,6 +143,7 @@ export class MenuScene extends AbstractScene {
         container.addLayer(new Layer('main', [0, 1], application));
 
         this.drawBackground();
+        this.states.getSateById(this.activeStateId).draw(this, this.registry);
     }
 
     private drawBackground(): void {
@@ -133,12 +157,5 @@ export class MenuScene extends AbstractScene {
         graphics.endFill();
 
         this.getLayerContainer().getLayerById('main').addGraphics(graphics);
-
-        position.y += 95;        
-        this.activeMenuItems.forEach(menuItem => {
-            this.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw(position));
-            position.y += menuItem.size.y;
-            position.y += 30;
-        });
     }
 }

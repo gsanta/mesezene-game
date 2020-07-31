@@ -4,7 +4,7 @@ import { SpriteObject, GameObjectTag, GameObjectRole } from "../model/SpriteObje
 import { IListener } from "./EventService";
 import { IService, ServiceCapability } from "./IService";
 import { SceneActions } from "../actions/SceneActions";
-import { GameSceneId } from "../scenes/game_scene/GameScene";
+import { GameSceneId } from "../scenes/game_scene/GameSceneState";
 
 export interface Collision {
     v: number;

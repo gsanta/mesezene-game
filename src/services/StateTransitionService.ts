@@ -1,6 +1,6 @@
 import { SceneStateLegacy } from "../scenes/AbstractScene";
 import { Registry } from "../Registry";
-import { GameSceneId } from "../scenes/game_scene/GameScene";
+import { GameSceneId } from "../scenes/game_scene/GameSceneState";
 
 
 
@@ -13,10 +13,6 @@ export class StateTransitionService {
 
     constructor(registry: Registry) {
         this.registry = registry;
-    }
-
-    execute(description: StateDescription) {
-
     }
 
     registerSceneStates<T>(sceneId: string) {

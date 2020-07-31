@@ -1,13 +1,9 @@
 import * as React from 'react';
-import { AppProps } from './AppProps';
-import { defaultAppJson } from '../scenes/SceneLoader';
 import styled from 'styled-components';
+import { MapSceneId } from '../scenes/map_scene/MapScene';
+import { AppProps } from './AppProps';
 import { Header } from './Header';
 import { TheEnd } from './TheEnd';
-import { ScoreSceneId } from '../scenes/score_scene/ScoreScene';
-import { GameSceneId } from '../scenes/game_scene/GameScene';
-import { MapSceneId } from '../scenes/map_scene/MapScene';
-import { MenuSceneId } from '../scenes/menu_scene/MenuScene';
 
 const AppStyled = styled.div`
     display: flex;
@@ -41,7 +37,6 @@ export class Game extends React.Component<AppProps> {
         this.props.registry.services.scene.sceneHtmlElement = this.ref.current;
         this.props.registry.services.scene.init(this.ref.current);
         this.props.registry.services.scene.activateScene(MapSceneId);
-        this.props.registry.services.scene.activateScene(MenuSceneId);
     }
 
     render() {

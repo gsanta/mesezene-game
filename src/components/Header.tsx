@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Registry } from '../Registry';
 import styled from 'styled-components';
-import { MenuSceneId } from '../scenes/menu_scene/MenuScene';
+import { MenuSceneId } from '../scenes/menu_scene/MenuSceneState';
 const homeIcon = require('../../assets/icons/home-icon.png');
 
 const HeaderStyled = styled.div`

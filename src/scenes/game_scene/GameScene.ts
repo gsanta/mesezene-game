@@ -15,46 +15,65 @@ import { GameSpriteFactory } from "./GameSpriteFactory";
 import { CoinGenerator } from "./generators/CoinGenerator";
 import { ObstacleGenerator } from "./generators/ObstacleGenerator";
 import { PlayerSprite } from "./PlayerSprite";
-import { MenuSceneStates } from "../menu_scene/MenuScene";
+import { GameSceneId, GameSceneState } from "./GameSceneState";
+import { MenuSceneId, MenuSceneState } from "../menu_scene/MenuSceneState";
 
-export enum GameSceneStates {
-    Running = 'Running',
-    GameOver = 'GameOver',
-    Paused = 'Paused'
-}
 
-const gameStates: StateDescription<GameSceneStates>[] = [
-    {
-        stateId: GameSceneStates.Running,
-        overlay: null,
-
-        apply() {
-            
-        }
-    }
+const gameStates: StateDescription<GameSceneState>[] = [
+    new StateDescription<GameSceneState>(GameSceneId, GameSceneState.Running)
+        // .overlay(MenuSceneId, MenuSceneState.GameOverState)
+        .onDraw((scene: GameScene, registry: Registry) => {
+            const application = registry.services.scene.application;
+        
+            const gameContainer = registry.stores.layer.getContainer(scene.id);
+        
+            gameContainer.addLayer(new Layer('background-layer', [0, 0.73], application));
+            gameContainer.addLayer(new Layer(`game-layer-1`, [0.73, 0.78], application))
+            gameContainer.addLayer(new Layer(`game-layer-2`, [0.78, 0.83], application))
+            gameContainer.addLayer(new Layer(`game-layer-3`, [0.83, 0.88], application))
+            gameContainer.addLayer(new Layer(`game-layer-4`, [0.88, 0.93], application))
+            gameContainer.addLayer(new Layer('menu-layer', [0, 1], application));
+        
+            const appJson = defaultAppJson;
+            this.gameSpeed = appJson.gameSpeed;
+        
+            const player = scene.spriteStore.getByRole(GameObjectRole.Player)[0];
+    
+            gameContainer.getLayerById('game-layer-3').addChild(player);
+    
+            const backgroundSprites = scene.spriteStore.getByRole(GameObjectRole.Background);
+            backgroundSprites.forEach(sprite => gameContainer.getLayerById('background-layer').addChild(sprite));
+    
+            scene.vertialBorders = [405, 510];
+            scene.horizontalBorders = [0, registry.services.scene.sceneDimensions.x];
+    
+            scene.obstacleGenerator.update();
+            scene.coinGenerator.update();
+    
+            registry.services.event.dispatch(SceneActions.SCENE_START);
+        })
 ]
 
-
-
-export const GameSceneId = 'game-scene';
 export class GameScene extends AbstractScene implements IListener, IService {
     id = GameSceneId;
     capabilities = [ServiceCapability.Listen];
 
-    private obstacleGenerator: ObstacleGenerator;
-    private coinGenerator: CoinGenerator;
+    obstacleGenerator: ObstacleGenerator;
+    coinGenerator: CoinGenerator;
     private obstacleCollider: ObstacleCollider;
     private coinCollider: CoinCollider;
 
     gameSpeed: number;
     gameLayerCount = 4;
 
-    private vertialBorders: [number, number];
-    private horizontalBorders: [number, number];
+    vertialBorders: [number, number];
+    horizontalBorders: [number, number];
 
     constructor(registry: Registry) {
         super(registry, defaultAppJson);
         this.registry = registry;
+
+        this.states.registerStates(gameStates);
 
         this.loader = new SceneLoader(this, this.registry);
         this.factory = new GameSpriteFactory();
@@ -64,39 +83,10 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.coinCollider = new CoinCollider(this, registry);
 
         this.spriteStore = new GameObjectStore(this.registry);
-
-        this.states.registerState()
     }
 
-    protected doInit() {
-        const application = this.registry.services.scene.application;
-        
-        const gameContainer = this.registry.stores.layer.getContainer(this.id);
-    
-        gameContainer.addLayer(new Layer('background-layer', [0, 0.73], application));
-        gameContainer.addLayer(new Layer(`game-layer-1`, [0.73, 0.78], application))
-        gameContainer.addLayer(new Layer(`game-layer-2`, [0.78, 0.83], application))
-        gameContainer.addLayer(new Layer(`game-layer-3`, [0.83, 0.88], application))
-        gameContainer.addLayer(new Layer(`game-layer-4`, [0.88, 0.93], application))
-        gameContainer.addLayer(new Layer('menu-layer', [0, 1], application));
-    
-        const appJson = defaultAppJson;
-        this.gameSpeed = appJson.gameSpeed;
-    
-        const player = this.spriteStore.getByRole(GameObjectRole.Player)[0];
-
-        gameContainer.getLayerById('game-layer-3').addChild(player);
-
-        const backgroundSprites = this.spriteStore.getByRole(GameObjectRole.Background);
-        backgroundSprites.forEach(sprite => gameContainer.getLayerById('background-layer').addChild(sprite));
-
-        this.vertialBorders = [405, 510];
-        this.horizontalBorders = [0, this.registry.services.scene.sceneDimensions.x];
-
-        this.obstacleGenerator.update();
-        this.coinGenerator.update();
-
-        this.registry.services.event.dispatch(SceneActions.SCENE_START);
+    protected doDraw() {
+        this.states.getSateById(this.activeStateId).draw(this, this.registry);
     }
 
     listen() {}

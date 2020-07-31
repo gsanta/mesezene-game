@@ -12,14 +12,48 @@ export enum SceneStateLegacy {
 }
 
 export class StateDescription<T extends string> {
+    sceneId: string;
     stateId: T;
 
-    overlay: {
-        overlayStateId: string;
+    constructor(sceneId: string, stateId: T) {
+        this.sceneId = sceneId;
+        this.stateId = stateId;
     }
 
-    apply(scene: AbstractScene) {
+    private drawFunc: (scene: AbstractScene, registry: Registry) => void;
 
+    overlay: {
+        sceneId: string;
+        stateId: string;
+    }
+
+    setOverlay(sceneId: string, stateId: string) {
+        this.overlay = {
+            sceneId,
+            stateId
+        }
+        return this;
+    }
+
+    onDraw(drawFunc: (scene: AbstractScene, registry: Registry) => void) {
+        this.drawFunc = drawFunc;
+
+        return this;
+    }
+
+    draw(scene: AbstractScene, registry: Registry) {
+        if (this.overlay) {
+            const overlayScene = registry.services.scene.getSceneById(this.overlay.sceneId);
+            overlayScene.activeStateId = this.overlay.stateId;
+            overlayScene.load();
+            registry.services.scene.overlayScene = overlayScene;
+            // registry.services.scene.getActiveScene(true).activeStateId = this.overlay.stateId;
+        } else if (!scene.isOverlay && registry.services.scene.overlayScene) {
+            registry.services.scene.overlayScene.destroy();
+            registry.services.scene.overlayScene = undefined;
+        }
+
+        this.drawFunc(scene, registry);
     }
 }
 
@@ -30,7 +64,7 @@ export class SceneStates {
         states.forEach(state => this.sceneStatesMap.set(state.stateId, state));
     }
 
-    getSateById<T extends string>(sceneState: T): StateDescription<T> {
+    getSateById<T extends string, U extends AbstractScene>(sceneState: T): StateDescription<T> {
         return <StateDescription<T>> this.sceneStatesMap.get(sceneState);
     }
 }
@@ -38,10 +72,13 @@ export class SceneStates {
 
 export abstract class AbstractScene<T extends string = null> {
     id: string;
+    isOverlay = false;
+    isLoading = false;
     // application: Application;
     factory: ISpriteFactory;
     loader: SceneLoader;
     states: SceneStates = new SceneStates();
+    activeStateId: string;
 
     private hidden = false;
     
@@ -79,19 +116,21 @@ export abstract class AbstractScene<T extends string = null> {
     }
 
     load() {
+        this.isLoading = true;
         this.state = SceneStateLegacy.Loading;
         this.loader.load(this.sceneJson)
             .then(() => {
-                this.state = SceneStateLegacy.Ready;
-                this.doInit();
+                this.isLoading = false;
+                this.doDraw();
             })
             .catch((e) => {
+                this.isLoading = false;
                 console.error(e);
             });
     }
 
     update() {
-        if (this.state === SceneStateLegacy.Running) {
+        if (!this.isLoading) {
             this.doUpdate();
         }
     }
@@ -116,7 +155,7 @@ export abstract class AbstractScene<T extends string = null> {
         return this.hidden;
     }
 
-    protected abstract doInit();
+    protected abstract doDraw();
     protected abstract doUpdate();
     protected abstract doDestroy();
 }

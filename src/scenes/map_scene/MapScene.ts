@@ -5,9 +5,10 @@ import { IListener } from "../../services/EventService";
 import { IService, ServiceCapability } from "../../services/IService";
 import { GameObjectStore } from "../../stores/GameObjectStore";
 import { Layer } from "../../stores/LayerContainer";
-import { AbstractScene } from "../AbstractScene";
+import { AbstractScene, StateDescription } from "../AbstractScene";
 import { GameSpriteFactory } from "../game_scene/GameSpriteFactory";
 import { AppJson, SceneLoader } from "../SceneLoader";
+import { MenuSceneState, MenuSceneId } from "../menu_scene/MenuSceneState";
 
 export const mapSceneJson: AppJson = {
     width: 700,
@@ -31,14 +32,38 @@ export const mapSceneJson: AppJson = {
     ]
 }
 
-export const MapSceneId = 'map-scene';
-export class MapScene extends AbstractScene implements IListener, IService {
+export enum WorldMapState {
+    DefaultState = 'DefaultState',
+}
+
+export const MapSceneId = 'map_scene';
+
+
+const worldMapStates: StateDescription<WorldMapState>[] = [
+    new StateDescription<WorldMapState>(MapSceneId, WorldMapState.DefaultState)
+        .setOverlay(MenuSceneId, MenuSceneState.WorldMapState)
+        .onDraw((worldMapScene, registry) => {
+            const background = worldMapScene.spriteStore.getByRole(GameObjectRole.Background)[0];
+
+            const backgroundLayer = registry.stores.layer.getContainer(worldMapScene.id).getLayerById('background-layer');
+            
+            backgroundLayer.addChild(background);
+        
+            registry.services.event.dispatch(SceneActions.SCENE_START);
+        })
+]
+
+export class MapScene extends AbstractScene<WorldMapState> implements IListener, IService {
     id = MapSceneId;
     capabilities = [ServiceCapability.Listen];
 
     constructor(registry: Registry) {
         super(registry, mapSceneJson);
         this.registry = registry;
+        this.activeStateId = WorldMapState.DefaultState;
+        
+        this.states.registerStates(worldMapStates);
+
         this.loader = new SceneLoader(this, this.registry);
         this.factory = new GameSpriteFactory();
 
@@ -47,20 +72,14 @@ export class MapScene extends AbstractScene implements IListener, IService {
 
     listen(action: string) {}
 
-    doInit() {
+    doDraw() {
         this.registry.services.event.addListener(this);
 
         const application = this.registry.services.scene.application;
 
         this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer', [0, 1], application));
 
-        const background = this.spriteStore.getByRole(GameObjectRole.Background)[0];
-    
-        const backgroundLayer = this.registry.stores.layer.getContainer(this.id).getLayerById('background-layer');
-        
-        backgroundLayer.addChild(background);
-    
-        this.registry.services.event.dispatch(SceneActions.SCENE_START);
+        this.states.getSateById(this.activeStateId).draw(this, this.registry);
     }
 
     doDestroy() {

@@ -2,7 +2,7 @@ import { Rectangle } from "pixi.js";
 import { GameScript } from "../model/GameScript";
 import { Registry } from "../Registry";
 import { GameObjectRole } from "../model/SpriteObject";
-import { GameSceneId } from "../scenes/game_scene/GameScene";
+import { GameSceneId } from "../scenes/game_scene/GameSceneState";
 
 export enum GamepadKey {
     Left = 'Left',

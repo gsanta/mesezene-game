@@ -112,7 +112,7 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
 
     listen(action: string) {}
 
-    doInit() {
+    doDraw() {
         const appJson = scoreSceneJson;
 
         this.registry.services.event.addListener(this);
