@@ -1,5 +1,5 @@
 import { Registry } from "../Registry";
-import { GameObjectStore } from "../stores/GameObjectStore";
+import { SpriteStore } from "../stores/SpriteStore";
 import { ISpriteFactory } from "./ISpriteFactory";
 import { SceneLoader, AppJson } from "./SceneLoader";
 
@@ -22,6 +22,7 @@ export class StateDescription<T extends string> {
 
     private drawFunc: (scene: AbstractScene, registry: Registry) => void;
     private updateFunc: (scene: AbstractScene, registry: Registry) => void;
+    private activateFunc: (scene: AbstractScene, registry: Registry) => void;
 
     overlay: {
         sceneId: string;
@@ -36,6 +37,16 @@ export class StateDescription<T extends string> {
         return this;
     }
 
+    onActivate(activateFunc: (scene: AbstractScene, registry: Registry) => void) {
+        this.activateFunc = activateFunc;
+
+        return this;
+    }
+
+    activate(scene: AbstractScene, registry: Registry) {
+        this.activateFunc && this.activateFunc(scene, registry);
+    }
+
     onDraw(drawFunc: (scene: AbstractScene, registry: Registry) => void) {
         this.drawFunc = drawFunc;
 
@@ -43,10 +54,11 @@ export class StateDescription<T extends string> {
     }
 
     draw(scene: AbstractScene, registry: Registry) {
+
         if (this.overlay) {
             const overlayScene = registry.services.scene.getSceneById(this.overlay.sceneId);
             overlayScene.activeStateId = this.overlay.stateId;
-            overlayScene.load();
+            overlayScene.activate();
             registry.services.scene.overlayScene = overlayScene;
             // registry.services.scene.getActiveScene(true).activeStateId = this.overlay.stateId;
         } else if (!scene.isOverlay && registry.services.scene.overlayScene) {
@@ -54,7 +66,7 @@ export class StateDescription<T extends string> {
             registry.services.scene.overlayScene = undefined;
         }
 
-        this.drawFunc(scene, registry);
+        this.drawFunc && this.drawFunc(scene, registry);
     }
 
     onUpdate(updateFunc: (scene: AbstractScene, registry: Registry) => void) {
@@ -64,7 +76,7 @@ export class StateDescription<T extends string> {
     }
 
     update(scene: AbstractScene, registry: Registry) {
-        this.updateFunc(scene, registry);
+        this.updateFunc && this.updateFunc(scene, registry);
     }
 }
 
@@ -84,7 +96,7 @@ export class SceneStates {
 export abstract class AbstractScene<T extends string = null> {
     id: string;
     isOverlay = false;
-    isLoading = false;
+    isLoaded = false;
     // application: Application;
     factory: ISpriteFactory;
     loader: SceneLoader;
@@ -93,7 +105,7 @@ export abstract class AbstractScene<T extends string = null> {
 
     private hidden = false;
     
-    spriteStore: GameObjectStore;
+    spriteStore: SpriteStore;
     private sceneHtmlElement: HTMLDivElement;
     protected registry: Registry;
     protected sceneJson: AppJson;
@@ -113,8 +125,28 @@ export abstract class AbstractScene<T extends string = null> {
         return this.state;
     }
 
+    activate() {
+        if (!this.isLoaded) {
+            this.load()
+                .then(() => {
+                    this.doDraw();
+                    // this.states.getSateById(this.activeStateId).activate(this, this.registry);
+                });
+        } else {
+            this.doDraw();
+
+            // this.states.getSateById(this.activeStateId).activate(this, this.registry);
+        }
+    }
+
     stop() {
         this.state = SceneStateLegacy.Stopped;
+    }
+
+    reset() {
+        this.registry.stores.layer.getContainer(this.id).container.removeChildren();
+        this.getLayerContainer().removeAllLayers();
+        this.spriteStore.clear();
     }
 
     destroy() {
@@ -126,22 +158,20 @@ export abstract class AbstractScene<T extends string = null> {
         // this.application.destroy(true);
     }
 
-    load() {
-        this.isLoading = true;
+    private load(): Promise<void> {
         this.state = SceneStateLegacy.Loading;
-        this.loader.load(this.sceneJson)
+        return this.loader.load(this.sceneJson)
             .then(() => {
-                this.isLoading = false;
-                this.doDraw();
+                this.isLoaded = true;
             })
             .catch((e) => {
-                this.isLoading = false;
+                this.isLoaded = true;
                 console.error(e);
             });
     }
 
     update() {
-        if (!this.isLoading) {
+        if (this.isLoaded) {
             this.doUpdate();
         }
     }

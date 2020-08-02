@@ -5,7 +5,7 @@ import { Registry } from "../../Registry";
 import { IListener } from "../../services/EventService";
 import { GamepadKey } from "../../services/GamepadService";
 import { IService, ServiceCapability } from "../../services/IService";
-import { GameObjectStore } from "../../stores/GameObjectStore";
+import { SpriteStore } from "../../stores/SpriteStore";
 import { Layer } from "../../stores/LayerContainer";
 import { AbstractScene, SceneStates, StateDescription } from "../AbstractScene";
 import { defaultAppJson, SceneLoader } from "../SceneLoader";
@@ -17,12 +17,14 @@ import { ObstacleGenerator } from "./generators/ObstacleGenerator";
 import { PlayerSprite } from "./PlayerSprite";
 import { GameSceneId, GameSceneState } from "./GameSceneState";
 import { PlayerMoveHandler } from "./movement/PlayerMoveHandler";
+import { MenuSceneId, MenuSceneState } from "../menu_scene/MenuSceneState";
 
 
 const gameStates: StateDescription<GameSceneState>[] = [
     new StateDescription<GameSceneState>(GameSceneId, GameSceneState.Running)
         // .overlay(MenuSceneId, MenuSceneState.GameOverState)
         .onDraw((scene: GameScene, registry: Registry) => {
+            scene.reset();
             const application = registry.services.scene.application;
         
             const gameContainer = registry.stores.layer.getContainer(scene.id);
@@ -72,13 +74,18 @@ const gameStates: StateDescription<GameSceneState>[] = [
             scene.coinGenerator.update();
     
             if (scene.obstacleCollider.checkCollisions()) {
-    
+                registry.services.scene.getSceneById(GameSceneId).activeStateId = GameSceneState.GameOver;
+                registry.services.scene.activateScene(GameSceneId);
             }
             scene.coinCollider.checkCollisions();
 
             registry.services.event.dispatch(SceneActions.SCENE_UPDATE);
+        }),
 
-        })
+    new StateDescription<GameSceneState>(GameSceneId, GameSceneState.GameOver)
+        .setOverlay(MenuSceneId, MenuSceneState.GameOverState)
+        
+    
 ]
 
 export class GameScene extends AbstractScene implements IListener, IService {
@@ -111,7 +118,7 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.coinCollider = new CoinCollider(this, registry);
         this.playerMoveHandler = new PlayerMoveHandler(this, registry);
 
-        this.spriteStore = new GameObjectStore(this.registry);
+        this.spriteStore = new SpriteStore(this.registry);
     }
 
     protected doDraw() {

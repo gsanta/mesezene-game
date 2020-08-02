@@ -58,7 +58,7 @@ export class SceneService implements IService, IListener {
             }
         }
 
-        scene.load()
+        scene.activate();
     }
 
     getActiveScene(isOverlay: boolean): AbstractScene {

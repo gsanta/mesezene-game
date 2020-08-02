@@ -3,7 +3,7 @@ import { GameObjectRole } from "../../model/SpriteObject";
 import { Registry } from "../../Registry";
 import { IListener } from "../../services/EventService";
 import { IService, ServiceCapability } from "../../services/IService";
-import { GameObjectStore } from "../../stores/GameObjectStore";
+import { SpriteStore } from "../../stores/SpriteStore";
 import { Layer } from "../../stores/LayerContainer";
 import { AbstractScene, StateDescription } from "../AbstractScene";
 import { GameSpriteFactory } from "../game_scene/GameSpriteFactory";
@@ -67,7 +67,7 @@ export class MapScene extends AbstractScene<WorldMapState> implements IListener,
         this.loader = new SceneLoader(this, this.registry);
         this.factory = new GameSpriteFactory();
 
-        this.spriteStore = new GameObjectStore(this.registry);
+        this.spriteStore = new SpriteStore(this.registry);
     }
 
     listen(action: string) {}

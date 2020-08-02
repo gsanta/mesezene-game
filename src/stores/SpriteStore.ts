@@ -3,7 +3,7 @@ import { SpriteObject, GameObjectRole } from "../model/SpriteObject";
 import { PlayerSprite } from "../scenes/game_scene/PlayerSprite";
 
 
-export class GameObjectStore extends AbstractStore {
+export class SpriteStore extends AbstractStore {
     private gameObjects: SpriteObject[] = [];
 
     getByRole(role: GameObjectRole): SpriteObject[] {
@@ -20,5 +20,17 @@ export class GameObjectStore extends AbstractStore {
 
     getAll() {
         return this.gameObjects;
+    }
+
+    clear() {
+
+        // TODO get rid of 'remaininGameObjects': e.g put those sprites into an other store 
+        const remaininGameObjects: SpriteObject[] = [];
+        this.gameObjects.forEach(spriteObject =>  {
+            if (!spriteObject.roles.has(GameObjectRole.Template)) {
+                remaininGameObjects.push(spriteObject);
+            }
+        });
+        this.gameObjects = remaininGameObjects;;
     }
 }
