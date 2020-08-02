@@ -21,6 +21,7 @@ export class StateDescription<T extends string> {
     }
 
     private drawFunc: (scene: AbstractScene, registry: Registry) => void;
+    private updateFunc: (scene: AbstractScene, registry: Registry) => void;
 
     overlay: {
         sceneId: string;
@@ -54,6 +55,16 @@ export class StateDescription<T extends string> {
         }
 
         this.drawFunc(scene, registry);
+    }
+
+    onUpdate(updateFunc: (scene: AbstractScene, registry: Registry) => void) {
+        this.updateFunc = updateFunc;
+
+        return this;
+    }
+
+    update(scene: AbstractScene, registry: Registry) {
+        this.updateFunc(scene, registry);
     }
 }
 

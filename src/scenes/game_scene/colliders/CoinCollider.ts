@@ -17,7 +17,6 @@ export class CoinCollider {
 
     removeBalloon() {
         let balloons = this.scene.spriteStore.getByRole(GameObjectRole.Coin); 
-        this.registry.stores.scoreStore.setScores(this.registry.stores.scoreStore.getScores() + 1);
 
         const collidedBalloons = balloons.filter(balloon => balloon.tags.has(GameObjectTag.Collided));
 

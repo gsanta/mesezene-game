@@ -1,5 +1,5 @@
 import { Registry } from "../../../Registry";
-import { GameObjectRole, GameObjectTag } from "../../../model/SpriteObject";
+import { GameObjectRole, GameObjectTag, SpriteObject } from "../../../model/SpriteObject";
 import { AbstractScene } from "../../AbstractScene";
 
 export class ObstacleCollider {
@@ -11,11 +11,11 @@ export class ObstacleCollider {
         this.registry = registry;
     }
         
-    checkCollisions() {
+    checkCollisions(): SpriteObject | null {
         const collidedObj = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle).find(obstacle => obstacle.tags.has(GameObjectTag.Collided)); 
         if (collidedObj && !collidedObj.tags.has(GameObjectTag.CollisionSuspended)) {
             collidedObj.tags.add(GameObjectTag.CollisionSuspended);
-            this.registry.stores.scoreStore.setLives(this.registry.stores.scoreStore.getLives() - 1);
+            return collidedObj;
         }    
     }
 }

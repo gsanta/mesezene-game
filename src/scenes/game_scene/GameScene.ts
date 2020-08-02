@@ -16,7 +16,7 @@ import { CoinGenerator } from "./generators/CoinGenerator";
 import { ObstacleGenerator } from "./generators/ObstacleGenerator";
 import { PlayerSprite } from "./PlayerSprite";
 import { GameSceneId, GameSceneState } from "./GameSceneState";
-import { MenuSceneId, MenuSceneState } from "../menu_scene/MenuSceneState";
+import { PlayerMoveHandler } from "./movement/PlayerMoveHandler";
 
 
 const gameStates: StateDescription<GameSceneState>[] = [
@@ -37,7 +37,8 @@ const gameStates: StateDescription<GameSceneState>[] = [
             const appJson = defaultAppJson;
             this.gameSpeed = appJson.gameSpeed;
         
-            const player = scene.spriteStore.getByRole(GameObjectRole.Player)[0];
+            const player = <PlayerSprite> scene.spriteStore.getByRole(GameObjectRole.Player)[0];
+            scene.playerMoveHandler.setPlayer(player);
     
             gameContainer.getLayerById('game-layer-3').addChild(player);
     
@@ -52,6 +53,32 @@ const gameStates: StateDescription<GameSceneState>[] = [
     
             registry.services.event.dispatch(SceneActions.SCENE_START);
         })
+        .onUpdate((scene: GameScene, registry: Registry) => {
+            const player = <PlayerSprite> scene.spriteStore.getByRole(GameObjectRole.Player)[0];
+
+            const scrollableSprites = scene.spriteStore.getAll().filter(gameObject => !gameObject.roles.has(GameObjectRole.Player));
+            const deltaMove = new Point(-scene.gameSpeed, 0);
+            scrollableSprites.forEach(gameObject => gameObject.move(deltaMove));
+    
+            scene.playerMoveHandler.move();
+
+            if (registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
+                player.jump();
+            }
+
+            player.update();
+    
+            scene.obstacleGenerator.update();
+            scene.coinGenerator.update();
+    
+            if (scene.obstacleCollider.checkCollisions()) {
+    
+            }
+            scene.coinCollider.checkCollisions();
+
+            registry.services.event.dispatch(SceneActions.SCENE_UPDATE);
+
+        })
 ]
 
 export class GameScene extends AbstractScene implements IListener, IService {
@@ -60,10 +87,11 @@ export class GameScene extends AbstractScene implements IListener, IService {
 
     obstacleGenerator: ObstacleGenerator;
     coinGenerator: CoinGenerator;
-    private obstacleCollider: ObstacleCollider;
-    private coinCollider: CoinCollider;
+    obstacleCollider: ObstacleCollider;
+    coinCollider: CoinCollider;
+    playerMoveHandler: PlayerMoveHandler;
 
-    gameSpeed: number;
+    gameSpeed: number = 2;
     gameLayerCount = 4;
 
     vertialBorders: [number, number];
@@ -81,6 +109,7 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.coinGenerator = new CoinGenerator(this, registry);
         this.obstacleCollider = new ObstacleCollider(this, registry);
         this.coinCollider = new CoinCollider(this, registry);
+        this.playerMoveHandler = new PlayerMoveHandler(this, registry);
 
         this.spriteStore = new GameObjectStore(this.registry);
     }
@@ -96,60 +125,6 @@ export class GameScene extends AbstractScene implements IListener, IService {
     }
 
     protected doUpdate() {
-        const player = <PlayerSprite> this.spriteStore.getByRole(GameObjectRole.Player)[0];
-
-        const scrollableSprites = this.spriteStore.getAll().filter(gameObject => !gameObject.roles.has(GameObjectRole.Player));
-        const deltaMove = new Point(-this.gameSpeed, 0);
-        scrollableSprites.forEach(gameObject => gameObject.move(deltaMove));
-
-        this.moveWithConstrains(player);
-
-        if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
-            player.jump();
-        }
-
-        player.update();
-        this.updateVerticalLayer(player);
-
-        this.obstacleGenerator.update();
-        this.coinGenerator.update();
-        this.obstacleCollider.checkCollisions();
-        this.coinCollider.checkCollisions();
-
-        this.registry.services.event.dispatch(SceneActions.SCENE_UPDATE);
-    }
-
-    private updateVerticalLayer(player: PlayerSprite) {
-        const gameContainer = this.registry.stores.layer.getContainer(this.id);
-
-        const y = player.sprite.y + player.currentJumpY + player.sprite.height;
-        const normalizedY = y / this.registry.services.scene.sceneDimensions.y;
-
-        const newLayer = gameContainer.layers.find(l => l.range[0] <= normalizedY && l.range[1] >= normalizedY);
-
-        if (newLayer.id !== player.layer) {
-            gameContainer.getLayerById(player.layer).removeChild(player);
-            gameContainer.getLayerById(newLayer.id).addChild(player);
-            player.layer = newLayer.id;
-        }
-    }
-
-
-    private moveWithConstrains(player: SpriteObject) {
-        let speed = new Point(player.speed.x, player.speed.y);
-
-        if (player.sprite.x < this.horizontalBorders[0] && player.speed.x < 0) {
-            speed.x = 0;
-        } else if (player.sprite.x + player.sprite.width > this.horizontalBorders[1] && player.speed.x > 0) {
-            speed.x = 0;
-        }
-        
-        if (player.sprite.y < this.vertialBorders[0] && speed.y < 0) {
-            speed.y = 0;
-        } else if (player.sprite.y > this.vertialBorders[1] && player.speed.y > 0) {
-            speed.y = 0;
-        }
-        
-        player.move(speed);
+        this.states.getSateById(this.activeStateId).update(this, this.registry);
     }
 }

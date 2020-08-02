@@ -37,6 +37,8 @@ export class MenuItemGraphics {
     private hoverTextStyle: TextStyle;
     private position: Point;
 
+    private label: Text;
+
     constructor(len: number, config: MenuItemGraphicsConfig) {
         this.config = config;
         this.len = len;
@@ -49,13 +51,14 @@ export class MenuItemGraphics {
     }
 
     draw(position: Point): Graphics {
-        this.position = position;
+        this.position = new Point(position.x, position.y);
         this.addEventHandlers();
         return this.drawMenuItem();
     }
 
     update() {
         this.graphics.clear();
+        this.graphics.removeChildren();
         this.drawMenuItem();
     }
 
@@ -115,11 +118,13 @@ export class MenuItemGraphics {
 
         const textOffsetX = 25;
         const textOffsetY = 0;
-        const richText = new Text(this.config.label, this.hovered ? this.hoverTextStyle : this.textStyle);
-        richText.x = pos.x;
-        richText.y = pos.y;
-        richText.anchor.set(0.5);
+        const label = new Text(this.config.label, this.hovered ? this.hoverTextStyle : this.textStyle);
+        label.x = pos.x;
+        label.y = pos.y;
+        label.anchor.set(0.5);
 
-        this.graphics.addChild(richText);
+        this.label = label;
+
+        this.graphics.addChild(label);
     }
 }
