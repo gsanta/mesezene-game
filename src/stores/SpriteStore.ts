@@ -10,6 +10,10 @@ export class SpriteStore extends AbstractStore {
         return this.gameObjects.filter(gameObject => gameObject.roles.has(role));
     }
 
+    getByName(name: string): SpriteObject[] {
+        return this.gameObjects.filter(gameObject => gameObject.id === name);
+    }
+
     add(gameObject: SpriteObject) {
         this.gameObjects.push(gameObject);
     }

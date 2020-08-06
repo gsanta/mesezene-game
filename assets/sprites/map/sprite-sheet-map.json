@@ -1,0 +1,30 @@
+{
+    "frames": {
+
+        "badge_gray":
+        {
+            "frame": {"x":37,"y":21,"w":139,"h":139}
+        },
+        "badge_green":
+        {
+            "frame": {"x":37,"y":197,"w":139,"h":139}
+        },
+        "badge_yellow":
+        {
+            "frame": {"x":37,"y":373,"w":139,"h":139}
+        },
+        "badge_red":
+        {
+            "frame": {"x":38,"y":549,"w":139,"h":139}
+        },
+        "badge_orange":
+        {
+            "frame": {"x":37,"y":725,"w":139,"h":139}
+        }
+    },
+    "meta": {
+        "image": "./sprite-sheet-map.png",
+        "size": {"w":1000,"h":1500},
+        "scale": "1"
+    }
+}

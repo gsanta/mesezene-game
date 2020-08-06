@@ -8,13 +8,15 @@ import { Layer } from "../../stores/LayerContainer";
 import { AbstractScene, StateDescription } from "../AbstractScene";
 import { GameSpriteFactory } from "../game_scene/GameSpriteFactory";
 import { AppJson, SceneLoader } from "../SceneLoader";
-import { MenuSceneState, MenuSceneId } from "../menu_scene/MenuSceneState";
+import { ArrowGraphics } from "./ArrowGraphics";
+import { BezierCurve } from "../../utils/BezierCurve";
+import { Point } from "pixi.js";
 
 export const mapSceneJson: AppJson = {
     width: 700,
     height: 700,
     gameSpeed: 2,
-    spriteSheet: 'assets/sprites/sprite-sheet-characters.json',
+    spriteSheet: 'assets/sprites/map/sprite-sheet-map.json',
     sprites: [
         {
             x: 0,
@@ -28,7 +30,72 @@ export const mapSceneJson: AppJson = {
             viewportX: 0,
             viewportY: 0,
             roles: [GameObjectRole.Background]
-        }
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            frameName: 'badge_gray',
+            name: 'front-layer',
+            isBackgroundImage: false,
+            speedX: 0,
+            speedY: 0,
+            viewportX: 580,
+            viewportY: 20,
+            roles: []
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            frameName: 'badge_green',
+            name: 'front-layer',
+            isBackgroundImage: false,
+            speedX: 0,
+            speedY: 0,
+            viewportX: 30,
+            viewportY: 80,
+            roles: []
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            frameName: 'badge_yellow',
+            name: 'front-layer',
+            isBackgroundImage: false,
+            speedX: 0,
+            speedY: 0,
+            viewportX: 350,
+            viewportY: 300,
+            roles: []
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            frameName: 'badge_red',
+            name: 'front-layer',
+            isBackgroundImage: false,
+            speedX: 0,
+            speedY: 0,
+            viewportX: 35,
+            viewportY: 600,
+            roles: []
+        },
+        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            frameName: 'badge_orange',
+            name: 'front-layer',
+            isBackgroundImage: false,
+            speedX: 0,
+            speedY: 0,
+            viewportX: 550,
+            viewportY: 600,
+            roles: []
+        },
     ]
 }
 
@@ -41,14 +108,34 @@ export const MapSceneId = 'map_scene';
 
 const worldMapStates: StateDescription<WorldMapState>[] = [
     new StateDescription<WorldMapState>(MapSceneId, WorldMapState.DefaultState)
-        .setOverlay(MenuSceneId, MenuSceneState.WorldMapState)
+        // .setOverlay(MenuSceneId, MenuSceneState.WorldMapState)
         .onDraw((worldMapScene, registry) => {
             const background = worldMapScene.spriteStore.getByRole(GameObjectRole.Background)[0];
 
             const backgroundLayer = registry.stores.layer.getContainer(worldMapScene.id).getLayerById('background-layer');
             
             backgroundLayer.addChild(background);
-        
+
+            const foregroundLayer = registry.stores.layer.getContainer(worldMapScene.id).getLayerById('foreground-layer');
+            const badgeGray = worldMapScene.spriteStore.getByName('badge_gray')[0];
+            foregroundLayer.addChild(badgeGray);
+
+            const badgeGreen = worldMapScene.spriteStore.getByName('badge_green')[0];
+            foregroundLayer.addChild(badgeGreen);
+
+            const badgeYellow = worldMapScene.spriteStore.getByName('badge_yellow')[0];
+            foregroundLayer.addChild(badgeYellow);
+
+            const badgeRed = worldMapScene.spriteStore.getByName('badge_red')[0];
+            foregroundLayer.addChild(badgeRed);
+
+            const badgeOrange = worldMapScene.spriteStore.getByName('badge_orange')[0];
+            foregroundLayer.addChild(badgeOrange);
+
+            const arrow = new ArrowGraphics(new BezierCurve([new Point(600, 50), new Point(50, 20), new Point(10, 10)], 10));
+
+            foregroundLayer.addGraphics(arrow.draw());
+
             registry.services.event.dispatch(SceneActions.SCENE_START);
         })
 ]
@@ -78,6 +165,7 @@ export class MapScene extends AbstractScene<WorldMapState> implements IListener,
         const application = this.registry.services.scene.application;
 
         this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer', [0, 1], application));
+        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('foreground-layer', [0, 1], application));
 
         this.states.getSateById(this.activeStateId).draw(this, this.registry);
     }
