@@ -66,7 +66,6 @@ export class MenuItemGraphics {
         this.graphics.on('mouseover', () => {
             this.hovered = true;
             this.update();
-            console.log('update')
         });
 
         this.graphics.on('mouseout', () => {

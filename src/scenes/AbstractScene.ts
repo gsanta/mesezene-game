@@ -2,6 +2,7 @@ import { Registry } from "../Registry";
 import { SpriteStore } from "../stores/SpriteStore";
 import { ISpriteFactory } from "./ISpriteFactory";
 import { SceneLoader, AppJson } from "./SceneLoader";
+import { TextureStore } from "../stores/TextureStore";
 
 export enum SceneStateLegacy {
     Loading = 'Loading',
@@ -106,6 +107,7 @@ export abstract class AbstractScene<T extends string = null> {
     private hidden = false;
     
     spriteStore: SpriteStore;
+    textureStore: TextureStore;
     private sceneHtmlElement: HTMLDivElement;
     protected registry: Registry;
     protected sceneJson: AppJson;
@@ -113,6 +115,8 @@ export abstract class AbstractScene<T extends string = null> {
     constructor(registry: Registry, sceneJson: AppJson) {
         this.registry = registry;
         this.sceneJson = sceneJson;
+
+        this.textureStore = new TextureStore(this.registry);
     }
 
     state: SceneStateLegacy = SceneStateLegacy.Destroyed;

@@ -1,7 +1,5 @@
 import { AbstractStore } from "./AbstractStore";
 import { SpriteObject, GameObjectRole } from "../model/SpriteObject";
-import { PlayerSprite } from "../scenes/game_scene/PlayerSprite";
-
 
 export class SpriteStore extends AbstractStore {
     private gameObjects: SpriteObject[] = [];

@@ -188,6 +188,7 @@ export class SceneLoader {
             } else if (spriteJson.frameName) {
                 const sheet = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${appJson.spriteSheet}`];
                 sprite = new Sprite(sheet.textures[spriteJson.frameName]);
+                this.scene.textureStore.addTexture(spriteJson.frameName, sheet.textures[spriteJson.frameName]);
             }
 
             gameObject = this.scene.factory.getInstance(spriteJson, sprite);

@@ -13,6 +13,7 @@ import { BezierCurve } from "../../utils/BezierCurve";
 import { Point } from "pixi.js";
 import { LineCalcs } from "../../utils/LineCalcs";
 import { Line } from "../../model/primitives/Line";
+import { BadgeGraphics } from "./BadgeGraphics";
 
 export const mapSceneJson: AppJson = {
     width: 700,
@@ -44,6 +45,18 @@ export const mapSceneJson: AppJson = {
             speedY: 0,
             viewportX: 580,
             viewportY: 20,
+            roles: []
+        },        {
+            x: 0,
+            y: 0,
+            scale: 0.5,
+            frameName: 'badge_gray_highlighted',
+            name: 'front-layer',
+            isBackgroundImage: false,
+            speedX: 0,
+            speedY: 0,
+            viewportX: 234,
+            viewportY: 21,
             roles: []
         },
         {
@@ -158,6 +171,9 @@ const worldMapStates: StateDescription<WorldMapState>[] = [
             foregroundLayer.addChild(badgeYellow);
             foregroundLayer.addChild(badgeRed);
             foregroundLayer.addChild(badgeOrange);
+
+            const badgeGrayGraphics = new BadgeGraphics(badgeGray, badgeGray.id, worldMapScene.textureStore);
+
 
             registry.services.event.dispatch(SceneActions.SCENE_START);
         })

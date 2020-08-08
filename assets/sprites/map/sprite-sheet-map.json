@@ -5,6 +5,10 @@
         {
             "frame": {"x":37,"y":21,"w":139,"h":139}
         },
+        "badge_gray_highlighted":
+        {
+            "frame": {"x":234,"y":21,"w":139,"h":139}
+        },
         "badge_green":
         {
             "frame": {"x":37,"y":197,"w":139,"h":139}
