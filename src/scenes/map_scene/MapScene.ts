@@ -12,6 +12,7 @@ import { ArrowGraphics } from "./ArrowGraphics";
 import { BezierCurve } from "../../utils/BezierCurve";
 import { Point } from "pixi.js";
 import { LineCalcs } from "../../utils/LineCalcs";
+import { Line } from "../../model/primitives/Line";
 
 export const mapSceneJson: AppJson = {
     width: 700,
@@ -124,56 +125,33 @@ const worldMapStates: StateDescription<WorldMapState>[] = [
             const badgeRed = worldMapScene.spriteStore.getByName('badge_red')[0];
             const badgeOrange = worldMapScene.spriteStore.getByName('badge_orange')[0];
 
-            let p1 = new Point(...badgeGray.getDimensions().center());
-            let p2 = new Point(...badgeGreen.getDimensions().center());
-            let pControl = new Point(badgeGreen.getDimensions().center()[0] + 100, badgeGreen.getDimensions().center()[1] - 100);
-            let line: [Point, Point] = [p1, p2];
-            line = new LineCalcs().shorten(line, 3);
-            // const [p1x, p1y] = badgeGray.getDimensions().center();
-            // const [p2x, p2y] = [badgeGreen.getDimensions().center()[0] + 100, badgeGreen.getDimensions().center()[1] - 100] 
-            // const [p3x, p3y] = badgeGreen.getDimensions().center();
-
-            let arrow = new ArrowGraphics(new BezierCurve([line[0], pControl, line[1]], 100));
+            let arrow = new ArrowGraphics(
+                new LineCalcs().shorten(new Line(new Point(...badgeGray.getDimensions().center()), new Point(...badgeGreen.getDimensions().center()))),
+                { lineColorHex: '#ff0000', dashWidth: 30, strokeWidth: 3}
+            );
 
             foregroundLayer.addGraphics(arrow.draw());
 
-            p1 = new Point(...badgeGreen.getDimensions().center());
-            p2 = new Point(...badgeYellow.getDimensions().center());
-            pControl = new Point(badgeYellow.getDimensions().center()[0] - 100, badgeYellow.getDimensions().center()[1] + 100);
-            line = [p1, p2];
-            line = new LineCalcs().shorten(line, 3);
-            // const [p1x, p1y] = badgeGray.getDimensions().center();
-            // const [p2x, p2y] = [badgeGreen.getDimensions().center()[0] + 100, badgeGreen.getDimensions().center()[1] - 100] 
-            // const [p3x, p3y] = badgeGreen.getDimensions().center();
-
-            arrow = new ArrowGraphics(new BezierCurve([line[0], pControl, line[1]], 100));
-            foregroundLayer.addGraphics(arrow.draw());
-
-            p1 = new Point(...badgeYellow.getDimensions().center());
-            p2 = new Point(...badgeRed.getDimensions().center());
-            pControl = new Point(badgeRed.getDimensions().center()[0], badgeRed.getDimensions().center()[1] - 100);
-            line = [p1, p2];
-            line = new LineCalcs().shorten(line, 3);
-            // const [p1x, p1y] = badgeGray.getDimensions().center();
-            // const [p2x, p2y] = [badgeGreen.getDimensions().center()[0] + 100, badgeGreen.getDimensions().center()[1] - 100] 
-            // const [p3x, p3y] = badgeGreen.getDimensions().center();
-
-            arrow = new ArrowGraphics(new BezierCurve([line[0], pControl, line[1]], 100));
+            arrow = new ArrowGraphics(
+                new LineCalcs().shorten(new Line(new Point(...badgeGreen.getDimensions().center()), new Point(...badgeYellow.getDimensions().center()))),
+                { lineColorHex: '#ff0000', dashWidth: 30, strokeWidth: 3}
+            );
 
             foregroundLayer.addGraphics(arrow.draw());
 
-            p1 = new Point(...badgeRed.getDimensions().center());
-            p2 = new Point(...badgeOrange.getDimensions().center());
-            pControl = new Point(badgeOrange.getDimensions().center()[0] - 100, badgeOrange.getDimensions().center()[1] - 100);
-            line = [p1, p2];
-            line = new LineCalcs().shorten(line, 3);
-            // const [p1x, p1y] = badgeGray.getDimensions().center();
-            // const [p2x, p2y] = [badgeGreen.getDimensions().center()[0] - 100, badgeGreen.getDimensions().center()[1] - 100] 
-            // const [p3x, p3y] = badgeGreen.getDimensions().center();
+            arrow = new ArrowGraphics(
+                new LineCalcs().shorten(new Line(new Point(...badgeYellow.getDimensions().center()), new Point(...badgeRed.getDimensions().center()))),
+                { lineColorHex: '#ff0000', dashWidth: 30, strokeWidth: 3}
+            );
 
-            arrow = new ArrowGraphics(new BezierCurve([line[0], pControl, line[1]], 100));
             foregroundLayer.addGraphics(arrow.draw());
 
+            arrow = new ArrowGraphics(
+                new LineCalcs().shorten(new Line(new Point(...badgeRed.getDimensions().center()), new Point(...badgeOrange.getDimensions().center()))),
+                { lineColorHex: '#ff0000', dashWidth: 30, strokeWidth: 3}
+            );
+
+            foregroundLayer.addGraphics(arrow.draw());
 
             foregroundLayer.addChild(badgeGray);
             foregroundLayer.addChild(badgeGreen);

@@ -1,19 +1,45 @@
 import { BezierCurve } from "../../utils/BezierCurve";
 import { Graphics, Point } from "pixi.js";
+import { toHexNumber } from "../menu_scene/MenuScene";
+import { Line } from "../../model/primitives/Line";
+
+export interface ArrowGraphicsConfig {
+    lineColorHex: string;
+    dashWidth: number;
+    strokeWidth: number;
+}
 
 export class ArrowGraphics {
     private bezier: BezierCurve;
     private graphics: Graphics = new Graphics();
 
-    private readonly rectWidth = 30;
-    private readonly rectHeight = 3;
+    private readonly arrowConfig: ArrowGraphicsConfig;
+    private line: Line;
 
-    constructor(bezier: BezierCurve) {
-        this.bezier = bezier;
+    constructor(line: Line, arrowConfig: ArrowGraphicsConfig) {
+        this.line = line;
+        this.bezier = this.createBezierCurve();
+        this.arrowConfig = arrowConfig;
+    }
+
+    private createBezierCurve(): BezierCurve {
+        let pControl: Point;
+
+        if (this.line.p1.x < this.line.p2.x) {
+            const x = this.line.p2.x - 100;
+            const y = this.line.p2.y - 100;
+            pControl = new Point(x, y);
+        } else {
+            const x = this.line.p2.x + 100;
+            const y = this.line.p2.y - 100;
+            pControl = new Point(x, y);        
+        }
+
+        return new BezierCurve([this.line.p1, pControl, this.line.p2], 80);
     }
 
     draw(): Graphics {
-        this.graphics.lineStyle(4, 0xff0000, 1);
+        this.graphics.lineStyle(4, toHexNumber(this.arrowConfig.lineColorHex), 1);
         this.drawArrow();
 
         return this.graphics;
@@ -27,49 +53,46 @@ export class ArrowGraphics {
 
     private drawArrow() {
         const points = this.bezier.getPoints();
-        const derivatives = this.bezier.getDerivatives();
+        const derivatives = this.bezier.getNormalizedDerivatives();
         const normals = this.bezier.getNormals();
 
-        const lines = points.map((point, index) => {
-            return this.drawRect(point, derivatives[index], normals[index]);
-            // this.graphics.drawCircle(point.x, point.y, 3);
-        });
+        const dashLines = points.map((point, index) => this.getDashLine(point, derivatives[index]));
+        const lastLine = dashLines[dashLines.length - 1];
+        const arrowHeadLines = this.getArrowHeadLines(lastLine.p2, lastLine.p1, normals[normals.length - 1]);
 
-        const lastLine = lines[lines.length - 1];
-        this.drawArrowHead(lastLine[1], lastLine[0], normals[normals.length - 1]);
+        dashLines.forEach((line, i) => this.graphics.drawPolygon(this.lineToPolygon(line, normals[i])));
+        this.graphics.drawPolygon([arrowHeadLines[0].p1, arrowHeadLines[0].p2, arrowHeadLines[0].p2, arrowHeadLines[0].p1]);
+        this.graphics.drawPolygon([arrowHeadLines[1].p1, arrowHeadLines[1].p2, arrowHeadLines[1].p2, arrowHeadLines[1].p1]);
     }
 
-    private drawRect(centerPoint: Point, derivative: Point, normal: Point): [Point, Point]
-    {
-        const ratio = derivative.y / derivative.x;
-        const cx1 = centerPoint.x - this.rectWidth / 2 * derivative.x;
-        const cx2 = centerPoint.x + this.rectWidth / 2 * derivative.x;
-        const cy1 = centerPoint.y - this.rectWidth / 2 * derivative.y;
-        const cy2 = centerPoint.y + this.rectWidth / 2 * derivative.y;
-        const line: [Point, Point] = [new Point(cx1, cy1), new Point(cx2, cy2)];
+    private getDashLine(centerPoint: Point, derivative: Point): Line {
+        const offsetX = this.arrowConfig.dashWidth / 2 * derivative.x;
+        const offsetY = this.arrowConfig.dashWidth / 2 * derivative.y;
 
-        this.graphics.drawPolygon(this.lineToPolygon(line, normal));
-        // this.graphics.draw(centerPoint.x - 5, centerPoint.y - 2, 15, 3);
-        
-        return line;
+        const cx1 = centerPoint.x - offsetX;
+        const cx2 = centerPoint.x + offsetX;
+        const cy1 = centerPoint.y - offsetY;
+        const cy2 = centerPoint.y + offsetY;
+        return new Line(new Point(cx1, cy1), new Point(cx2, cy2));        
     }
 
-    private lineToPolygon(line: [Point, Point], normal: Point): Point[] {
+    private lineToPolygon(line: Line, normal: Point): Point[] {
+        const offsetX = this.arrowConfig.strokeWidth / 2 * normal.x;
+        const offsetY = this.arrowConfig.strokeWidth / 2 * normal.y;
 
-        const [x1, y1] = [line[0].x - this.rectHeight / 2 * normal.x, line[0].y - this.rectHeight / 2 * normal.y];
-        const [x2, y2] = [line[1].x - this.rectHeight / 2 * normal.x, line[1].y - this.rectHeight / 2 * normal.y];
-        const [x3, y3] = [line[1].x + this.rectHeight / 2 * normal.x, line[1].y + this.rectHeight / 2 * normal.y];
-        const [x4, y4] = [line[0].x + this.rectHeight / 2 * normal.x, line[0].y + this.rectHeight / 2 * normal.y];
+        const [x1, y1] = [line.p1.x - offsetX, line.p1.y - offsetY];
+        const [x2, y2] = [line.p2.x - offsetX, line.p2.y - offsetY];
+        const [x3, y3] = [line.p2.x + offsetX, line.p2.y + offsetY];
+        const [x4, y4] = [line.p1.x + offsetX, line.p1.y + offsetY];
 
         return [new Point(x1, y1), new Point(x2, y2), new Point(x3, y3), new Point(x4, y4)];
     }
 
-    private drawArrowHead(headPoint: Point, tailPoint: Point, normal: Point) {
+    private getArrowHeadLines(headPoint: Point, tailPoint: Point, normal: Point): [Line, Line] {
         const width = 30;
-        const cP1 = [tailPoint.x - width * normal.x, tailPoint.y - width * normal.y];
-        const cP2 = [tailPoint.x + width * normal.x, tailPoint.y + width * normal.y];
+        const cp1 = new Point(tailPoint.x - width * normal.x, tailPoint.y - width * normal.y);
+        const cp2 = new Point(tailPoint.x + width * normal.x, tailPoint.y + width * normal.y);
 
-        this.graphics.drawPolygon([headPoint, new Point(cP1[0], cP1[1]), new Point(cP1[0], cP1[1]), headPoint]);
-        this.graphics.drawPolygon([headPoint, new Point(cP2[0], cP2[1]), new Point(cP2[0], cP2[1]), headPoint]);
+        return [new Line(headPoint, cp1), new Line(headPoint, cp2)];
     }
 }

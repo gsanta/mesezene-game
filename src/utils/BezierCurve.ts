@@ -2,8 +2,6 @@ import { Point } from "pixi.js";
 import Bezier from 'bezier-js';
 
 export class BezierCurve {
-    private points: Point[];
-
     private curve: Bezier;
     private distance: number;
     private dots: Point[];
@@ -11,7 +9,6 @@ export class BezierCurve {
     private normals: Point[];
 
     constructor(points: Point[], distance: number) {
-        this.points = points;
         this.distance = distance;
 
         const flatPoints: number[] = [];
@@ -27,7 +24,7 @@ export class BezierCurve {
         return this.dots;
     }
 
-    getDerivatives(): Point[] {
+    getNormalizedDerivatives(): Point[] {
         if (!this.derivatives) {
             this.createDerivatives();
         }
@@ -44,33 +41,35 @@ export class BezierCurve {
     }
 
     private createDots() {
-        const dotNum = this.curve.length() / this.distance;
         this.dots = [];
-
-        for (let i = 0; i < dotNum; i++) {
-            const nextDot = this.curve.get(this.distance * i / this.curve.length());
+        this.iteratePoints((t: number) => {
+            const nextDot = this.curve.get(t);
             this.dots.push(new Point(nextDot.x, nextDot.y));
-        }
+        });
     }
 
     private createDerivatives() {
-        const dotNum = this.curve.length() / this.distance;
         this.derivatives = [];
-
-        for (let i = 0; i < dotNum; i++) {
-            const nextDerivative = this.curve.derivative(this.distance * i / this.curve.length());
+        this.iteratePoints((t: number) => {
+            const nextDerivative = this.curve.derivative(t);
             const magnitude = Math.sqrt(nextDerivative.x ** 2 + nextDerivative.y ** 2);
             this.derivatives.push(new Point(nextDerivative.x / magnitude, nextDerivative.y / magnitude));
-        }
+        });
     }
 
     private createNormals() {
-        const dotNum = this.curve.length() / this.distance;
         this.normals = [];
+        this.iteratePoints((t: number) => {
+            const nextNormal = this.curve.normal(t);
+            this.normals.push(new Point(nextNormal.x, nextNormal.y));
+        });
+    }
+
+    private iteratePoints(callback: (t: number) => void) {
+        const dotNum = this.curve.length() / this.distance;
 
         for (let i = 0; i < dotNum; i++) {
-            const nextNormal = this.curve.normal(this.distance * i / this.curve.length());
-            this.normals.push(new Point(nextNormal.x, nextNormal.y));
+            callback(this.distance * i / this.curve.length());
         }
     }
 }
