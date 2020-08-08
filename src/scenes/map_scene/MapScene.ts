@@ -11,6 +11,7 @@ import { AppJson, SceneLoader } from "../SceneLoader";
 import { ArrowGraphics } from "./ArrowGraphics";
 import { BezierCurve } from "../../utils/BezierCurve";
 import { Point } from "pixi.js";
+import { LineCalcs } from "../../utils/LineCalcs";
 
 export const mapSceneJson: AppJson = {
     width: 700,
@@ -118,23 +119,67 @@ const worldMapStates: StateDescription<WorldMapState>[] = [
 
             const foregroundLayer = registry.stores.layer.getContainer(worldMapScene.id).getLayerById('foreground-layer');
             const badgeGray = worldMapScene.spriteStore.getByName('badge_gray')[0];
-            foregroundLayer.addChild(badgeGray);
-
             const badgeGreen = worldMapScene.spriteStore.getByName('badge_green')[0];
-            foregroundLayer.addChild(badgeGreen);
-
             const badgeYellow = worldMapScene.spriteStore.getByName('badge_yellow')[0];
-            foregroundLayer.addChild(badgeYellow);
-
             const badgeRed = worldMapScene.spriteStore.getByName('badge_red')[0];
-            foregroundLayer.addChild(badgeRed);
-
             const badgeOrange = worldMapScene.spriteStore.getByName('badge_orange')[0];
-            foregroundLayer.addChild(badgeOrange);
 
-            const arrow = new ArrowGraphics(new BezierCurve([new Point(600, 50), new Point(50, 20), new Point(10, 10)], 10));
+            let p1 = new Point(...badgeGray.getDimensions().center());
+            let p2 = new Point(...badgeGreen.getDimensions().center());
+            let pControl = new Point(badgeGreen.getDimensions().center()[0] + 100, badgeGreen.getDimensions().center()[1] - 100);
+            let line: [Point, Point] = [p1, p2];
+            line = new LineCalcs().shorten(line, 3);
+            // const [p1x, p1y] = badgeGray.getDimensions().center();
+            // const [p2x, p2y] = [badgeGreen.getDimensions().center()[0] + 100, badgeGreen.getDimensions().center()[1] - 100] 
+            // const [p3x, p3y] = badgeGreen.getDimensions().center();
+
+            let arrow = new ArrowGraphics(new BezierCurve([line[0], pControl, line[1]], 100));
 
             foregroundLayer.addGraphics(arrow.draw());
+
+            p1 = new Point(...badgeGreen.getDimensions().center());
+            p2 = new Point(...badgeYellow.getDimensions().center());
+            pControl = new Point(badgeYellow.getDimensions().center()[0] - 100, badgeYellow.getDimensions().center()[1] + 100);
+            line = [p1, p2];
+            line = new LineCalcs().shorten(line, 3);
+            // const [p1x, p1y] = badgeGray.getDimensions().center();
+            // const [p2x, p2y] = [badgeGreen.getDimensions().center()[0] + 100, badgeGreen.getDimensions().center()[1] - 100] 
+            // const [p3x, p3y] = badgeGreen.getDimensions().center();
+
+            arrow = new ArrowGraphics(new BezierCurve([line[0], pControl, line[1]], 100));
+            foregroundLayer.addGraphics(arrow.draw());
+
+            p1 = new Point(...badgeYellow.getDimensions().center());
+            p2 = new Point(...badgeRed.getDimensions().center());
+            pControl = new Point(badgeRed.getDimensions().center()[0], badgeRed.getDimensions().center()[1] - 100);
+            line = [p1, p2];
+            line = new LineCalcs().shorten(line, 3);
+            // const [p1x, p1y] = badgeGray.getDimensions().center();
+            // const [p2x, p2y] = [badgeGreen.getDimensions().center()[0] + 100, badgeGreen.getDimensions().center()[1] - 100] 
+            // const [p3x, p3y] = badgeGreen.getDimensions().center();
+
+            arrow = new ArrowGraphics(new BezierCurve([line[0], pControl, line[1]], 100));
+
+            foregroundLayer.addGraphics(arrow.draw());
+
+            p1 = new Point(...badgeRed.getDimensions().center());
+            p2 = new Point(...badgeOrange.getDimensions().center());
+            pControl = new Point(badgeOrange.getDimensions().center()[0] - 100, badgeOrange.getDimensions().center()[1] - 100);
+            line = [p1, p2];
+            line = new LineCalcs().shorten(line, 3);
+            // const [p1x, p1y] = badgeGray.getDimensions().center();
+            // const [p2x, p2y] = [badgeGreen.getDimensions().center()[0] - 100, badgeGreen.getDimensions().center()[1] - 100] 
+            // const [p3x, p3y] = badgeGreen.getDimensions().center();
+
+            arrow = new ArrowGraphics(new BezierCurve([line[0], pControl, line[1]], 100));
+            foregroundLayer.addGraphics(arrow.draw());
+
+
+            foregroundLayer.addChild(badgeGray);
+            foregroundLayer.addChild(badgeGreen);
+            foregroundLayer.addChild(badgeYellow);
+            foregroundLayer.addChild(badgeRed);
+            foregroundLayer.addChild(badgeOrange);
 
             registry.services.event.dispatch(SceneActions.SCENE_START);
         })
