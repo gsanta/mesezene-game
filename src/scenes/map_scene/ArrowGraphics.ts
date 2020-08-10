@@ -2,6 +2,9 @@ import { BezierCurve } from "../../utils/BezierCurve";
 import { Graphics, Point } from "pixi.js";
 import { toHexNumber } from "../menu_scene/MenuScene";
 import { Line } from "../../model/primitives/Line";
+import { BadgeGraphics } from "./BadgeGraphics";
+import { MapScene } from "./MapScene";
+import { LineCalcs } from "../../utils/LineCalcs";
 
 export interface ArrowGraphicsConfig {
     lineColorHex: string;
@@ -15,11 +18,28 @@ export class ArrowGraphics {
 
     private readonly arrowConfig: ArrowGraphicsConfig;
     private line: Line;
+    private startBadge: BadgeGraphics;
+    private endBadge: BadgeGraphics;
+    private mapScene: MapScene;
+    private layerId: string;
 
-    constructor(line: Line, arrowConfig: ArrowGraphicsConfig) {
-        this.line = line;
+    constructor(scene: MapScene, startBadge: BadgeGraphics, endBadge: BadgeGraphics, layerId: string, arrowConfig: ArrowGraphicsConfig) {
+        this.mapScene = scene;
+        this.startBadge = startBadge;
+        this.endBadge = endBadge;
+        this.layerId = layerId;
+
+        this.line = this.createLine();
         this.bezier = this.createBezierCurve();
         this.arrowConfig = arrowConfig;
+    }
+
+    private createLine() {
+        const startBadgeSprite = this.mapScene.spriteStore.getByName(this.startBadge.spriteId)[0];
+        const endBadgeSprite = this.mapScene.spriteStore.getByName(this.endBadge.spriteId)[0];
+
+        const line = new LineCalcs().shorten(new Line(new Point(...startBadgeSprite.getDimensions().center()), new Point(...endBadgeSprite.getDimensions().center())));
+        return line;
     }
 
     private createBezierCurve(): BezierCurve {
@@ -41,6 +61,8 @@ export class ArrowGraphics {
     draw(): Graphics {
         this.graphics.lineStyle(4, toHexNumber(this.arrowConfig.lineColorHex), 1);
         this.drawArrow();
+
+        this.mapScene.getLayerContainer().getLayerById(this.layerId).addGraphics(this.graphics);
 
         return this.graphics;
     }

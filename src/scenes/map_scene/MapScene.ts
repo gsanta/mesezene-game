@@ -14,6 +14,7 @@ import { Point } from "pixi.js";
 import { LineCalcs } from "../../utils/LineCalcs";
 import { Line } from "../../model/primitives/Line";
 import { BadgeGraphics } from "./BadgeGraphics";
+import { GameSceneId } from "../game_scene/GameSceneState";
 
 export const mapSceneJson: AppJson = {
     width: 700,
@@ -124,56 +125,31 @@ export const MapSceneId = 'map_scene';
 const worldMapStates: StateDescription<WorldMapState>[] = [
     new StateDescription<WorldMapState>(MapSceneId, WorldMapState.DefaultState)
         // .setOverlay(MenuSceneId, MenuSceneState.WorldMapState)
-        .onDraw((worldMapScene, registry) => {
+        .onDraw((worldMapScene: MapScene, registry) => {
             const background = worldMapScene.spriteStore.getByRole(GameObjectRole.Background)[0];
-
             const backgroundLayer = registry.stores.layer.getContainer(worldMapScene.id).getLayerById('background-layer');
             
             backgroundLayer.addChild(background);
 
-            const foregroundLayer = registry.stores.layer.getContainer(worldMapScene.id).getLayerById('foreground-layer');
-            const badgeGray = worldMapScene.spriteStore.getByName('badge_gray')[0];
-            const badgeGreen = worldMapScene.spriteStore.getByName('badge_green')[0];
-            const badgeYellow = worldMapScene.spriteStore.getByName('badge_yellow')[0];
-            const badgeRed = worldMapScene.spriteStore.getByName('badge_red')[0];
-            const badgeOrange = worldMapScene.spriteStore.getByName('badge_orange')[0];
+            const badges: BadgeGraphics[] = [
+                new BadgeGraphics(worldMapScene, 'badge_gray', 'foreground-layer'),
+                new BadgeGraphics(worldMapScene, 'badge_green', 'foreground-layer'),
+                new BadgeGraphics(worldMapScene, 'badge_yellow', 'foreground-layer'),
+                new BadgeGraphics(worldMapScene, 'badge_red', 'foreground-layer'),
+                new BadgeGraphics(worldMapScene, 'badge_orange', 'foreground-layer'),
+            ];
 
-            let arrow = new ArrowGraphics(
-                new LineCalcs().shorten(new Line(new Point(...badgeGray.getDimensions().center()), new Point(...badgeGreen.getDimensions().center()))),
-                { lineColorHex: '#ff0000', dashWidth: 30, strokeWidth: 3}
-            );
+            badges[0].isDisabled = false;
+            badges[0].onClick(() => registry.services.scene.activateScene(GameSceneId));
 
-            foregroundLayer.addGraphics(arrow.draw());
+            const routes: ArrowGraphics[] = []
 
-            arrow = new ArrowGraphics(
-                new LineCalcs().shorten(new Line(new Point(...badgeGreen.getDimensions().center()), new Point(...badgeYellow.getDimensions().center()))),
-                { lineColorHex: '#ff0000', dashWidth: 30, strokeWidth: 3}
-            );
+            for (let i = 0; i < badges.length - 1; i++) {
+                routes[i] = new ArrowGraphics(worldMapScene, badges[i], badges[i + 1], 'foreground-layer', { lineColorHex: '#ff0000', dashWidth: 30, strokeWidth: 3});
+            }
 
-            foregroundLayer.addGraphics(arrow.draw());
-
-            arrow = new ArrowGraphics(
-                new LineCalcs().shorten(new Line(new Point(...badgeYellow.getDimensions().center()), new Point(...badgeRed.getDimensions().center()))),
-                { lineColorHex: '#ff0000', dashWidth: 30, strokeWidth: 3}
-            );
-
-            foregroundLayer.addGraphics(arrow.draw());
-
-            arrow = new ArrowGraphics(
-                new LineCalcs().shorten(new Line(new Point(...badgeRed.getDimensions().center()), new Point(...badgeOrange.getDimensions().center()))),
-                { lineColorHex: '#ff0000', dashWidth: 30, strokeWidth: 3}
-            );
-
-            foregroundLayer.addGraphics(arrow.draw());
-
-            foregroundLayer.addChild(badgeGray);
-            foregroundLayer.addChild(badgeGreen);
-            foregroundLayer.addChild(badgeYellow);
-            foregroundLayer.addChild(badgeRed);
-            foregroundLayer.addChild(badgeOrange);
-
-            const badgeGrayGraphics = new BadgeGraphics(badgeGray, badgeGray.id, worldMapScene.textureStore);
-
+            routes.forEach(route => route.draw());
+            badges.forEach(badge => badge.draw());
 
             registry.services.event.dispatch(SceneActions.SCENE_START);
         })
