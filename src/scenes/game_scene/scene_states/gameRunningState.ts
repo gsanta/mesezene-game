@@ -12,7 +12,7 @@ import { Point } from "pixi.js";
 import { GamepadKey } from "../../../services/GamepadService";
 
 export const gameRunningState = new SceneState<GameSceneState>(GameSceneId, GameSceneState.Running)
-    .setOverlay(MenuSceneId, MenuSceneState.GameOverState, false)
+    .setOverlay(MenuSceneId, MenuSceneState.GameRunningMenuState, false)
     .onDraw((scene: GameScene, registry: Registry) => {
         scene.reset();
         const application = registry.services.scene.application;

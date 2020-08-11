@@ -11,4 +11,8 @@ export class LayerStore {
     getContainer(id: string): LayerContainer {
         return this.containers.get(id);
     }
+
+    removeContainer(id: string): void {
+        this.containers.delete(id);
+    }
 }

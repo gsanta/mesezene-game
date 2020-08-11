@@ -83,7 +83,7 @@ export class SceneService implements IService, IListener {
         htmlElement.appendChild(this.application.view);
         this.sceneDimensions = new Point(defaultAppJson.width, defaultAppJson.height);
         
-        this.scenes.forEach(scene => this.registry.stores.layer.addContainer(new LayerContainer(scene.id, this.registry)));
+        // this.scenes.forEach(scene => this.registry.stores.layer.addContainer(new LayerContainer(scene.id, this.registry)));
         this.application.renderer.resize(defaultAppJson.width, defaultAppJson.height);
 
         this.application.ticker.add(delta => {

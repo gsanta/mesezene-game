@@ -3,6 +3,7 @@ import { SpriteStore } from "../stores/SpriteStore";
 import { ISpriteFactory } from "./ISpriteFactory";
 import { SceneLoader, AppJson } from "./SceneLoader";
 import { TextureStore } from "../stores/TextureStore";
+import { LayerContainer } from "../stores/LayerContainer";
 
 export enum SceneStateLegacy {
     Loading = 'Loading',
@@ -102,25 +103,34 @@ export abstract class AbstractScene<T extends string = string> {
         return this.state;
     }
 
-    activate(stateId: T) {
+    activate(stateId: T, isHiddenInitially: boolean = false) {
+        this.isPaused = false;
+        this.isDestroyed = false;
+
         this.activeStateId = stateId;
         this.registry.services.scene.activateScene(this.id);
+        this.registry.stores.layer.addContainer(new LayerContainer(this.id, this.registry));
 
         const state = this.sceneStates.get(this.activeStateId);
         
         if (state.overlay) {
             const overlayScene = this.registry.services.scene.getSceneById(state.overlay.sceneId);
-            state.overlay.displayOnLoad === false && overlayScene.hide();
-            overlayScene.activate(state.overlay.stateId);
+            overlayScene.hidden = !state.overlay.displayOnLoad;
+            overlayScene.activate(state.overlay.stateId, state.overlay.displayOnLoad);
+        } else {
+            const overlay = this.registry.services.scene.getActiveScene(true);
+            if (overlay) {
+                overlay.destroy();
+            }
         }
 
         if (!this.isLoaded) {
             this.load()
                 .then(() => {
-                    this.hidden === false && this.draw();
+                    isHiddenInitially === false && this.draw();
                 });
         } else {
-            this.hidden === false && this.draw();
+            isHiddenInitially === false && this.draw();
         }
     }
 
@@ -144,6 +154,7 @@ export abstract class AbstractScene<T extends string = string> {
         this.state = SceneStateLegacy.Destroyed;
         this.registry.stores.layer.getContainer(this.id).container.removeChildren();
         this.getLayerContainer().removeAllLayers();
+        this.registry.stores.layer.removeContainer(this.id);
     }
 
     draw() {
