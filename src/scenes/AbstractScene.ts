@@ -12,7 +12,7 @@ export enum SceneStateLegacy {
     Destroyed = 'Destroyed'
 }
 
-export class StateDescription<T extends string> {
+export class SceneState<T extends string> {
     sceneId: string;
     stateId: T;
 
@@ -21,9 +21,10 @@ export class StateDescription<T extends string> {
         this.stateId = stateId;
     }
 
-    private drawFunc: (scene: AbstractScene, registry: Registry) => void;
-    private updateFunc: (scene: AbstractScene, registry: Registry) => void;
-    private activateFunc: (scene: AbstractScene, registry: Registry) => void;
+    drawFunc: (scene: AbstractScene, registry: Registry) => void = () => {}
+    updateFunc: (scene: AbstractScene, registry: Registry) => void = () => {};
+    activateFunc: (scene: AbstractScene, registry: Registry) => void = () => {};
+    destroyFunc: (scene: AbstractScene, registry: Registry) => void = () => {};
 
     overlay: {
         sceneId: string;
@@ -46,29 +47,10 @@ export class StateDescription<T extends string> {
         return this;
     }
 
-    activate(scene: AbstractScene, registry: Registry) {
-        this.activateFunc && this.activateFunc(scene, registry);
-    }
-
     onDraw(drawFunc: (scene: AbstractScene, registry: Registry) => void) {
         this.drawFunc = drawFunc;
 
         return this;
-    }
-
-    draw(scene: AbstractScene, registry: Registry) {
-
-        if (this.overlay) {
-            const overlayScene = registry.services.scene.getSceneById(this.overlay.sceneId);
-            overlayScene.activate(this.overlay.stateId);
-            registry.services.scene.overlayScene = overlayScene;
-            // registry.services.scene.getActiveScene(true).activeStateId = this.overlay.stateId;
-        } else if (!scene.isOverlay && registry.services.scene.overlayScene) {
-            registry.services.scene.overlayScene.destroy();
-            registry.services.scene.overlayScene = undefined;
-        }
-
-        this.drawFunc && this.drawFunc(scene, registry);
     }
 
     onUpdate(updateFunc: (scene: AbstractScene, registry: Registry) => void) {
@@ -77,23 +59,12 @@ export class StateDescription<T extends string> {
         return this;
     }
 
-    update(scene: AbstractScene, registry: Registry) {
-        this.updateFunc && this.updateFunc(scene, registry);
+    onDestroy(destroyFunc: (scene: AbstractScene, registry: Registry) => void) {
+        this.destroyFunc = destroyFunc;
+
+        return this;
     }
 }
-
-export class SceneStates {
-    private sceneStatesMap: Map<string, StateDescription<string>> = new Map();
-
-    registerStates<T extends string>(states: StateDescription<T>[]) {
-        states.forEach(state => this.sceneStatesMap.set(state.stateId, state));
-    }
-
-    getSateById<T extends string, U extends AbstractScene>(sceneState: T): StateDescription<T> {
-        return <StateDescription<T>> this.sceneStatesMap.get(sceneState);
-    }
-}
-
 
 export abstract class AbstractScene<T extends string = string> {
     id: string;
@@ -101,11 +72,10 @@ export abstract class AbstractScene<T extends string = string> {
     isLoaded = false;
     isPaused = false;
     isDestroyed = false;
-    // application: Application;
     factory: ISpriteFactory;
     loader: SceneLoader;
-    states: SceneStates = new SceneStates();
-    activeStateId: string;
+    sceneStates: Map<T, SceneState<T>> = new Map();
+    activeStateId: T;
 
     private hidden = false;
     
@@ -136,7 +106,7 @@ export abstract class AbstractScene<T extends string = string> {
         this.activeStateId = stateId;
         this.registry.services.scene.activateScene(this.id);
 
-        const state = this.states.getSateById(this.activeStateId);
+        const state = this.sceneStates.get(this.activeStateId);
         
         if (state.overlay) {
             const overlayScene = this.registry.services.scene.getSceneById(state.overlay.sceneId);
@@ -148,12 +118,9 @@ export abstract class AbstractScene<T extends string = string> {
             this.load()
                 .then(() => {
                     this.hidden === false && this.draw();
-                    // this.states.getSateById(this.activeStateId).activate(this, this.registry);
                 });
         } else {
             this.hidden === false && this.draw();
-
-            // this.states.getSateById(this.activeStateId).activate(this, this.registry);
         }
     }
 
@@ -174,17 +141,14 @@ export abstract class AbstractScene<T extends string = string> {
     destroy() {
         this.isDestroyed = true;
 
-        this.doDestroy();
         this.state = SceneStateLegacy.Destroyed;
-        // this.spriteStore.getAll().forEach(spriteObject => spriteObject.destroy());
         this.registry.stores.layer.getContainer(this.id).container.removeChildren();
         this.getLayerContainer().removeAllLayers();
-        // this.application.destroy(true);
     }
 
     draw() {
-        const state = this.states.getSateById(this.activeStateId);
-        state.draw(this, this.registry);
+        const state = this.sceneStates.get(this.activeStateId);
+        state.drawFunc(this, this.registry);
     }
 
     private load(): Promise<void> {
@@ -201,7 +165,7 @@ export abstract class AbstractScene<T extends string = string> {
 
     update() {
         if (this.isLoaded && !this.isPaused) {
-            this.doUpdate();
+            this.sceneStates.get(this.activeStateId).updateFunc(this, this.registry);
         }
     }
 
@@ -215,7 +179,6 @@ export abstract class AbstractScene<T extends string = string> {
     }
 
     show() {
-        // if (this.state !== SceneState.Hidden) { throw new Error(`'show()' can only be applied to a hidden scene, current state is: ${this.state}`); }
         console.log('now it is visible')
         this.getLayerContainer().container.visible = true;
         this.hidden = false;
@@ -225,7 +188,4 @@ export abstract class AbstractScene<T extends string = string> {
     isHidden() {
         return this.hidden;
     }
-
-    protected abstract doUpdate();
-    protected abstract doDestroy();
 }

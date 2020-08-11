@@ -1,13 +1,14 @@
-import { AbstractScene, StateDescription } from "../AbstractScene";
-import { Application, Graphics, Point, TextStyle, Text } from "pixi.js";
+import { Point } from "pixi.js";
 import { Registry } from "../../Registry";
-import { LayerContainer, Layer } from "../../stores/LayerContainer";
-import { AppJson, SceneLoader } from "../SceneLoader";
-import { MapSceneId, WorldMapState } from "../map_scene/MapScene";
-import { MenuItemGraphics } from "./MenuItemGraphics";
-import { MenuSceneState, MenuSceneId } from "./MenuSceneState";
-import { GameSceneId, GameSceneState } from "../game_scene/GameSceneState";
 import { SpriteStore } from "../../stores/SpriteStore";
+import { AbstractScene } from "../AbstractScene";
+import { GameSceneState } from "../game_scene/GameSceneState";
+import { AppJson, SceneLoader } from "../SceneLoader";
+import { MenuItemGraphics } from "./MenuItemGraphics";
+import { MenuSceneId } from "./MenuSceneState";
+import { gameOverMenuState } from "./scene_states/gameOverMenuState";
+import { worldmapMenuState } from "./scene_states/worldmapMenuState";
+import { WorldMapState } from "../map_scene/scene_states/WorldMapState";
 
 export enum MenuItemId {
     GameResume = 'GameResume',
@@ -16,74 +17,6 @@ export enum MenuItemId {
     GameRestart = 'GameRestart',
     WorldMap = 'WorldMap'
 }
-
-const menuStates: StateDescription<MenuSceneState>[] = [
-    new StateDescription(MenuSceneId, MenuSceneState.WorldMapState)
-        .onDraw((menuScene: MenuScene, registry: Registry) => {
-            menuScene.reset();
-            const container = new LayerContainer(menuScene.id, registry);
-            registry.stores.layer.addContainer(container);
-            const application = registry.services.scene.application;
-    
-            container.addLayer(new Layer('main', [0, 1], application));
-    
-            const dimensions = registry.services.scene.sceneDimensions;
-            let position = new Point(dimensions.x / 2 - menuScene.size.x / 2, 0);
-
-            const graphics = new Graphics();
-            graphics.lineStyle(4, 0x424a3f, 1);
-            graphics.beginFill(0x000000, 0.5);
-            graphics.drawRect(position.x, position.y, menuScene.size.x, menuScene.size.y);
-            graphics.endFill();
-    
-            menuScene.getLayerContainer().getLayerById('main').addGraphics(graphics)
-
-            position.y += 95;
-
-            menuScene.activeMenuItems = [
-                menuScene.menuItems.get(MenuItemId.GameStart)
-            ];
-            
-            menuScene.activeMenuItems.forEach(menuItem => {
-                menuScene.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw(position));
-                position.y += menuItem.size.y;
-                position.y += 30;
-            });
-        }),
-    new StateDescription(MenuSceneId, MenuSceneState.GameOverState)
-        .onDraw((menuScene: MenuScene, registry: Registry) => {
-            menuScene.reset();
-            const container = new LayerContainer(menuScene.id, registry);
-            registry.stores.layer.addContainer(container);
-            const application = registry.services.scene.application;
-    
-            container.addLayer(new Layer('main', [0, 1], application));
-    
-            const dimensions = registry.services.scene.sceneDimensions;
-            let position = new Point(dimensions.x / 2 - menuScene.size.x / 2, 0);
-
-            const graphics = new Graphics();
-            graphics.lineStyle(4, 0x424a3f, 1);
-            graphics.beginFill(0x000000, 0.5);
-            graphics.drawRect(position.x, position.y, menuScene.size.x, menuScene.size.y);
-            graphics.endFill();
-    
-            menuScene.getLayerContainer().getLayerById('main').addGraphics(graphics)
-
-            position.y += 95;
-
-            menuScene.activeMenuItems = [
-                menuScene.menuItems.get(MenuItemId.GameRestart),
-                menuScene.menuItems.get(MenuItemId.WorldMap),
-            ];
-            
-            menuScene.activeMenuItems.forEach(menuItem => {
-                menuScene.getLayerContainer().getLayerById('main').addGraphics(menuItem.draw(position));
-                position.y += menuItem.size.y;
-                position.y += 30;
-            });
-        }),
-];
 
 export const toHexNumber = (hexString: string): number => {
     return parseInt(hexString.replace(/^#/, ''), 16);
@@ -99,7 +32,6 @@ export const appJson: AppJson = {
 export class MenuScene extends AbstractScene {
     id = MenuSceneId;
     isOverlay = true;
-    private application: Application;
     size = new Point(700, 700);
 
     menuItems: Map<MenuItemId, MenuItemGraphics> = new Map();
@@ -172,14 +104,7 @@ export class MenuScene extends AbstractScene {
             }
         ));
 
-        this.states.registerStates(menuStates);
-    }
-
-    doDestroy() {
-        this.getLayerContainer().getLayerById('main').container.children.forEach(child => (child as Graphics).clear());
-    }
-
-    doUpdate() {
-        
+        this.sceneStates.set(gameOverMenuState.stateId, gameOverMenuState);
+        this.sceneStates.set(worldmapMenuState.stateId, worldmapMenuState);
     }
 }

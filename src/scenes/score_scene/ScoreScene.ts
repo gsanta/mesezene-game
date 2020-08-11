@@ -144,7 +144,4 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
     
         this.registry.services.event.dispatch(SceneActions.SCENE_START);
     }
-
-    doDestroy() {}
-    doUpdate() {}
 }

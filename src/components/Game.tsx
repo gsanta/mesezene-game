@@ -1,9 +1,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { MapSceneId, WorldMapState } from '../scenes/map_scene/MapScene';
 import { AppProps } from './AppProps';
 import { Header } from './Header';
 import { TheEnd } from './TheEnd';
+import { WorldMapState } from '../scenes/map_scene/scene_states/WorldMapState';
 
 const AppStyled = styled.div`
     display: flex;
