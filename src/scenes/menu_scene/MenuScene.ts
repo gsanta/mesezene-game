@@ -3,7 +3,7 @@ import { Application, Graphics, Point, TextStyle, Text } from "pixi.js";
 import { Registry } from "../../Registry";
 import { LayerContainer, Layer } from "../../stores/LayerContainer";
 import { AppJson, SceneLoader } from "../SceneLoader";
-import { MapSceneId } from "../map_scene/MapScene";
+import { MapSceneId, WorldMapState } from "../map_scene/MapScene";
 import { MenuItemGraphics } from "./MenuItemGraphics";
 import { MenuSceneState, MenuSceneId } from "./MenuSceneState";
 import { GameSceneId, GameSceneState } from "../game_scene/GameSceneState";
@@ -119,8 +119,7 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#e26b58',
                 label: 'Játék',
                 action: () => {
-                    this.registry.services.scene.getSceneById(GameSceneId).activeStateId = GameSceneState.Running;
-                    this.registry.services.scene.activateScene(GameSceneId);
+                    this.registry.services.scene.gameScene.activate(GameSceneState.Running);
                 }
             }
         ));
@@ -132,8 +131,7 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#e26b58',
                 label: 'Újra',
                 action: () => {
-                    this.registry.services.scene.getSceneById(GameSceneId).activeStateId = GameSceneState.Running;
-                    this.registry.services.scene.activateScene(GameSceneId);
+                    this.registry.services.scene.gameScene.activate(GameSceneState.Running);
                 }
             }
         ));
@@ -145,7 +143,7 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#50863b',
                 label: 'Lufivilág',
                 action: () => {
-                    this.registry.services.scene.activateScene(MapSceneId);
+                    this.registry.services.scene.mapScene.activate(WorldMapState.DefaultState);
                 }
             }
         ));
@@ -157,7 +155,7 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#50863b',
                 label: 'Folytatom',
                 action: () => {
-                    this.registry.services.scene.activateScene(MapSceneId);
+                    this.registry.services.scene.mapScene.activate(WorldMapState.DefaultState);
                 }
             }
         ));
@@ -169,7 +167,7 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#50863b',
                 label: 'Befejezem',
                 action: () => {
-                    this.registry.services.scene.activateScene(MapSceneId);
+                    this.registry.services.scene.mapScene.activate(WorldMapState.DefaultState);
                 }
             }
         ));
@@ -177,17 +175,11 @@ export class MenuScene extends AbstractScene {
         this.states.registerStates(menuStates);
     }
 
-    doDestroy() {}
+    doDestroy() {
+        this.getLayerContainer().getLayerById('main').container.children.forEach(child => (child as Graphics).clear());
+    }
+
     doUpdate() {
         
-    }
-
-    doDraw() {
-        this.states.getSateById(this.activeStateId).draw(this, this.registry);
-
-    }
-
-    private drawBackground(): void {
-
     }
 }

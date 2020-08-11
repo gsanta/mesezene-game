@@ -28,12 +28,14 @@ export class StateDescription<T extends string> {
     overlay: {
         sceneId: string;
         stateId: string;
+        displayOnLoad: boolean;
     }
 
-    setOverlay(sceneId: string, stateId: string) {
+    setOverlay(sceneId: string, stateId: string, displayOnLoad = true) {
         this.overlay = {
             sceneId,
-            stateId
+            stateId,
+            displayOnLoad
         }
         return this;
     }
@@ -58,8 +60,7 @@ export class StateDescription<T extends string> {
 
         if (this.overlay) {
             const overlayScene = registry.services.scene.getSceneById(this.overlay.sceneId);
-            overlayScene.activeStateId = this.overlay.stateId;
-            overlayScene.activate();
+            overlayScene.activate(this.overlay.stateId);
             registry.services.scene.overlayScene = overlayScene;
             // registry.services.scene.getActiveScene(true).activeStateId = this.overlay.stateId;
         } else if (!scene.isOverlay && registry.services.scene.overlayScene) {
@@ -94,10 +95,12 @@ export class SceneStates {
 }
 
 
-export abstract class AbstractScene<T extends string = null> {
+export abstract class AbstractScene<T extends string = string> {
     id: string;
     isOverlay = false;
     isLoaded = false;
+    isPaused = false;
+    isDestroyed = false;
     // application: Application;
     factory: ISpriteFactory;
     loader: SceneLoader;
@@ -129,22 +132,37 @@ export abstract class AbstractScene<T extends string = null> {
         return this.state;
     }
 
-    activate() {
+    activate(stateId: T) {
+        this.activeStateId = stateId;
+        this.registry.services.scene.activateScene(this.id);
+
+        const state = this.states.getSateById(this.activeStateId);
+        
+        if (state.overlay) {
+            const overlayScene = this.registry.services.scene.getSceneById(state.overlay.sceneId);
+            state.overlay.displayOnLoad === false && overlayScene.hide();
+            overlayScene.activate(state.overlay.stateId);
+        }
+
         if (!this.isLoaded) {
             this.load()
                 .then(() => {
-                    this.doDraw();
+                    this.hidden === false && this.draw();
                     // this.states.getSateById(this.activeStateId).activate(this, this.registry);
                 });
         } else {
-            this.doDraw();
+            this.hidden === false && this.draw();
 
             // this.states.getSateById(this.activeStateId).activate(this, this.registry);
         }
     }
 
-    stop() {
-        this.state = SceneStateLegacy.Stopped;
+    pause() {
+        this.isPaused = true;
+    }
+
+    resume() {
+        this.isPaused = false;
     }
 
     reset() {
@@ -154,12 +172,19 @@ export abstract class AbstractScene<T extends string = null> {
     }
 
     destroy() {
+        this.isDestroyed = true;
+
+        this.doDestroy();
         this.state = SceneStateLegacy.Destroyed;
         // this.spriteStore.getAll().forEach(spriteObject => spriteObject.destroy());
         this.registry.stores.layer.getContainer(this.id).container.removeChildren();
         this.getLayerContainer().removeAllLayers();
-        this.doDestroy();
         // this.application.destroy(true);
+    }
+
+    draw() {
+        const state = this.states.getSateById(this.activeStateId);
+        state.draw(this, this.registry);
     }
 
     private load(): Promise<void> {
@@ -175,7 +200,7 @@ export abstract class AbstractScene<T extends string = null> {
     }
 
     update() {
-        if (this.isLoaded) {
+        if (this.isLoaded && !this.isPaused) {
             this.doUpdate();
         }
     }
@@ -191,16 +216,16 @@ export abstract class AbstractScene<T extends string = null> {
 
     show() {
         // if (this.state !== SceneState.Hidden) { throw new Error(`'show()' can only be applied to a hidden scene, current state is: ${this.state}`); }
-
+        console.log('now it is visible')
         this.getLayerContainer().container.visible = true;
         this.hidden = false;
+        this.draw();
     }
 
     isHidden() {
         return this.hidden;
     }
 
-    protected abstract doDraw();
     protected abstract doUpdate();
     protected abstract doDestroy();
 }

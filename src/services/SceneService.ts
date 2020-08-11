@@ -18,7 +18,6 @@ export class SceneService implements IService, IListener {
     private overlayScenes: Set<AbstractScene> = new Set();
 
     sceneHtmlElement: HTMLDivElement;
-
     application: Application;
     sceneDimensions: Point;
 
@@ -27,14 +26,24 @@ export class SceneService implements IService, IListener {
     activeScene: AbstractScene;
     overlayScene: AbstractScene;
 
+    gameScene: GameScene;
+    scoreScene: ScoreScene;
+    mapScene: MapScene;
+    menuScene: MenuScene;
+
     constructor(registry: Registry) {        
         this.registry = registry;
         this.application = new Application({width: 256, height: 256});
 
-        this.registerScene(new GameScene(registry), false);
-        this.registerScene(new ScoreScene(registry), false);
-        this.registerScene(new MapScene(registry), false);
-        this.registerScene(new MenuScene(registry), true);
+        this.gameScene = new GameScene(registry);
+        this.scoreScene = new ScoreScene(registry);
+        this.mapScene = new MapScene(registry);
+        this.menuScene = new MenuScene(registry);
+
+        this.registerScene(this.gameScene, false);
+        this.registerScene(this.scoreScene, false);
+        this.registerScene(this.mapScene, false);
+        this.registerScene(this.menuScene, true);
 
         this.registry.registerControlledObject(this);
     }
@@ -44,7 +53,7 @@ export class SceneService implements IService, IListener {
         isOverlay && this.overlayScenes.add(scene);
     }
 
-    activateScene(sceneId: string, run = false) {
+    activateScene(sceneId: string) {
         const scene = this.scenes.find(scene => scene.id === sceneId);
 
         if (!scene) { throw new Error(`Scene '${sceneId}' not registered, so can not be activated.`);}
@@ -57,8 +66,6 @@ export class SceneService implements IService, IListener {
                 this.activeScene = scene;
             }
         }
-
-        scene.activate();
     }
 
     getActiveScene(isOverlay: boolean): AbstractScene {
@@ -95,9 +102,9 @@ export class SceneService implements IService, IListener {
             case ScoreStoreEvents.LIVES_CHANGED:
                 if (this.registry.stores.scoreStore.getLives() <= 1) {
                     if (this.getActiveScene(false) && this.getActiveScene(false).id === GameSceneId) {
-                        this.getActiveScene(false).stop();
-                        this.getActiveScene(true).show();
-                        this.registry.services.renderService.reRender();
+                        // this.getActiveScene(false).pause();
+                        // this.getActiveScene(true).show();
+                        // this.registry.services.renderService.reRender();
                     }
                 }
             break;

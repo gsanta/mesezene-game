@@ -3,18 +3,14 @@ import { GameObjectRole } from "../../model/SpriteObject";
 import { Registry } from "../../Registry";
 import { IListener } from "../../services/EventService";
 import { IService, ServiceCapability } from "../../services/IService";
-import { SpriteStore } from "../../stores/SpriteStore";
 import { Layer } from "../../stores/LayerContainer";
+import { SpriteStore } from "../../stores/SpriteStore";
 import { AbstractScene, StateDescription } from "../AbstractScene";
 import { GameSpriteFactory } from "../game_scene/GameSpriteFactory";
 import { AppJson, SceneLoader } from "../SceneLoader";
 import { ArrowGraphics } from "./ArrowGraphics";
-import { BezierCurve } from "../../utils/BezierCurve";
-import { Point } from "pixi.js";
-import { LineCalcs } from "../../utils/LineCalcs";
-import { Line } from "../../model/primitives/Line";
 import { BadgeGraphics } from "./BadgeGraphics";
-import { GameSceneId } from "../game_scene/GameSceneState";
+import { GameSceneState } from "../game_scene/GameSceneState";
 
 export const mapSceneJson: AppJson = {
     width: 700,
@@ -126,6 +122,13 @@ const worldMapStates: StateDescription<WorldMapState>[] = [
     new StateDescription<WorldMapState>(MapSceneId, WorldMapState.DefaultState)
         // .setOverlay(MenuSceneId, MenuSceneState.WorldMapState)
         .onDraw((worldMapScene: MapScene, registry) => {
+            registry.services.event.addListener(worldMapScene);
+
+            const application = registry.services.scene.application;
+    
+            registry.stores.layer.getContainer(worldMapScene.id).addLayer(new Layer('background-layer', [0, 1], application));
+            registry.stores.layer.getContainer(worldMapScene.id).addLayer(new Layer('foreground-layer', [0, 1], application));
+            
             const background = worldMapScene.spriteStore.getByRole(GameObjectRole.Background)[0];
             const backgroundLayer = registry.stores.layer.getContainer(worldMapScene.id).getLayerById('background-layer');
             
@@ -140,7 +143,7 @@ const worldMapStates: StateDescription<WorldMapState>[] = [
             ];
 
             badges[0].isDisabled = false;
-            badges[0].onClick(() => registry.services.scene.activateScene(GameSceneId));
+            badges[0].onClick(() => registry.services.scene.gameScene.activate(GameSceneState.Running));
 
             const routes: ArrowGraphics[] = []
 
@@ -173,17 +176,6 @@ export class MapScene extends AbstractScene<WorldMapState> implements IListener,
     }
 
     listen(action: string) {}
-
-    doDraw() {
-        this.registry.services.event.addListener(this);
-
-        const application = this.registry.services.scene.application;
-
-        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer', [0, 1], application));
-        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('foreground-layer', [0, 1], application));
-
-        this.states.getSateById(this.activeStateId).draw(this, this.registry);
-    }
 
     doDestroy() {
 

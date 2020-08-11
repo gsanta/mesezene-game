@@ -40,7 +40,22 @@ export class Header extends React.Component<{registry: Registry}> {
                     onClick={() => {
                         const menuScene = this.props.registry.services.scene.getSceneById(MenuSceneId);
                         
-                        menuScene.isHidden() ? menuScene.show() : menuScene.hide();
+                        if (!this.props.registry.services.scene.getActiveScene(false).isPaused) {
+                            this.props.registry.services.scene.getActiveScene(false).pause();
+                            menuScene.show();
+                        } else {
+                            this.props.registry.services.scene.getActiveScene(false).resume();
+                            menuScene.hide();
+                        }
+
+                        
+                        // const overlayScene = this.props.registry.services.scene.getActiveScene(true);
+
+                        // if (overlayScene.isDestroyed) {
+                        //     overlayScene.activate(overlayScene.activeStateId);
+                        // } else {
+                        //     overlayScene.destroy();
+                        // }
                     }}
                 >
 

@@ -22,7 +22,7 @@ import { MenuSceneId, MenuSceneState } from "../menu_scene/MenuSceneState";
 
 const gameStates: StateDescription<GameSceneState>[] = [
     new StateDescription<GameSceneState>(GameSceneId, GameSceneState.Running)
-        // .overlay(MenuSceneId, MenuSceneState.GameOverState)
+        .setOverlay(MenuSceneId, MenuSceneState.GameOverState, false)
         .onDraw((scene: GameScene, registry: Registry) => {
             scene.reset();
             const application = registry.services.scene.application;
@@ -74,8 +74,7 @@ const gameStates: StateDescription<GameSceneState>[] = [
             scene.coinGenerator.update();
     
             if (scene.obstacleCollider.checkCollisions()) {
-                registry.services.scene.getSceneById(GameSceneId).activeStateId = GameSceneState.GameOver;
-                registry.services.scene.activateScene(GameSceneId);
+                // registry.services.scene.gameScene.activate(GameSceneState.GameOver);
             }
             scene.coinCollider.checkCollisions();
 
@@ -88,7 +87,7 @@ const gameStates: StateDescription<GameSceneState>[] = [
     
 ]
 
-export class GameScene extends AbstractScene implements IListener, IService {
+export class GameScene extends AbstractScene<GameSceneState> implements IListener, IService {
     id = GameSceneId;
     capabilities = [ServiceCapability.Listen];
 
@@ -119,10 +118,6 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.playerMoveHandler = new PlayerMoveHandler(this, registry);
 
         this.spriteStore = new SpriteStore(this.registry);
-    }
-
-    protected doDraw() {
-        this.states.getSateById(this.activeStateId).draw(this, this.registry);
     }
 
     listen() {}

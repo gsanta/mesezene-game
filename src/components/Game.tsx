@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { MapSceneId } from '../scenes/map_scene/MapScene';
+import { MapSceneId, WorldMapState } from '../scenes/map_scene/MapScene';
 import { AppProps } from './AppProps';
 import { Header } from './Header';
 import { TheEnd } from './TheEnd';
@@ -36,7 +36,7 @@ export class Game extends React.Component<AppProps> {
         this.ref.current.focus();
         this.props.registry.services.scene.sceneHtmlElement = this.ref.current;
         this.props.registry.services.scene.init(this.ref.current);
-        this.props.registry.services.scene.activateScene(MapSceneId);
+        this.props.registry.services.scene.mapScene.activate(WorldMapState.DefaultState);
     }
 
     render() {
