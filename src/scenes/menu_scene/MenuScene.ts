@@ -2,7 +2,7 @@ import { Point } from "pixi.js";
 import { Registry } from "../../Registry";
 import { SpriteStore } from "../../stores/SpriteStore";
 import { AbstractScene } from "../AbstractScene";
-import { GameSceneState } from "../game_scene/GameSceneState";
+import { GameSceneState, GameSceneId } from "../game_scene/GameSceneState";
 import { AppJson, SceneLoader } from "../SceneLoader";
 import { MenuItemGraphics } from "./MenuItemGraphics";
 import { MenuSceneId } from "./MenuSceneState";
@@ -11,6 +11,7 @@ import { worldmapMenuState } from "./scene_states/worldmapMenuState";
 import { WorldMapState } from "../map_scene/scene_states/WorldMapState";
 import { gameRunningMenuState } from "./scene_states/gameRunningMenuState";
 import { MenuGraphics } from "./MenuGraphics";
+import { MapScene, MapSceneId } from "../map_scene/MapScene";
 
 export enum MenuItemId {
     GameResume = 'GameResume',
@@ -55,7 +56,7 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#e26b58',
                 label: 'Játék',
                 action: () => {
-                    this.registry.services.scene.gameScene.activate(GameSceneState.Running);
+                    this.registry.services.scene.activateScene(GameSceneId);
                 }
             }
         ));
@@ -67,7 +68,7 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#e26b58',
                 label: 'Újra',
                 action: () => {
-                    this.registry.services.scene.gameScene.activate(GameSceneState.Running);
+                    this.registry.services.scene.activateScene(GameSceneId);
                 }
             }
         ));
@@ -79,7 +80,7 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#e26b58',
                 label: 'Lufivilág',
                 action: () => {
-                    this.registry.services.scene.mapScene.activate(WorldMapState.DefaultState);
+                    this.registry.services.scene.activateScene(MapSceneId);
                 }
             }
         ));
@@ -104,13 +105,20 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#e26b58',
                 label: 'Befejezem',
                 action: () => {
-                    this.registry.services.scene.mapScene.activate(WorldMapState.DefaultState);
+                    this.registry.services.scene.activateScene(MapSceneId);
                 }
             }
         ));
-
-        this.sceneStates.set(gameOverMenuState.stateId, gameOverMenuState);
-        this.sceneStates.set(gameRunningMenuState.stateId, gameRunningMenuState);
-        this.sceneStates.set(worldmapMenuState.stateId, worldmapMenuState);
     }
+
+    doDraw() {
+        this.menu.menuItems = [
+            this.menuItems.get(MenuItemId.GameRestart),
+            this.menuItems.get(MenuItemId.WorldMap)
+        ];
+    
+        this.menu.draw();
+    }
+
+    doUpdate() {}
 }

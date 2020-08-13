@@ -8,6 +8,7 @@ import { RenderService } from "./services/RenderService";
 import { SceneService } from "./services/SceneService";
 import { UserService } from "./services/UserService";
 import { StateTransitionService } from "./services/StateTransitionService";
+import { MenuService } from "./services/MenuService";
 
 export class Services {
     private registry: Registry;
@@ -15,6 +16,7 @@ export class Services {
     keyboard: KeyboardService;
     gamepad: GamepadService;
     scene: SceneService;
+    menu: MenuService;
     loginService: UserService;
     renderService: RenderService;
     event: EventService;
@@ -29,6 +31,7 @@ export class Services {
         this.keyboard = new KeyboardService(registry);
         this.gamepad = new GamepadService(registry);
         this.scene = new SceneService(registry);
+        this.menu = new MenuService(registry);
         this.loginService = new UserService(registry);
         this.renderService = new RenderService();
         this.stateTransition = new StateTransitionService(this.registry);

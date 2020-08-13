@@ -1,20 +1,24 @@
+import { Point } from "pixi.js";
+import { SceneActions } from "../../actions/SceneActions";
+import { GameObjectRole } from "../../model/SpriteObject";
 import { Registry } from "../../Registry";
 import { IListener } from "../../services/EventService";
+import { GamepadKey } from "../../services/GamepadService";
 import { IService, ServiceCapability } from "../../services/IService";
+import { Layer } from "../../stores/LayerContainer";
 import { SpriteStore } from "../../stores/SpriteStore";
 import { AbstractScene } from "../AbstractScene";
 import { defaultAppJson, SceneLoader } from "../SceneLoader";
 import { CoinCollider } from "./colliders/CoinCollider";
 import { ObstacleCollider } from "./colliders/ObstacleCollider";
-import { GameSceneId, GameSceneState } from "./GameSceneState";
+import { GameSceneId } from "./GameSceneState";
 import { GameSpriteFactory } from "./GameSpriteFactory";
 import { CoinGenerator } from "./generators/CoinGenerator";
 import { ObstacleGenerator } from "./generators/ObstacleGenerator";
 import { PlayerMoveHandler } from "./movement/PlayerMoveHandler";
-import { gameOverState } from "./scene_states/gameOverState";
-import { gameRunningState } from "./scene_states/gameRunningState";
+import { PlayerSprite } from "./PlayerSprite";
 
-export class GameScene extends AbstractScene<GameSceneState> implements IListener, IService {
+export class GameScene extends AbstractScene implements IListener, IService {
     id = GameSceneId;
     capabilities = [ServiceCapability.Listen];
 
@@ -34,9 +38,6 @@ export class GameScene extends AbstractScene<GameSceneState> implements IListene
         super(registry, defaultAppJson);
         this.registry = registry;
 
-        this.sceneStates.set(gameRunningState.stateId, gameRunningState);
-        this.sceneStates.set(gameOverState.stateId, gameOverState);
-
         this.loader = new SceneLoader(this, this.registry);
         this.factory = new GameSpriteFactory();
         this.obstacleGenerator = new ObstacleGenerator(this, registry);
@@ -49,4 +50,63 @@ export class GameScene extends AbstractScene<GameSceneState> implements IListene
     }
 
     listen() {}
+
+    doDraw() {
+        this.reset();
+        const application = this.registry.services.scene.application;
+    
+        const gameContainer = this.getLayerContainer();
+    
+        gameContainer.addLayer(new Layer('background-layer', [0, 0.73], application));
+        gameContainer.addLayer(new Layer(`game-layer-1`, [0.73, 0.78], application))
+        gameContainer.addLayer(new Layer(`game-layer-2`, [0.78, 0.83], application))
+        gameContainer.addLayer(new Layer(`game-layer-3`, [0.83, 0.88], application))
+        gameContainer.addLayer(new Layer(`game-layer-4`, [0.88, 0.93], application))
+        gameContainer.addLayer(new Layer('menu-layer', [0, 1], application));
+    
+        const appJson = defaultAppJson;
+        this.gameSpeed = appJson.gameSpeed;
+    
+        const player = <PlayerSprite> this.spriteStore.getByRole(GameObjectRole.Player)[0];
+        this.playerMoveHandler.setPlayer(player);
+
+        gameContainer.getLayerById('game-layer-3').addChild(player);
+
+        const backgroundSprites = this.spriteStore.getByRole(GameObjectRole.Background);
+        backgroundSprites.forEach(sprite => gameContainer.getLayerById('background-layer').addChild(sprite));
+
+        this.vertialBorders = [405, 510];
+        this.horizontalBorders = [0, this.registry.services.scene.sceneDimensions.x];
+
+        this.obstacleGenerator.update();
+        this.coinGenerator.update();
+
+        this.registry.services.event.dispatch(SceneActions.SCENE_START);
+    }
+
+    doUpdate() {
+        const player = <PlayerSprite> this.spriteStore.getByRole(GameObjectRole.Player)[0];
+
+        const scrollableSprites = this.spriteStore.getAll().filter(gameObject => !gameObject.roles.has(GameObjectRole.Player));
+        const deltaMove = new Point(-this.gameSpeed, 0);
+        scrollableSprites.forEach(gameObject => gameObject.move(deltaMove));
+
+        this.playerMoveHandler.move();
+
+        if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
+            player.jump();
+        }
+
+        player.update();
+
+        this.obstacleGenerator.update();
+        this.coinGenerator.update();
+
+        if (this.obstacleCollider.checkCollisions()) {
+        }
+
+        this.coinCollider.checkCollisions();
+        this.registry.services.event.dispatch(SceneActions.SCENE_UPDATE);
+
+    }
 }

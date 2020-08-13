@@ -99,7 +99,6 @@ export class CollisionService implements IListener, IService {
                 v: vertical ? vertical : 0,
                 gameObject
             };
-            console.log(collision)
         } else {
             collision = {
                 h: diag ? diag.h : 0,
