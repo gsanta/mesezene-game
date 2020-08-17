@@ -30,6 +30,10 @@ export class MapScene extends AbstractScene implements IListener, IService {
 
     listen(action: string) {}
 
+    doActivate() {
+        this.registry.services.scene.menuScene.setMenu(this.registry.services.scene.menuScene.menus.worldMap);
+    }
+
     doDraw() {
         this.registry.services.event.addListener(this);
 

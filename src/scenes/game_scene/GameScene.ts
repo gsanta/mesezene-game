@@ -17,6 +17,7 @@ import { CoinGenerator } from "./generators/CoinGenerator";
 import { ObstacleGenerator } from "./generators/ObstacleGenerator";
 import { PlayerMoveHandler } from "./movement/PlayerMoveHandler";
 import { PlayerSprite } from "./PlayerSprite";
+import { MenuSceneId } from "../menu_scene/MenuSceneState";
 
 export class GameScene extends AbstractScene implements IListener, IService {
     id = GameSceneId;
@@ -50,6 +51,10 @@ export class GameScene extends AbstractScene implements IListener, IService {
     }
 
     listen() {}
+
+    doActivate() {
+        this.registry.services.scene.menuScene.setMenu(this.registry.services.scene.menuScene.menus.game);
+    }
 
     doDraw() {
         this.reset();
@@ -103,10 +108,16 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.coinGenerator.update();
 
         if (this.obstacleCollider.checkCollisions()) {
+            this.pause();
+            this.gameOver();
         }
 
         this.coinCollider.checkCollisions();
         this.registry.services.event.dispatch(SceneActions.SCENE_UPDATE);
+    }
 
+    private gameOver() {
+        this.registry.services.scene.menuScene.setMenu(this.registry.services.scene.menuScene.menus.gameOver);
+        this.registry.services.scene.getSceneById(MenuSceneId).show();
     }
 }

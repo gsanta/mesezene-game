@@ -40,6 +40,21 @@ export class MenuScene extends AbstractScene {
     menuItems: Map<MenuItemId, MenuItemGraphics> = new Map();
     menu: MenuGraphics;
 
+    menus = {
+        game: [
+            MenuItemId.GameResume,
+            MenuItemId.GameRestart,
+            MenuItemId.WorldMap
+        ],
+        gameOver: [
+            MenuItemId.GameRestart,
+            MenuItemId.WorldMap
+        ],
+        worldMap: [
+            MenuItemId.GameStart,
+        ]
+    }
+
     constructor(registry: Registry) {
         super(registry, appJson);
 
@@ -69,6 +84,7 @@ export class MenuScene extends AbstractScene {
                 label: 'Újra',
                 action: () => {
                     this.registry.services.scene.activateScene(GameSceneId);
+                    this.hide();
                 }
             }
         ));
@@ -81,6 +97,7 @@ export class MenuScene extends AbstractScene {
                 label: 'Lufivilág',
                 action: () => {
                     this.registry.services.scene.activateScene(MapSceneId);
+                    this.hide();
                 }
             }
         ));
@@ -92,8 +109,8 @@ export class MenuScene extends AbstractScene {
                 hoveredColor: '#e26b58',
                 label: 'Folytatom',
                 action: () => {
-                    this.registry.services.scene.getActiveScene(true).hide();
-                    this.registry.services.scene.getActiveScene(false).resume();
+                    this.hide();
+                    this.registry.services.scene.gameScene.resume();
                 }
             }
         ));
@@ -109,14 +126,18 @@ export class MenuScene extends AbstractScene {
                 }
             }
         ));
+
+        this.setMenu(this.menus.worldMap);
     }
 
+    setMenu(menuItemIds: MenuItemId[]) {
+        this.menu.menuItems = [];
+        menuItemIds.forEach(id => this.menu.menuItems.push(this.menuItems.get(id)));
+    }
+
+    doActivate() {}
+
     doDraw() {
-        this.menu.menuItems = [
-            this.menuItems.get(MenuItemId.GameRestart),
-            this.menuItems.get(MenuItemId.WorldMap)
-        ];
-    
         this.menu.draw();
     }
 

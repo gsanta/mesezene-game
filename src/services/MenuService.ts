@@ -11,7 +11,5 @@ export class MenuService {
 
     constructor(registry: Registry) {
         this.menuScene = new MenuScene(registry);
-
-        this.menuScene.activate();
     }
 }

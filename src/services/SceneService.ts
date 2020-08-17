@@ -6,6 +6,7 @@ import { MapScene } from "../scenes/map_scene/MapScene";
 import { MenuScene } from "../scenes/menu_scene/MenuScene";
 import { defaultAppJson } from "../scenes/SceneLoader";
 import { ScoreScene as ScoreScene } from "../scenes/score_scene/ScoreScene";
+import { LayerContainer } from "../stores/LayerContainer";
 
 export class SceneService{
     scenes: AbstractScene[] = [];
@@ -75,6 +76,10 @@ export class SceneService{
         
         // this.scenes.forEach(scene => this.registry.stores.layer.addContainer(new LayerContainer(scene.id, this.registry)));
         this.application.renderer.resize(defaultAppJson.width, defaultAppJson.height);
+
+        this.scenes.forEach(scene => {
+            this.registry.stores.layer.addContainer(new LayerContainer(scene.id, this.registry));
+        });
 
         this.application.ticker.add(delta => {
             this.update();

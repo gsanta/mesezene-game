@@ -104,8 +104,6 @@ export abstract class AbstractScene {
     activate() {
         this.isPaused = false;
         this.isDestroyed = false;
-
-        this.registry.stores.layer.addContainer(new LayerContainer(this.id, this.registry));
         
         // if (state.overlay) {
         //     const overlayScene = this.registry.services.scene.getSceneById(state.overlay.sceneId);
@@ -121,6 +119,8 @@ export abstract class AbstractScene {
         } else {
             this.draw();
         }
+
+        this.doActivate();
     }
 
     pause() {
@@ -143,7 +143,7 @@ export abstract class AbstractScene {
         this.state = SceneStateLegacy.Destroyed;
         this.registry.stores.layer.getContainer(this.id).container.removeChildren();
         this.getLayerContainer().removeAllLayers();
-        this.registry.stores.layer.removeContainer(this.id);
+        // this.registry.stores.layer.removeContainer(this.id);
     }
 
     draw() {
@@ -164,7 +164,7 @@ export abstract class AbstractScene {
 
     update() {
         if (this.isLoaded && !this.isPaused) {
-            // this.sceneStates.get(this.activeStateId).updateFunc(this, this.registry);
+            this.doUpdate();
         }
     }
 
@@ -189,4 +189,5 @@ export abstract class AbstractScene {
 
     abstract doDraw();
     abstract doUpdate();
+    abstract doActivate();
 }
