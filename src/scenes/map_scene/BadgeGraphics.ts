@@ -19,23 +19,23 @@ export class BadgeGraphics {
     draw() {
         const spriteObj = this.scene.spriteStore.getByName(this.spriteId)[0];
 
-        spriteObj.sprite.interactive = true;
+        spriteObj.container.interactive = true;
 
-        spriteObj.sprite.on('mouseover', () => {
+        spriteObj.container.on('mouseover', () => {
             if (!this.isDisabled) {
-                spriteObj.sprite.scale.set(0.6)
-                spriteObj.sprite.texture = this.scene.textureStore.getByName(`${this.spriteId}_highlighted`);
+                spriteObj.container.scale.set(0.6)
+                spriteObj.setTexture(this.scene.textureStore.getByName(`${this.spriteId}_highlighted`));
             }
         });
     
-        spriteObj.sprite.on('mouseout', () => {
+        spriteObj.container.on('mouseout', () => {
             if (!this.isDisabled) {
-                spriteObj.sprite.scale.set(0.5)
-                spriteObj.sprite.texture = this.scene.textureStore.getByName(`${this.spriteId}`);
+                spriteObj.container.scale.set(0.5)
+                spriteObj.setTexture(this.scene.textureStore.getByName(`${this.spriteId}`));
             }
         });
     
-        spriteObj.sprite.on('click', () => {
+        spriteObj.container.on('click', () => {
             if (!this.isDisabled) {
                 this.onClickFunc && this.onClickFunc();
             }

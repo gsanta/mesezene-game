@@ -15,9 +15,7 @@ export class MenuGraphics {
     constructor(menuScene: MenuScene, registry: Registry, layerId: string) {
         this.menuScene = menuScene;
         this.registry = registry;
-        this.layerId = layerId;
-
-        
+        this.layerId = layerId; 
     }
     
     draw() {
@@ -39,7 +37,6 @@ export class MenuGraphics {
     
         position.y += 95;
     
-        
         this.menuItems.forEach(menuItem => {
             this.menuScene.getLayerContainer().getLayerById(this.layerId).addGraphics(menuItem.draw(position));
             position.y += menuItem.size.y;

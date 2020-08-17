@@ -1,6 +1,6 @@
-import { Point } from "pixi.js";
+import { Point, Container } from "pixi.js";
 import { SceneActions } from "../../actions/SceneActions";
-import { GameObjectRole } from "../../model/SpriteObject";
+import { GameObjectRole, SpriteObject } from "../../model/SpriteObject";
 import { Registry } from "../../Registry";
 import { IListener } from "../../services/EventService";
 import { GamepadKey } from "../../services/GamepadService";
@@ -15,9 +15,11 @@ import { GameSceneId } from "./GameSceneState";
 import { GameSpriteFactory } from "./GameSpriteFactory";
 import { CoinGenerator } from "./generators/CoinGenerator";
 import { ObstacleGenerator } from "./generators/ObstacleGenerator";
-import { PlayerMoveHandler } from "./movement/PlayerMoveHandler";
+import { LaneManager } from "./movement/LaneManager";
 import { PlayerSprite } from "./PlayerSprite";
 import { MenuSceneId } from "../menu_scene/MenuSceneState";
+import { LaneGraphics } from "./LaneGraphics";
+import { LaneObject } from "../../model/LaneObject";
 
 export class GameScene extends AbstractScene implements IListener, IService {
     id = GameSceneId;
@@ -27,7 +29,7 @@ export class GameScene extends AbstractScene implements IListener, IService {
     coinGenerator: CoinGenerator;
     obstacleCollider: ObstacleCollider;
     coinCollider: CoinCollider;
-    playerMoveHandler: PlayerMoveHandler;
+    laneManager: LaneManager;
 
     gameSpeed: number = 2;
     gameLayerCount = 4;
@@ -45,7 +47,15 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.coinGenerator = new CoinGenerator(this, registry);
         this.obstacleCollider = new ObstacleCollider(this, registry);
         this.coinCollider = new CoinCollider(this, registry);
-        this.playerMoveHandler = new PlayerMoveHandler(this, registry);
+        this.laneManager = new LaneManager(
+            [
+                new LaneObject([400, 450]),
+                new LaneObject([450, 510]),
+                new LaneObject([510, 570])
+            ],
+            this,
+            registry
+        );
 
         this.spriteStore = new SpriteStore(this.registry);
     }
@@ -73,15 +83,17 @@ export class GameScene extends AbstractScene implements IListener, IService {
         this.gameSpeed = appJson.gameSpeed;
     
         const player = <PlayerSprite> this.spriteStore.getByRole(GameObjectRole.Player)[0];
-        this.playerMoveHandler.setPlayer(player);
+        this.laneManager.setPlayer(player);
 
         gameContainer.getLayerById('game-layer-3').addChild(player);
 
         const backgroundSprites = this.spriteStore.getByRole(GameObjectRole.Background);
         backgroundSprites.forEach(sprite => gameContainer.getLayerById('background-layer').addChild(sprite));
-
+        
         this.vertialBorders = [405, 510];
         this.horizontalBorders = [0, this.registry.services.scene.sceneDimensions.x];
+
+        this.laneManager.draw();
 
         this.obstacleGenerator.update();
         this.coinGenerator.update();
@@ -96,7 +108,7 @@ export class GameScene extends AbstractScene implements IListener, IService {
         const deltaMove = new Point(-this.gameSpeed, 0);
         scrollableSprites.forEach(gameObject => gameObject.move(deltaMove));
 
-        this.playerMoveHandler.move();
+        this.laneManager.move();
 
         if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
             player.jump();

@@ -5,6 +5,11 @@ import { Stores } from "./Stores";
 import { IListener } from "./services/EventService";
 import { ServiceCapability, IService } from "./services/IService";
 
+export const gameConfig = {
+    width: 700,
+    height: 700
+}
+
 export class Registry {
     private controlledObjects: IService[] = [];
     gameScripts: GameScript[] = [];

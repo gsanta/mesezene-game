@@ -1,5 +1,6 @@
-import { Point, Sprite, TilingSprite } from "pixi.js";
+import { Point, Sprite, TilingSprite, Container, Texture, Graphics } from "pixi.js";
 import { Rectangle } from "./primitives/Rectangle";
+import { GraphicsObject } from "./GraphicsObject";
 
 export interface SpriteObjectJson {
     x: number;
@@ -38,7 +39,7 @@ export enum GameObjectRole {
 
 export class SpriteObject {
     type: GameObjectType = GameObjectType.GameObject;
-    sprite: Sprite;
+    container: Container;
     protected viewportX: number = 0;
     viewportY: number = 0;
     speed: Point;
@@ -50,31 +51,33 @@ export class SpriteObject {
     layer: string;
     collisionBox: Rectangle;
 
-    constructor(sprite: Sprite) {
-        this.sprite = sprite;
+    children: GraphicsObject[] = [];
+
+    constructor(sprite: Container) {
+        this.container = sprite;
     }
 
     setPosition(point: Point) {
-        this.sprite.x = point.x;
-        this.sprite.y = point.y;
+        this.container.x = point.x;
+        this.container.y = point.y;
     }
 
     getPosition(): Point {
-        return new Point(this.sprite.x, this.sprite.y);
+        return new Point(this.container.x, this.container.y);
     }
 
     getDimensions(): Rectangle {
-        return new Rectangle(this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height);
+        return new Rectangle(this.container.x, this.container.y, this.container.width, this.container.height);
     }
 
     getCollisionBox(): Rectangle {
         if (this.collisionBox) {
-            const [x, y, width, height] = [this.sprite.x + this.collisionBox.x, this.sprite.y + this.collisionBox.y, this.collisionBox.width, this.collisionBox.height];
+            const [x, y, width, height] = [this.container.x + this.collisionBox.x, this.container.y + this.collisionBox.y, this.collisionBox.width, this.collisionBox.height];
             return new Rectangle(x, y, width, height);
         }
 
         if (this.id.indexOf('balloon') !== -1) {
-            return new Rectangle(this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height / 4);
+            return new Rectangle(this.container.x, this.container.y, this.container.width, this.container.height / 4);
         }
 
         return this.getDimensions();
@@ -90,28 +93,44 @@ export class SpriteObject {
 
     move(delta: Point) {
         if (delta.y) {
-            this.sprite.position.y += delta.y;
+            this.container.position.y += delta.y;
         }
 
         if (delta.x) {
-            this.sprite.position.x += delta.x;
+            this.container.position.x += delta.x;
         }
     }
 
     destroy() {
-        this.sprite.destroy({children: true, texture: true});
+        this.container.destroy({children: true, texture: true});
+    }
+
+    setTexture(texture: Texture) {
+        if (this.container instanceof Sprite) {
+            this.container.texture = texture;
+        }
+    }
+
+    addChild(graphicsObject: GraphicsObject) {
+        this.container.addChild(graphicsObject.graphics);
+        this.children.push(graphicsObject);
     }
 
     clone(): SpriteObject {
-        const clone = new SpriteObject(new Sprite(this.sprite.texture));
+        let clone: SpriteObject;
+        if (this.container instanceof Sprite) {
+            clone = new SpriteObject(new Sprite(this.container.texture));
+        } else {
+            clone = new SpriteObject(this.container);
+        }
         clone.speed = this.speed;
 
-        clone.sprite.x = this.sprite.x;
-        clone.sprite.y = this.sprite.y;
+        clone.container.x = this.container.x;
+        clone.container.y = this.container.y;
         clone.viewportX = this.viewportX;
         clone.viewportY = this.viewportY;
         clone.scale = this.scale ? new Point(this.scale.x, this.scale.y) : new Point(1, 1);
-        clone.sprite.scale = this.scale;
+        clone.container.scale = this.scale;
         clone.id = this.id;
         
         Array.from(this.roles).forEach(role => clone.roles.add(role));
@@ -125,7 +144,7 @@ export class SpriteObject {
 
     fromJson(json: SpriteObjectJson) {
         this.scale = json.scale ? new Point(json.scale, json.scale) : new Point(1, 1);
-        this.sprite.scale = this.scale;
+        this.container.scale = this.scale;
         this.id = json.frameName || json.name;
         this.speed = new Point(json.speedX, json.speedY);
         this.viewportX = json.viewportX;
@@ -133,8 +152,8 @@ export class SpriteObject {
         json.roles.forEach(role => this.roles.add(<GameObjectRole> role));
 
         if (this.type === GameObjectType.GameObject) {
-            this.sprite.position.x = json.viewportX;
-            this.sprite.position.y = json.viewportY;
+            this.container.position.x = json.viewportX;
+            this.container.position.y = json.viewportY;
         }
 
         if (json.collisionBox) {

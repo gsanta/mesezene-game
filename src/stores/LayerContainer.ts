@@ -18,7 +18,7 @@ export class Layer {
 
     addChild(gameObject: SpriteObject) {
         this.gameObjects.push(gameObject);
-        this.container.addChild(gameObject.sprite);
+        this.container.addChild(gameObject.container);
     }
 
     addGraphics(graphics: Graphics) {
@@ -27,7 +27,7 @@ export class Layer {
 
     removeChild(gameObject: SpriteObject) {
         this.gameObjects = this.gameObjects.filter(go => go !== gameObject);
-        this.container.removeChild(gameObject.sprite);
+        this.container.removeChild(gameObject.container);
     }
 }
 

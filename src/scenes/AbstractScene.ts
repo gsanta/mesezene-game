@@ -3,7 +3,6 @@ import { SpriteStore } from "../stores/SpriteStore";
 import { ISpriteFactory } from "./ISpriteFactory";
 import { SceneLoader, AppJson } from "./SceneLoader";
 import { TextureStore } from "../stores/TextureStore";
-import { LayerContainer } from "../stores/LayerContainer";
 
 export enum SceneStateLegacy {
     Loading = 'Loading',

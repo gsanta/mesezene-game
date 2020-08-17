@@ -32,7 +32,7 @@ export class CoinGenerator {
             this.scene.getLayerContainer().getLayerById(removable.layer).removeChild(removable);
         });
 
-        this.registry.services.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.sprite));
+        this.registry.services.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.container));
     }
 
     private generateRandomObstacle(xRange: [number, number]): number {

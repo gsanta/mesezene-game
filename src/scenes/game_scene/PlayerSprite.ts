@@ -54,6 +54,6 @@ export class PlayerSprite extends SpriteObject {
             }
         }
 
-        this.sprite.y -= delta;
+        this.container.y -= delta;
     }
 }
