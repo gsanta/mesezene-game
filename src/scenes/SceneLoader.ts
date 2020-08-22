@@ -15,132 +15,6 @@ export interface AppJson {
     sprites: SpriteObjectJson[];
 }
 
-export const defaultAppJson: AppJson = {
-    width: 700,
-    height: 700,
-    gameSpeed: 2,
-    spriteSheet: 'assets/sprites/sprite-sheet.json',
-    sprites: [
-        // {
-        //     x: 0,
-        //     y: 96,
-        //     scale: 0.4,
-        //     path: "assets/sprites/balloon2.png",
-        //     name: 'player',
-        //     isTiling: false,
-        //     speedX: 1,
-        //     speedY: 1,
-        //     viewportX: 0,
-        //     viewportY: 0
-        // },
-        {
-            x: 0,
-            y: 0,
-            scale: 0.5,
-            path: "assets/sprites/background.png",
-            name: 'background-layer',
-            isBackgroundImage: true,
-            speedX: -0.64,
-            speedY: 0,
-            viewportX: 0,
-            viewportY: 0,
-            roles: [GameObjectRole.Background]
-        },
-        {
-            x: 0,
-            y: 0,
-            scale: 0.5,
-            path: "assets/sprites/middle.png",
-            name: 'middle-layer',
-            isBackgroundImage: true,
-            speedX: -1.28,
-            speedY: 0,
-            viewportX: 0,
-            viewportY: 0,
-            roles: [GameObjectRole.Background]
-        },
-        {
-            x: 0,
-            y: 0,
-            scale: 0.4,
-            frameName: 'platform_01',
-            name: 'front-layer',
-            isBackgroundImage: false,
-            speedX: -1.28,
-            speedY: 0,
-            viewportX: 32,
-            viewportY: 470,
-            roles: [GameObjectRole.Obstacle, GameObjectRole.Template]
-        },
-        {
-            x: 0,
-            y: 0,
-            scale: 0.4,
-            frameName: 'platform_02',
-            name: 'front-layer',
-            isBackgroundImage: false,
-            speedX: -1.28,
-            speedY: 0,
-            viewportX: 32,
-            viewportY: 470,
-            roles: [GameObjectRole.Obstacle, GameObjectRole.Template]
-        },
-        {
-            x: 0,
-            y: 0,
-            scale: 0.4,
-            frameName: 'platform_03',
-            name: 'front-layer',
-            isBackgroundImage: false,
-            speedX: -1.28,
-            speedY: 0,
-            viewportX: 32,
-            viewportY: 470,
-            roles: [GameObjectRole.Obstacle, GameObjectRole.Template]
-        },
-        {
-            x: 0,
-            y: 0,
-            scale: 0.5,
-            frameName: 'balloon_01',
-            name: 'front-layer',
-            isBackgroundImage: false,
-            speedX: -1.28,
-            speedY: 0,
-            viewportX: 32,
-            viewportY: 470,
-            roles: [GameObjectRole.Coin, GameObjectRole.Template]
-            // collisionBox: "0 0 67 80"
-        },
-        {
-            x: 0,
-            y: 0,
-            scale: 0.5,
-            frameName: 'player',
-            name: 'front-layer',
-            isBackgroundImage: false,
-            speedX: 0,
-            speedY: 0,
-            viewportX: 32,
-            viewportY: 470,
-            roles: [GameObjectRole.Player]
-        },
-        // {
-        //     x: 0,
-        //     y: 0,
-        //     scale: 0.5,
-        //     path: "assets/sprites/kutya.png",
-        //     name: 'front-layer',
-        //     isBackgroundImage: false,
-        //     speedX: 0,
-        //     speedY: 0,
-        //     viewportX: 32,
-        //     viewportY: 470,
-        //     roles: []
-        // }
-    ]
-}
-
 export class SceneLoader {
     private loader: Loader;
     private scene: AbstractScene;
@@ -179,9 +53,8 @@ export class SceneLoader {
 
     private setupSprites(appJson: AppJson) {
         appJson.sprites.forEach(spriteJson => {
-            let gameObject: SpriteObject;
             let sprite: Sprite;
-
+                        
             if (spriteJson.roles.indexOf(GameObjectRole.Background) !== -1) {
                 const texture = this.loader.resources[`${mesezeneGlobals.urlPrefix}/${spriteJson.path}`].texture;
                 sprite = new TilingSprite(texture, texture.baseTexture.width, texture.baseTexture.height);
@@ -190,8 +63,9 @@ export class SceneLoader {
                 sprite = new Sprite(sheet.textures[spriteJson.frameName]);
                 this.scene.textureStore.addTexture(spriteJson.frameName, sheet.textures[spriteJson.frameName]);
             }
-
-            gameObject = this.scene.factory.getInstance(spriteJson, sprite);
+            
+            let gameObject: SpriteObject = new SpriteObject(sprite);
+            gameObject.fromJson(spriteJson);
 
             if (gameObject.roles.has(GameObjectRole.Template)) {
                 this.registry.stores.template.add(gameObject);

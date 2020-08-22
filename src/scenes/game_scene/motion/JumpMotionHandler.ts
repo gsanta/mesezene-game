@@ -1,27 +1,20 @@
-import { SpriteObject } from "../../model/SpriteObject";
-import { Point } from "pixi.js";
+import { IMotionHandler } from "./IMotionHandler";
+import { SpriteObject } from "../../../model/SpriteObject";
 
-export interface PlayerConfig {
-    jumpSpeed: number;
-    jumpMax: number;
-}
-
-export class PlayerSprite extends SpriteObject {
-    state: Set<'jumping' | 'moving'> = new Set();
+export class JumpMotionHandler implements IMotionHandler {
+    gameObject: SpriteObject;
+    private state: Set<'jumping' | 'moving'> = new Set();
 
     currentJumpY = 0;
-    currentJumpSpeed = 0;
-    layer = 'game-layer-3';
+    private currentJumpSpeed = 0;
 
-    config: PlayerConfig = {
-        jumpSpeed: 8,
-        jumpMax: 250
-    }
+    private readonly jumpSpeed =  8;
+    private readonly jumpMax = 250;
 
-    jump() {
+    execute() {
         if (!this.state.has('jumping')) {
             this.state.add('jumping')
-            this.currentJumpSpeed = this.config.jumpSpeed
+            this.currentJumpSpeed = this.jumpSpeed
         }
     }
 
@@ -34,9 +27,9 @@ export class PlayerSprite extends SpriteObject {
     updateJump() {
         let delta = 0;
         if (this.currentJumpSpeed > 0) {
-            if (this.currentJumpY + this.currentJumpSpeed >= this.config.jumpMax) {
-                delta = this.config.jumpMax - this.currentJumpY;
-                this.currentJumpSpeed = - this.config.jumpSpeed;
+            if (this.currentJumpY + this.currentJumpSpeed >= this.jumpMax) {
+                delta = this.jumpMax - this.currentJumpY;
+                this.currentJumpSpeed = - this.jumpSpeed;
                 this.currentJumpY += delta;
             } else {
                 delta = this.currentJumpSpeed;
@@ -54,6 +47,6 @@ export class PlayerSprite extends SpriteObject {
             }
         }
 
-        this.container.y -= delta;
+        this.gameObject.container.y -= delta;
     }
 }

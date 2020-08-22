@@ -1,10 +1,9 @@
 import { Application, Point } from "pixi.js";
 import { Registry } from "../Registry";
 import { AbstractScene } from "../scenes/AbstractScene";
-import { GameScene } from "../scenes/game_scene/GameScene";
+import { GameScene, defaultAppJson } from "../scenes/game_scene/GameScene";
 import { MapScene } from "../scenes/map_scene/MapScene";
 import { MenuScene } from "../scenes/menu_scene/MenuScene";
-import { defaultAppJson } from "../scenes/SceneLoader";
 import { ScoreScene as ScoreScene } from "../scenes/score_scene/ScoreScene";
 import { LayerContainer } from "../stores/LayerContainer";
 

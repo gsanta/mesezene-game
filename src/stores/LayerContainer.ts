@@ -5,13 +5,11 @@ import { Registry } from "../Registry";
 
 export class Layer {
     id: string;
-    range: [number, number]
     container: Container;
     private gameObjects: SpriteObject[] = [];
 
-    constructor(id: string, range: [number, number], application: Application) {
+    constructor(id: string, application: Application) {
         this.id = id;
-        this.range = range;
         this.container = new Container();
         // application.stage.addChild(this.container);
     }

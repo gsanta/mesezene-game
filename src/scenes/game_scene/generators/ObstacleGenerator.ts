@@ -25,30 +25,13 @@ export class ObstacleGenerator {
         }
     }
 
-
-    // awake() {
-    //     let maxX = this.getMaxX(); 
-    //     while (maxX < this.registry.services.scene.sceneDimensions.x - 200) {
-    //         maxX = this.generateRandomPlatform([maxX, maxX + 200]);
-    //     }
-    // }
-
-    // update() {
-    //     let maxX = this.getMaxX(); 
-        
-    //     if (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
-    //         this.generateRandomPlatform([this.registry.services.scene.sceneDimensions.x - 100, this.registry.services.scene.sceneDimensions.x - 50]);
-    //     }
-
-    //     this.cleanupSprites();
-    // }
-
     private removeSpritesNotOnScreen() {
         const obstacles = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle);
         const invalidPlatforms = obstacles.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
         invalidPlatforms.forEach(obstacle => {
             this.scene.spriteStore.remove(obstacle);
-            this.scene.getLayerContainer().getLayerById(obstacle.layer).removeChild(obstacle);
+
+            this.scene.laneManager.lanes[obstacle.layer].removeChild(obstacle);
         });
     }
 
@@ -57,13 +40,12 @@ export class ObstacleGenerator {
         const gameObject = obstacleTemplates[Math.floor(obstacleTemplates.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
         gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
-        const layerIndex = Math.floor(Math.random() * 3) + 1;
-        gameObject.layer = `game-layer-${layerIndex}`
+        const laneIndex = Math.floor(Math.random() * 3) + 1;
 
-        const layer = this.scene.getLayerContainer().getLayerById(gameObject.layer);
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.registry.services.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
-
-        // gameObject.sprite.scale = new Point(0.3 + gameObject.verticalLayer * 0.1, 0.3 + gameObject.verticalLayer * 0.1);
+        const layer = this.scene.getLayerContainer().getLayerById('game-layer');
+        
+        const y = this.scene.laneManager.lanes[laneIndex].range[1] - gameObject.getDimensions().height;
+        gameObject.setPosition(new Point(gameObject.getPosition().x, y));
 
         this.scene.spriteStore.add(gameObject);
         layer.addChild(gameObject);

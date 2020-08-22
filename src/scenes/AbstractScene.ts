@@ -72,7 +72,6 @@ export abstract class AbstractScene {
     isLoaded = false;
     isPaused = false;
     isDestroyed = false;
-    factory: ISpriteFactory;
     loader: SceneLoader;
 
     private hidden = false;

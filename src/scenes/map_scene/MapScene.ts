@@ -6,7 +6,6 @@ import { IService, ServiceCapability } from "../../services/IService";
 import { Layer } from "../../stores/LayerContainer";
 import { SpriteStore } from "../../stores/SpriteStore";
 import { AbstractScene } from "../AbstractScene";
-import { GameSpriteFactory } from "../game_scene/GameSpriteFactory";
 import { SceneLoader } from "../SceneLoader";
 import { ArrowGraphics } from "./ArrowGraphics";
 import { BadgeGraphics } from "./BadgeGraphics";
@@ -23,7 +22,6 @@ export class MapScene extends AbstractScene implements IListener, IService {
         this.registry = registry;
 
         this.loader = new SceneLoader(this, this.registry);
-        this.factory = new GameSpriteFactory();
 
         this.spriteStore = new SpriteStore(this.registry);
     }
@@ -39,8 +37,8 @@ export class MapScene extends AbstractScene implements IListener, IService {
 
         const application = this.registry.services.scene.application;
 
-        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer', [0, 1], application));
-        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('foreground-layer', [0, 1], application));
+        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer', application));
+        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('foreground-layer', application));
         
         const background = this.spriteStore.getByRole(GameObjectRole.Background)[0];
         const backgroundLayer = this.registry.stores.layer.getContainer(this.id).getLayerById('background-layer');

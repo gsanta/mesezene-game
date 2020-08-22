@@ -2,16 +2,12 @@ import { Point } from "pixi.js";
 import { Registry } from "../../Registry";
 import { SpriteStore } from "../../stores/SpriteStore";
 import { AbstractScene } from "../AbstractScene";
-import { GameSceneState, GameSceneId } from "../game_scene/GameSceneState";
+import { GameSceneId } from "../game_scene/GameSceneState";
+import { MapSceneId } from "../map_scene/MapScene";
 import { AppJson, SceneLoader } from "../SceneLoader";
+import { MenuGraphics } from "./MenuGraphics";
 import { MenuItemGraphics } from "./MenuItemGraphics";
 import { MenuSceneId } from "./MenuSceneState";
-import { gameOverMenuState } from "./scene_states/gameOverMenuState";
-import { worldmapMenuState } from "./scene_states/worldmapMenuState";
-import { WorldMapState } from "../map_scene/scene_states/WorldMapState";
-import { gameRunningMenuState } from "./scene_states/gameRunningMenuState";
-import { MenuGraphics } from "./MenuGraphics";
-import { MapScene, MapSceneId } from "../map_scene/MapScene";
 
 export enum MenuItemId {
     GameResume = 'GameResume',

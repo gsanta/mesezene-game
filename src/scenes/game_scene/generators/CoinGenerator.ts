@@ -29,7 +29,8 @@ export class CoinGenerator {
         const invalidBalloons = this.scene.spriteStore.getByRole(GameObjectRole.Coin).filter(balloon => balloon.getPosition().x + balloon.getDimensions().width < 0);
         invalidBalloons.forEach(removable => {
             this.scene.spriteStore.remove(removable);
-            this.scene.getLayerContainer().getLayerById(removable.layer).removeChild(removable);
+
+            this.scene.laneManager.lanes[removable.layer].removeChild(removable);
         });
 
         this.registry.services.scene.application.stage.removeChild(...invalidBalloons.map(balloon => balloon.container));
@@ -40,11 +41,13 @@ export class CoinGenerator {
         const gameObject = obstacleTemplates[Math.floor(obstacleTemplates.length * Math.random())].clone();
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
         gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
-        const layerIndex = Math.floor(Math.random() * 3) + 1;
-        gameObject.layer = `game-layer-${layerIndex}`; 
+        const laneIndex = Math.floor(Math.random() * 3) + 1;
 
-        const layer = this.scene.getLayerContainer().getLayerById(gameObject.layer);
-        gameObject.setPosition(new Point(gameObject.getPosition().x, layer.range[1] * this.registry.services.scene.sceneDimensions.y - 10 - gameObject.getDimensions().height));
+        const layer = this.scene.getLayerContainer().getLayerById('game-layer');
+        
+        const y = this.scene.laneManager.lanes[laneIndex].range[1] - gameObject.getDimensions().height;
+
+        gameObject.setPosition(new Point(gameObject.getPosition().x, y));
 
         this.scene.spriteStore.add(gameObject);
         layer.addChild(gameObject);

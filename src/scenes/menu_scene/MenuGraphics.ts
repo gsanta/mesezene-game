@@ -22,7 +22,7 @@ export class MenuGraphics {
         this.clear();
         // TODO find a better place
         const application = this.registry.services.scene.application;
-        this.menuScene.getLayerContainer().addLayer(new Layer(this.layerId, [0, 1], application));
+        this.menuScene.getLayerContainer().addLayer(new Layer(this.layerId, application));
 
         const dimensions = this.registry.services.scene.sceneDimensions;
         let position = new Point(dimensions.x / 2 - this.menuScene.size.x / 2, 0);

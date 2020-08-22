@@ -20,7 +20,6 @@ export class Services {
     loginService: UserService;
     renderService: RenderService;
     event: EventService;
-    collision: CollisionService;
     stateTransition: StateTransitionService;
 
     services: IService[] = [];
@@ -35,11 +34,6 @@ export class Services {
         this.loginService = new UserService(registry);
         this.renderService = new RenderService();
         this.stateTransition = new StateTransitionService(this.registry);
-
-        this.collision = new CollisionService(this.registry);
-        this.services.push(
-            this.collision
-        );
 
         this.setupListeners();
     }

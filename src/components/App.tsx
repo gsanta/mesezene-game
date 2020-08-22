@@ -1,14 +1,7 @@
 import * as React from 'react';
-import { Registry } from '../Registry';
-import { defaultAppJson } from '../scenes/SceneLoader';
-import { Header } from './Header';
-import { TheEnd } from './TheEnd';
 import styled from 'styled-components';
 import { AppProps } from './AppProps';
 import { Game } from './Game';
-import { Login } from './Login';
-import { Registration } from './Registration';
-import { AppScreen } from '../stores/AppStore';
 
 const AppStyled = styled.div`
     display: flex;

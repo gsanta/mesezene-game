@@ -1,6 +1,10 @@
-import { Point, Sprite, TilingSprite, Container, Texture, Graphics } from "pixi.js";
+import { Point, Sprite, TilingSprite, Container, Texture, Graphics, Loader } from "pixi.js";
 import { Rectangle } from "./primitives/Rectangle";
 import { GraphicsObject } from "./GraphicsObject";
+import { appJson } from "../scenes/menu_scene/MenuScene";
+import { MesezeneGlobals } from "./MesezeneGlobals";
+
+declare const mesezeneGlobals: MesezeneGlobals;
 
 export interface SpriteObjectJson {
     x: number;
@@ -39,6 +43,8 @@ export enum GameObjectRole {
 
 export class SpriteObject {
     type: GameObjectType = GameObjectType.GameObject;
+
+    isTiling = false;
     container: Container;
     protected viewportX: number = 0;
     viewportY: number = 0;
@@ -48,10 +54,10 @@ export class SpriteObject {
     tags: Set<GameObjectTag> = new Set();
     roles: Set<GameObjectRole> = new Set();
 
-    layer: string;
+    layer: number;
     collisionBox: Rectangle;
 
-    children: GraphicsObject[] = [];
+    children: (GraphicsObject | SpriteObject)[] = [];
 
     constructor(sprite: Container) {
         this.container = sprite;
@@ -93,11 +99,19 @@ export class SpriteObject {
 
     move(delta: Point) {
         if (delta.y) {
-            this.container.position.y += delta.y;
+            if (this.isTiling) {
+                (this.container as TilingSprite).tilePosition.y += delta.y;
+            } else {
+                this.container.position.y += delta.y;
+            }
         }
 
         if (delta.x) {
-            this.container.position.x += delta.x;
+            if (this.isTiling) {
+                (this.container as TilingSprite).tilePosition.x += delta.x;
+            } else {
+                this.container.position.y += delta.x;
+            }
         }
     }
 
@@ -111,9 +125,29 @@ export class SpriteObject {
         }
     }
 
-    addChild(graphicsObject: GraphicsObject) {
-        this.container.addChild(graphicsObject.graphics);
-        this.children.push(graphicsObject);
+    addChild(gameObject: GraphicsObject | SpriteObject) {
+        if (gameObject instanceof SpriteObject) {
+            this.container.addChild(gameObject.container);
+        } else {
+            this.container.addChild(gameObject.graphics);
+        }
+
+        this.children.push(gameObject);
+    }
+
+    removeChild(gameObject: GraphicsObject | SpriteObject) {
+        if (this.children.indexOf(gameObject) === -1) { return; }
+
+        let index: number;
+
+        if (gameObject instanceof SpriteObject) {
+            index = this.container.getChildIndex(gameObject.container);
+        } else {
+            index = this.container.getChildIndex(gameObject.graphics);
+        }
+
+        this.children.splice(this.children.indexOf(gameObject), 1);
+        this.container.removeChildAt(index);
     }
 
     clone(): SpriteObject {
@@ -143,6 +177,10 @@ export class SpriteObject {
     }
 
     fromJson(json: SpriteObjectJson) {
+        if (json.roles.indexOf(GameObjectRole.Background) !== -1) {
+            this.isTiling = true;
+        }
+
         this.scale = json.scale ? new Point(json.scale, json.scale) : new Point(1, 1);
         this.container.scale = this.scale;
         this.id = json.frameName || json.name;

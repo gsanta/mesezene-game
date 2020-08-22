@@ -67,7 +67,6 @@ export class CollisionService implements IListener, IService {
         const collidableObjs = [...this.registry.services.scene.getActiveScene(false).spriteStore.getByRole(GameObjectRole.Coin), ...this.registry.services.scene.getActiveScene(false).spriteStore.getByRole(GameObjectRole.Obstacle)];
 
         const collidedObj = collidableObjs
-            .filter(obj => obj.layer === player.layer)
             .filter(obj => !obj.tags.has(GameObjectTag.Collided))
             .find(platform => {
                 const platformCollisionBox = platform.getCollisionBox();

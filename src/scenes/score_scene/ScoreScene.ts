@@ -6,7 +6,6 @@ import { IService, ServiceCapability } from "../../services/IService";
 import { SpriteStore } from "../../stores/SpriteStore";
 import { Layer } from "../../stores/LayerContainer";
 import { AbstractScene } from "../AbstractScene";
-import { GameSpriteFactory } from "../game_scene/GameSpriteFactory";
 import { AppJson, SceneLoader } from "../SceneLoader";
 
 export const scoreSceneJson: AppJson = {
@@ -105,7 +104,6 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
         super(registry, scoreSceneJson);
         this.registry = registry;
         this.loader = new SceneLoader(this, this.registry);
-        this.factory = new GameSpriteFactory();
 
         this.spriteStore = new SpriteStore(this.registry);
     }
@@ -121,7 +119,7 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
 
         const application = this.registry.services.scene.application;
 
-        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer2', [0, 1], application));
+        this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer2', application));
 
         const background = this.spriteStore.getByRole(GameObjectRole.Background)[0];
         
