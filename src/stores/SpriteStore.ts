@@ -1,22 +1,22 @@
 import { AbstractStore } from "./AbstractStore";
-import { SpriteObject, GameObjectRole } from "../model/SpriteObject";
+import { GameObject, GameObjectRole } from "../model/GameObject";
 
 export class SpriteStore extends AbstractStore {
-    private gameObjects: SpriteObject[] = [];
+    private gameObjects: GameObject[] = [];
 
-    getByRole(role: GameObjectRole): SpriteObject[] {
+    getByRole(role: GameObjectRole): GameObject[] {
         return this.gameObjects.filter(gameObject => gameObject.roles.has(role));
     }
 
-    getByName(name: string): SpriteObject[] {
+    getByName(name: string): GameObject[] {
         return this.gameObjects.filter(gameObject => gameObject.id === name);
     }
 
-    add(gameObject: SpriteObject) {
+    add(gameObject: GameObject) {
         this.gameObjects.push(gameObject);
     }
 
-    remove(gameObject: SpriteObject) {
+    remove(gameObject: GameObject) {
         this.gameObjects = this.gameObjects.filter(g => g !== gameObject);
     }
 
@@ -27,7 +27,7 @@ export class SpriteStore extends AbstractStore {
     clear() {
 
         // TODO get rid of 'remaininGameObjects': e.g put those sprites into an other store 
-        const remaininGameObjects: SpriteObject[] = [];
+        const remaininGameObjects: GameObject[] = [];
         this.gameObjects.forEach(spriteObject =>  {
             if (!spriteObject.roles.has(GameObjectRole.Template)) {
                 remaininGameObjects.push(spriteObject);

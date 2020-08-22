@@ -41,13 +41,11 @@ export enum GameObjectRole {
     Character = 'Character'
 }
 
-export class SpriteObject {
+export class GameObject {
     type: GameObjectType = GameObjectType.GameObject;
 
     isTiling = false;
     container: Container;
-    protected viewportX: number = 0;
-    viewportY: number = 0;
     speed: Point;
     id: string;
     scale: Point = new Point(0, 0);
@@ -57,19 +55,10 @@ export class SpriteObject {
     layer: number;
     collisionBox: Rectangle;
 
-    children: (GraphicsObject | SpriteObject)[] = [];
+    children: (GraphicsObject | GameObject)[] = [];
 
     constructor(sprite: Container) {
         this.container = sprite;
-    }
-
-    setPosition(point: Point) {
-        this.container.x = point.x;
-        this.container.y = point.y;
-    }
-
-    getPosition(): Point {
-        return new Point(this.container.x, this.container.y);
     }
 
     getDimensions(): Rectangle {
@@ -89,15 +78,7 @@ export class SpriteObject {
         return this.getDimensions();
     }
 
-    getViewportX() {
-        return this.viewportX;
-    }
-
-    moveViewportXBy(speed: number) {
-        this.viewportX += speed;
-    }
-
-    move(delta: Point) {
+    moveWith(delta: Point) {
         if (delta.y) {
             if (this.isTiling) {
                 (this.container as TilingSprite).tilePosition.y += delta.y;
@@ -110,9 +91,14 @@ export class SpriteObject {
             if (this.isTiling) {
                 (this.container as TilingSprite).tilePosition.x += delta.x;
             } else {
-                this.container.position.y += delta.x;
+                this.container.position.x += delta.x;
             }
         }
+    }
+
+    moveTo(point: Point) {
+        this.container.x = point.x;
+        this.container.y = point.y;
     }
 
     destroy() {
@@ -125,8 +111,8 @@ export class SpriteObject {
         }
     }
 
-    addChild(gameObject: GraphicsObject | SpriteObject) {
-        if (gameObject instanceof SpriteObject) {
+    addChild(gameObject: GraphicsObject | GameObject) {
+        if (gameObject instanceof GameObject) {
             this.container.addChild(gameObject.container);
         } else {
             this.container.addChild(gameObject.graphics);
@@ -135,12 +121,12 @@ export class SpriteObject {
         this.children.push(gameObject);
     }
 
-    removeChild(gameObject: GraphicsObject | SpriteObject) {
+    removeChild(gameObject: GraphicsObject | GameObject) {
         if (this.children.indexOf(gameObject) === -1) { return; }
 
         let index: number;
 
-        if (gameObject instanceof SpriteObject) {
+        if (gameObject instanceof GameObject) {
             index = this.container.getChildIndex(gameObject.container);
         } else {
             index = this.container.getChildIndex(gameObject.graphics);
@@ -150,19 +136,17 @@ export class SpriteObject {
         this.container.removeChildAt(index);
     }
 
-    clone(): SpriteObject {
-        let clone: SpriteObject;
+    clone(): GameObject {
+        let clone: GameObject;
         if (this.container instanceof Sprite) {
-            clone = new SpriteObject(new Sprite(this.container.texture));
+            clone = new GameObject(new Sprite(this.container.texture));
         } else {
-            clone = new SpriteObject(this.container);
+            clone = new GameObject(this.container);
         }
         clone.speed = this.speed;
 
         clone.container.x = this.container.x;
         clone.container.y = this.container.y;
-        clone.viewportX = this.viewportX;
-        clone.viewportY = this.viewportY;
         clone.scale = this.scale ? new Point(this.scale.x, this.scale.y) : new Point(1, 1);
         clone.container.scale = this.scale;
         clone.id = this.id;
@@ -185,8 +169,6 @@ export class SpriteObject {
         this.container.scale = this.scale;
         this.id = json.frameName || json.name;
         this.speed = new Point(json.speedX, json.speedY);
-        this.viewportX = json.viewportX;
-        this.viewportY = json.viewportY;
         json.roles.forEach(role => this.roles.add(<GameObjectRole> role));
 
         if (this.type === GameObjectType.GameObject) {

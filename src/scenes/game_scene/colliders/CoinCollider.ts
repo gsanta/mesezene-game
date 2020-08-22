@@ -1,4 +1,4 @@
-import { GameObjectRole, GameObjectTag } from "../../../model/SpriteObject";
+import { GameObjectRole, GameObjectTag } from "../../../model/GameObject";
 import { Registry } from "../../../Registry";
 import { GameScene } from "../GameScene";
 

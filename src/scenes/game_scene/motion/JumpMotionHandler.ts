@@ -1,8 +1,8 @@
 import { IMotionHandler } from "./IMotionHandler";
-import { SpriteObject } from "../../../model/SpriteObject";
+import { GameObject } from "../../../model/GameObject";
 
 export class JumpMotionHandler implements IMotionHandler {
-    gameObject: SpriteObject;
+    gameObject: GameObject;
     private state: Set<'jumping' | 'moving'> = new Set();
 
     currentJumpY = 0;

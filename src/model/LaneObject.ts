@@ -1,9 +1,9 @@
-import { SpriteObject } from "./SpriteObject";
+import { GameObject } from "./GameObject";
 import { Container } from "pixi.js";
 import { LaneGraphics } from "../scenes/game_scene/LaneGraphics";
 
 
-export class LaneObject extends SpriteObject {
+export class LaneObject extends GameObject {
 
     range: [number, number];
     graphics: LaneGraphics;

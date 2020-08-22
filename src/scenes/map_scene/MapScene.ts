@@ -1,19 +1,18 @@
 import { SceneActions } from "../../actions/SceneActions";
-import { GameObjectRole } from "../../model/SpriteObject";
+import { GameObjectRole } from "../../model/GameObject";
 import { Registry } from "../../Registry";
-import { IListener } from "../../services/EventService";
 import { IService, ServiceCapability } from "../../services/IService";
 import { Layer } from "../../stores/LayerContainer";
 import { SpriteStore } from "../../stores/SpriteStore";
 import { AbstractScene } from "../AbstractScene";
+import { GameSceneId } from "../game_scene/GameSceneState";
 import { SceneLoader } from "../SceneLoader";
 import { ArrowGraphics } from "./ArrowGraphics";
 import { BadgeGraphics } from "./BadgeGraphics";
 import { mapSceneJson } from "./mapSceneJson";
-import { GameSceneId } from "../game_scene/GameSceneState";
 
 export const MapSceneId = 'map_scene';
-export class MapScene extends AbstractScene implements IListener, IService {
+export class MapScene extends AbstractScene implements IService {
     id = MapSceneId;
     capabilities = [ServiceCapability.Listen];
 
@@ -26,15 +25,12 @@ export class MapScene extends AbstractScene implements IListener, IService {
         this.spriteStore = new SpriteStore(this.registry);
     }
 
-    listen(action: string) {}
-
-    doActivate() {
+    activate() {
+        super.activate();
         this.registry.services.scene.menuScene.setMenu(this.registry.services.scene.menuScene.menus.worldMap);
     }
 
-    doDraw() {
-        this.registry.services.event.addListener(this);
-
+    init() {
         const application = this.registry.services.scene.application;
 
         this.registry.stores.layer.getContainer(this.id).addLayer(new Layer('background-layer', application));
@@ -64,10 +60,7 @@ export class MapScene extends AbstractScene implements IListener, IService {
 
         routes.forEach(route => route.draw());
         badges.forEach(badge => badge.draw());
-
-        this.registry.services.event.dispatch(SceneActions.SCENE_START);
-
     }
 
-    doUpdate() {}
+    update() {}
 }

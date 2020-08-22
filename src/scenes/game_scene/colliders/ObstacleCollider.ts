@@ -1,5 +1,5 @@
 import { Registry } from "../../../Registry";
-import { GameObjectRole, GameObjectTag, SpriteObject } from "../../../model/SpriteObject";
+import { GameObjectRole, GameObjectTag, GameObject } from "../../../model/GameObject";
 import { AbstractScene } from "../../AbstractScene";
 
 export class ObstacleCollider {
@@ -11,7 +11,7 @@ export class ObstacleCollider {
         this.registry = registry;
     }
         
-    checkCollisions(): SpriteObject | null {
+    checkCollisions(): GameObject | null {
         const collidedObj = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle).find(obstacle => obstacle.tags.has(GameObjectTag.Collided)); 
         if (collidedObj && !collidedObj.tags.has(GameObjectTag.CollisionSuspended)) {
             collidedObj.tags.add(GameObjectTag.CollisionSuspended);

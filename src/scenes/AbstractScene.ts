@@ -72,13 +72,10 @@ export abstract class AbstractScene {
     isLoaded = false;
     isPaused = false;
     isDestroyed = false;
-    loader: SceneLoader;
 
-    private hidden = false;
-    
+    loader: SceneLoader;
     spriteStore: SpriteStore;
     textureStore: TextureStore;
-    private sceneHtmlElement: HTMLDivElement;
     protected registry: Registry;
     protected sceneJson: AppJson;
 
@@ -89,44 +86,22 @@ export abstract class AbstractScene {
         this.textureStore = new TextureStore(this.registry);
     }
 
-    state: SceneStateLegacy = SceneStateLegacy.Destroyed;
-
     getLayerContainer() {
         return this.registry.stores.layer.getContainer(this.id);
-    }
-
-    getState() {
-        return this.state;
     }
 
     activate() {
         this.isPaused = false;
         this.isDestroyed = false;
-        
-        // if (state.overlay) {
-        //     const overlayScene = this.registry.services.scene.getSceneById(state.overlay.sceneId);
-        //     overlayScene.hidden = !state.overlay.displayOnLoad;
-        //     overlayScene.activate(state.overlay.stateId, state.overlay.displayOnLoad);
-        // }
 
         if (!this.isLoaded) {
             this.load()
                 .then(() => {
-                    this.draw();
+                    this.init();
                 });
         } else {
-            this.draw();
+            this.init();
         }
-
-        this.doActivate();
-    }
-
-    pause() {
-        this.isPaused = true;
-    }
-
-    resume() {
-        this.isPaused = false;
     }
 
     reset() {
@@ -138,19 +113,13 @@ export abstract class AbstractScene {
     destroy() {
         this.isDestroyed = true;
 
-        this.state = SceneStateLegacy.Destroyed;
         this.registry.stores.layer.getContainer(this.id).container.removeChildren();
         this.getLayerContainer().removeAllLayers();
-        // this.registry.stores.layer.removeContainer(this.id);
     }
 
-    draw() {
-        this.doDraw();
-    }
 
     private load(): Promise<void> {
-        this.state = SceneStateLegacy.Loading;
-        return this.loader.load(this.sceneJson)
+            return this.loader.load(this.sceneJson)
             .then(() => {
                 this.isLoaded = true;
             })
@@ -160,32 +129,15 @@ export abstract class AbstractScene {
             });
     }
 
-    update() {
-        if (this.isLoaded && !this.isPaused) {
-            this.doUpdate();
-        }
-    }
-
-    run() {
-        this.state = SceneStateLegacy.Running;
-    }
+    abstract init();
+    abstract update();
 
     hide() {
         this.getLayerContainer().container.visible = false;
-        this.hidden = true;
     }
 
     show() {
         this.getLayerContainer().container.visible = true;
-        this.hidden = false;
-        this.draw();
+        this.init();
     }
-
-    isHidden() {
-        return this.hidden;
-    }
-
-    abstract doDraw();
-    abstract doUpdate();
-    abstract doActivate();
 }

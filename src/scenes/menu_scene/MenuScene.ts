@@ -106,7 +106,7 @@ export class MenuScene extends AbstractScene {
                 label: 'Folytatom',
                 action: () => {
                     this.hide();
-                    this.registry.services.scene.gameScene.resume();
+                    this.registry.services.scene.gameScene.isPaused = false;
                 }
             }
         ));
@@ -131,11 +131,9 @@ export class MenuScene extends AbstractScene {
         menuItemIds.forEach(id => this.menu.menuItems.push(this.menuItems.get(id)));
     }
 
-    doActivate() {}
-
-    doDraw() {
+    init() {
         this.menu.draw();
     }
 
-    doUpdate() {}
+    update() {}
 }

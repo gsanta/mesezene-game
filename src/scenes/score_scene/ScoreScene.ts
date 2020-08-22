@@ -1,10 +1,8 @@
-import { SceneActions } from "../../actions/SceneActions";
-import { GameObjectRole } from "../../model/SpriteObject";
+import { GameObjectRole } from "../../model/GameObject";
 import { Registry } from "../../Registry";
-import { IListener } from "../../services/EventService";
 import { IService, ServiceCapability } from "../../services/IService";
-import { SpriteStore } from "../../stores/SpriteStore";
 import { Layer } from "../../stores/LayerContainer";
+import { SpriteStore } from "../../stores/SpriteStore";
 import { AbstractScene } from "../AbstractScene";
 import { AppJson, SceneLoader } from "../SceneLoader";
 
@@ -96,7 +94,7 @@ export const scoreSceneJson: AppJson = {
 }
 
 export const ScoreSceneId = 'score-scene';
-export class ScoreScene extends AbstractScene implements IListener, IService {
+export class ScoreScene extends AbstractScene implements IService {
     id = ScoreSceneId;
     capabilities = [ServiceCapability.Listen];
 
@@ -108,14 +106,8 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
         this.spriteStore = new SpriteStore(this.registry);
     }
 
-    listen(action: string) {}
-
-    doActivate() {}
-
-    doDraw() {
+    init() {
         const appJson = scoreSceneJson;
-
-        this.registry.services.event.addListener(this);
 
         const application = this.registry.services.scene.application;
 
@@ -141,9 +133,7 @@ export class ScoreScene extends AbstractScene implements IListener, IService {
     
         const eger = this.spriteStore.getByRole(GameObjectRole.Character)[4];
         backgroundLayer.addChild(eger);
-    
-        this.registry.services.event.dispatch(SceneActions.SCENE_START);
     }
 
-    doUpdate() {}
+    update() {}
 }

@@ -41,10 +41,10 @@ export class Header extends React.Component<{registry: Registry}> {
                         const menuScene = this.props.registry.services.scene.getSceneById(MenuSceneId);
                         
                         if (!this.props.registry.services.scene.getActiveScene(false).isPaused) {
-                            this.props.registry.services.scene.getActiveScene(false).pause();
+                            this.props.registry.services.scene.getActiveScene(false).isPaused = true;
                             menuScene.show();
                         } else {
-                            this.props.registry.services.scene.getActiveScene(false).resume();
+                            this.props.registry.services.scene.getActiveScene(false).isPaused = false;
                             menuScene.hide();
                         }
 

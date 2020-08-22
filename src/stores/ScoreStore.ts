@@ -15,7 +15,6 @@ export class ScoreStore extends AbstractStore {
     setScores(scores: number) {
         this.scores = scores;
 
-        this.registry.services.event.dispatch(ScoreStoreEvents.SCORE_CHANGED);
         this.render();
     }
 
@@ -26,7 +25,6 @@ export class ScoreStore extends AbstractStore {
     setLives(lives: number) {
         this.lives = lives;
 
-        this.registry.services.event.dispatch(ScoreStoreEvents.LIVES_CHANGED);
         this.render();
     }
 

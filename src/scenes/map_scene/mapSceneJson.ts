@@ -1,5 +1,5 @@
 import { AppJson } from "../SceneLoader";
-import { GameObjectRole } from "../../model/SpriteObject";
+import { GameObjectRole } from "../../model/GameObject";
 
 
 

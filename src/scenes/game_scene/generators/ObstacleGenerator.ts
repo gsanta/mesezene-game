@@ -1,67 +1,60 @@
-import { Point } from "pixi.js";
-import { GameObjectRole, SpriteObject } from "../../../model/SpriteObject";
-import { Registry } from "../../../Registry";
-import { GameScene } from "../GameScene";
+import { GameObject, GameObjectRole } from "../../../model/GameObject";
+import { AbstractGameObjectGenerator } from "./AbstractGameObjectGenerator";
 
-export class ObstacleGenerator {
-    private registry: Registry;
-    private scene: GameScene;
+export class ObstacleGenerator extends AbstractGameObjectGenerator {
+    // update() {
+    //     this.removeSpritesNotOnScreen();
+    //     this.generateNewSpritesIfNeeded();
+    // }
 
-    constructor(scene: GameScene, registry: Registry) {
-        this.scene = scene;
-        this.registry = registry;
+    // generateNewSpritesIfNeeded() {
+    //     let maxX = this.getMaxX(); 
+
+    //     while (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
+    //         maxX = this.generateRandomPlatform([maxX, maxX + 200]);
+    //     }
+    // }
+
+    // private removeSpritesNotOnScreen() {
+    //     const obstacles = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle);
+    //     const invalidPlatforms = obstacles.filter(platform => platform.getDimensions().x + platform.getDimensions().width < 0);
+    //     invalidPlatforms.forEach(obstacle => {
+    //         this.scene.spriteStore.remove(obstacle);
+
+    //         this.scene.laneManager.lanes[obstacle.layer].removeChild(obstacle);
+    //     });
+    // }
+
+    // private generateRandomPlatform(xRange: [number, number]): number {
+    //     const obstacleTemplates = this.registry.stores.template.getByRole(GameObjectRole.Obstacle);
+    //     const gameObject = obstacleTemplates[Math.floor(obstacleTemplates.length * Math.random())].clone();
+    //     const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
+    //     const yPos = (this.scene.laneManager.max - this.scene.laneManager.min) * Math.random() + this.scene.laneManager.min; 
+    //     gameObject.moveTo(new Point(xPos, yPos));
+    //     this.scene.laneManager.addGameObject(gameObject);
+
+    //     this.scene.spriteStore.add(gameObject);
+    //     return gameObject.getDimensions().x + gameObject.getDimensions().x;
+    // }
+
+    // private getMaxX(): number {
+    //     const rightMostPlatform = this.getRightMostObject();
+    //     const maxX = rightMostPlatform ? rightMostPlatform.getDimensions().x + rightMostPlatform.getDimensions().x : 0;
+    //     return maxX;
+    // }
+
+    // private getRightMostObject(): GameObject {
+    //     const platforms = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle);
+    //     this.getexplatforms.sort((a: GameObject, b: GameObject) => a.getDimensions().x - b.getDimensions().x);
+
+    //     return platforms.length > 0 ? platforms[platforms.length - 1] : undefined;
+    // }
+
+    protected getExistingGeneratedObjects(): GameObject[] {
+        return this.scene.spriteStore.getByRole(GameObjectRole.Obstacle);
     }
 
-    update() {
-        this.removeSpritesNotOnScreen();
-        this.generateNewSpritesIfNeeded();
-    }
-
-    generateNewSpritesIfNeeded() {
-        let maxX = this.getMaxX(); 
-
-        while (maxX < this.registry.services.scene.sceneDimensions.x - 320) {
-            maxX = this.generateRandomPlatform([maxX, maxX + 200]);
-        }
-    }
-
-    private removeSpritesNotOnScreen() {
-        const obstacles = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle);
-        const invalidPlatforms = obstacles.filter(platform => platform.getPosition().x + platform.getDimensions().width < 0);
-        invalidPlatforms.forEach(obstacle => {
-            this.scene.spriteStore.remove(obstacle);
-
-            this.scene.laneManager.lanes[obstacle.layer].removeChild(obstacle);
-        });
-    }
-
-    private generateRandomPlatform(xRange: [number, number]): number {
-        const obstacleTemplates = this.registry.stores.template.getByRole(GameObjectRole.Obstacle);
-        const gameObject = obstacleTemplates[Math.floor(obstacleTemplates.length * Math.random())].clone();
-        const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
-        gameObject.setPosition(new Point(xPos, gameObject.getPosition().y));
-        const laneIndex = Math.floor(Math.random() * 3) + 1;
-
-        const layer = this.scene.getLayerContainer().getLayerById('game-layer');
-        
-        const y = this.scene.laneManager.lanes[laneIndex].range[1] - gameObject.getDimensions().height;
-        gameObject.setPosition(new Point(gameObject.getPosition().x, y));
-
-        this.scene.spriteStore.add(gameObject);
-        layer.addChild(gameObject);
-        return gameObject.getPosition().x + gameObject.getDimensions().x;
-    }
-
-    private getMaxX(): number {
-        const rightMostPlatform = this.getRightMostPlatform();
-        const maxX = rightMostPlatform ? rightMostPlatform.getPosition().x + rightMostPlatform.getDimensions().x : 0;
-        return maxX;
-    }
-
-    private getRightMostPlatform(): SpriteObject {
-        const platforms = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle);
-        platforms.sort((a: SpriteObject, b: SpriteObject) => a.getPosition().x - b.getPosition().x);
-
-        return platforms.length > 0 ? platforms[platforms.length - 1] : undefined;
+    protected getObjectTempaltes(): GameObject[] {
+        return this.registry.stores.template.getByRole(GameObjectRole.Obstacle);
     }
 }

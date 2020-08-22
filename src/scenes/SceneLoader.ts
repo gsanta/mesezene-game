@@ -1,7 +1,7 @@
 import { Loader, Sprite, TilingSprite } from "pixi.js";
 import { SceneActions } from "../actions/SceneActions";
 import { MesezeneGlobals } from "../model/MesezeneGlobals";
-import { GameObjectRole, SpriteObject, SpriteObjectJson } from "../model/SpriteObject";
+import { GameObjectRole, GameObject, SpriteObjectJson } from "../model/GameObject";
 import { Registry } from "../Registry";
 import { AbstractScene } from "./AbstractScene";
 
@@ -40,12 +40,10 @@ export class SceneLoader {
             .load(() => {
                 this.setupSprites(appJson);
                 resolve();
-                this.registry.services.event.dispatch(SceneActions.SCENE_LOADED);
             })
             .on('error', (e) => {
                 this.registry.stores.messageStore.gameError = e.message;
                 reject(e);
-                this.registry.services.event.dispatch(SceneActions.SCENE_LOADING_ERROR);
             });
         });
 
@@ -64,7 +62,7 @@ export class SceneLoader {
                 this.scene.textureStore.addTexture(spriteJson.frameName, sheet.textures[spriteJson.frameName]);
             }
             
-            let gameObject: SpriteObject = new SpriteObject(sprite);
+            let gameObject: GameObject = new GameObject(sprite);
             gameObject.fromJson(spriteJson);
 
             if (gameObject.roles.has(GameObjectRole.Template)) {

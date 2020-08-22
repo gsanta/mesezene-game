@@ -73,7 +73,6 @@ export class SceneService{
         htmlElement.appendChild(this.application.view);
         this.sceneDimensions = new Point(defaultAppJson.width, defaultAppJson.height);
         
-        // this.scenes.forEach(scene => this.registry.stores.layer.addContainer(new LayerContainer(scene.id, this.registry)));
         this.application.renderer.resize(defaultAppJson.width, defaultAppJson.height);
 
         this.scenes.forEach(scene => {
@@ -86,9 +85,9 @@ export class SceneService{
     }
 
     update() {
-        // this.registry.services.stateTransition.update();
-
-        this.activeScene.update();
+        if (this.activeScene.isLoaded && !this.activeScene.isPaused) {
+            this.activeScene.update();
+        }
     }
 
     getSceneById(id: string) {

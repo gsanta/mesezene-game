@@ -17,6 +17,10 @@ export class Rectangle {
         return [this.x + this.width / 2, this.y + this.height / 2];
     }
 
+    right(): number {
+        return this.x + this.width;
+    }
+
     toString() {
         return `${this.x} ${this.y} ${this.width} ${this.height}`;
     }

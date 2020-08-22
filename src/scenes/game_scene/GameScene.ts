@@ -1,23 +1,22 @@
-import { Point, Container } from "pixi.js";
+import { Point } from "pixi.js";
 import { SceneActions } from "../../actions/SceneActions";
-import { GameObjectRole, SpriteObject } from "../../model/SpriteObject";
+import { GameObjectRole } from "../../model/GameObject";
 import { Registry } from "../../Registry";
-import { IListener } from "../../services/EventService";
 import { GamepadKey } from "../../services/GamepadService";
 import { IService, ServiceCapability } from "../../services/IService";
 import { Layer } from "../../stores/LayerContainer";
 import { SpriteStore } from "../../stores/SpriteStore";
 import { AbstractScene } from "../AbstractScene";
-import { SceneLoader, AppJson } from "../SceneLoader";
+import { MenuSceneId } from "../menu_scene/MenuSceneState";
+import { AppJson, SceneLoader } from "../SceneLoader";
 import { CoinCollider } from "./colliders/CoinCollider";
 import { ObstacleCollider } from "./colliders/ObstacleCollider";
 import { GameSceneId } from "./GameSceneState";
 import { CoinGenerator } from "./generators/CoinGenerator";
+import { ObjectAutoRemover } from "./generators/ObjectAutoRemover";
 import { ObstacleGenerator } from "./generators/ObstacleGenerator";
-import { LaneManager } from "./motion/LaneManager";
-import { MenuSceneId } from "../menu_scene/MenuSceneState";
-import { LaneObject } from "../../model/LaneObject";
 import { JumpMotionHandler } from "./motion/JumpMotionHandler";
+import { LaneManager } from "./motion/LaneManager";
 
 export const defaultAppJson: AppJson = {
     width: 700,
@@ -145,10 +144,12 @@ export const defaultAppJson: AppJson = {
     ]
 }
 
-export class GameScene extends AbstractScene implements IListener, IService {
+export class GameScene extends AbstractScene implements IService {
     id = GameSceneId;
     capabilities = [ServiceCapability.Listen];
 
+
+    objectAutoRemover: ObjectAutoRemover;
     obstacleGenerator: ObstacleGenerator;
     coinGenerator: CoinGenerator;
     obstacleCollider: ObstacleCollider;
@@ -159,96 +160,87 @@ export class GameScene extends AbstractScene implements IListener, IService {
     gameSpeed: number = 2;
     gameLayerCount = 4;
 
-    vertialBorders: [number, number];
-    horizontalBorders: [number, number];
-
     constructor(registry: Registry) {
         super(registry, defaultAppJson);
         this.registry = registry;
 
         this.loader = new SceneLoader(this, this.registry);
+        this.objectAutoRemover = new ObjectAutoRemover(this, registry, [GameObjectRole.Obstacle, GameObjectRole.Coin]);
         this.obstacleGenerator = new ObstacleGenerator(this, registry);
         this.coinGenerator = new CoinGenerator(this, registry);
         this.obstacleCollider = new ObstacleCollider(this, registry);
         this.coinCollider = new CoinCollider(this, registry);
         this.jumpMotion = new JumpMotionHandler();
         this.laneManager = new LaneManager(
-            [
-                new LaneObject([400, 450]),
-                new LaneObject([450, 510]),
-                new LaneObject([510, 570]),
-                new LaneObject([510, 610])
-            ],
             this,
-            registry
+            registry,
+            [
+                [400, 450],
+                [450, 510],
+                [510, 570],
+                [510, 610]
+            ]
         );
 
         this.spriteStore = new SpriteStore(this.registry);
     }
 
-    listen() {}
+    tick() {}
 
-    doActivate() {
+    activate() {
+        super.activate();
         this.registry.services.scene.menuScene.setMenu(this.registry.services.scene.menuScene.menus.game);
     }
 
-    doDraw() {
+    init() {
         this.reset();
         const application = this.registry.services.scene.application;
-    
+        
         const gameContainer = this.getLayerContainer();
-    
+        
         gameContainer.addLayer(new Layer('background-layer', application));
         gameContainer.addLayer(new Layer(`game-layer`, application))
-    
+        
         const appJson = defaultAppJson;
+        this.laneManager.draw();
         this.gameSpeed = appJson.gameSpeed;
     
         const player = this.spriteStore.getByRole(GameObjectRole.Player)[0];
-        this.laneManager.setPlayer(player);
-        this.jumpMotion.gameObject = player;
+        player.moveTo(new Point(10, this.laneManager.min + 50));
 
-        gameContainer.getLayerById('game-layer').addChild(player);
+        this.laneManager.addGameObject(player);
+        this.laneManager.player = player;
+        this.jumpMotion.gameObject = player;
 
         const backgroundSprites = this.spriteStore.getByRole(GameObjectRole.Background);
         backgroundSprites.forEach(sprite => gameContainer.getLayerById('background-layer').addChild(sprite));
-        
-        this.vertialBorders = [405, 510];
-        this.horizontalBorders = [0, this.registry.services.scene.sceneDimensions.x];
-
-        this.laneManager.draw();
-
-        this.obstacleGenerator.update();
-        this.coinGenerator.update();
-
-        this.registry.services.event.dispatch(SceneActions.SCENE_START);
     }
 
-    doUpdate() {
+    update() {
         const player = this.spriteStore.getByRole(GameObjectRole.Player)[0];
 
         const scrollableSprites = this.spriteStore.getAll().filter(gameObject => !gameObject.roles.has(GameObjectRole.Player));
         const deltaMove = new Point(-this.gameSpeed, 0);
-        scrollableSprites.forEach(gameObject => gameObject.move(deltaMove));
+        scrollableSprites.forEach(gameObject => gameObject.moveWith(deltaMove));
 
         this.laneManager.move();
+        this.laneManager.updateGameObject(player);
 
         if (this.registry.services.gamepad.downKeys.has(GamepadKey.Jump)) {
             this.jumpMotion.execute();
         }
 
         this.jumpMotion.update();
-
-        this.obstacleGenerator.update();
-        this.coinGenerator.update();
+        this.objectAutoRemover.tick();
+        this.obstacleGenerator.tick();
+        this.coinGenerator.tick();
 
         if (this.obstacleCollider.checkCollisions()) {
-            this.pause();
+            this.isPaused = true;
             this.gameOver();
         }
 
         this.coinCollider.checkCollisions();
-        this.registry.services.event.dispatch(SceneActions.SCENE_UPDATE);
     }
 
     private gameOver() {
