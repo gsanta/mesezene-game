@@ -6,14 +6,16 @@ import { LaneGraphics } from "../scenes/game_scene/LaneGraphics";
 export class LaneObject extends GameObject {
 
     range: [number, number];
+    color: string;
     graphics: LaneGraphics;
 
-    constructor(range: [number, number]) {
+    constructor(range: [number, number], color: string) {
         super(new Container());
 
         this.range = range;
+        this.color = color;
 
-        this.graphics = new LaneGraphics(this.container);
+        this.graphics = new LaneGraphics(this);
         this.addChild(this.graphics);
     }
 

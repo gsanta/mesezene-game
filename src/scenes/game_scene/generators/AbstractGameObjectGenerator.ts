@@ -26,10 +26,14 @@ export abstract class AbstractGameObjectGenerator {
         const selectedGameObject = obstacleTemplates[Math.floor(obstacleTemplates.length * Math.random())].clone();
 
         const xPos = Math.floor((xRange[1] - xRange[0]) * Math.random()) + xRange[0];
-        const yPos = (this.scene.laneManager.max - this.scene.laneManager.min) * Math.random() + this.scene.laneManager.min;
 
+        // const yPos = (this.scene.laneManager.max - this.scene.laneManager.min) * Math.random() + this.scene.laneManager.min - selectedGameObject.getDimensions().height;
+        const randomLaneIndex = Math.floor(Math.random() * this.scene.laneManager.lanes.length);
+        const yPos = randomLaneIndex * this.scene.laneManager.laneHeight + (this.scene.laneManager.laneHeight / 2) + this.scene.laneManager.min - selectedGameObject.getDimensions().height;
+
+        selectedGameObject.layer = randomLaneIndex;
         selectedGameObject.moveTo(new Point(xPos, yPos));
-        this.scene.laneManager.addGameObject(selectedGameObject);
+        this.scene.getLayerContainer().getLayerById('game-layer').addChild(selectedGameObject);
 
         this.scene.spriteStore.add(selectedGameObject);
         return selectedGameObject.getDimensions().right();

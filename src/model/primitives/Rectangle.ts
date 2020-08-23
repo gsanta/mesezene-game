@@ -21,6 +21,10 @@ export class Rectangle {
         return this.x + this.width;
     }
 
+    bottom(): number {
+        return this.y + this.height;
+    }
+
     toString() {
         return `${this.x} ${this.y} ${this.width} ${this.height}`;
     }

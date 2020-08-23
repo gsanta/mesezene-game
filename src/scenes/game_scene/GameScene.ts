@@ -1,6 +1,6 @@
 import { Point } from "pixi.js";
 import { SceneActions } from "../../actions/SceneActions";
-import { GameObjectRole } from "../../model/GameObject";
+import { GameObjectRole, GameObject } from "../../model/GameObject";
 import { Registry } from "../../Registry";
 import { GamepadKey } from "../../services/GamepadService";
 import { IService, ServiceCapability } from "../../services/IService";
@@ -160,6 +160,8 @@ export class GameScene extends AbstractScene implements IService {
     gameSpeed: number = 2;
     gameLayerCount = 4;
 
+    player: GameObject;
+
     constructor(registry: Registry) {
         super(registry, defaultAppJson);
         this.registry = registry;
@@ -175,10 +177,10 @@ export class GameScene extends AbstractScene implements IService {
             this,
             registry,
             [
-                [400, 450],
-                [450, 510],
-                [510, 570],
-                [510, 610]
+                [500, 550],
+                [550, 600],
+                [600, 650],
+                [650, 700],
             ]
         );
 
@@ -207,8 +209,10 @@ export class GameScene extends AbstractScene implements IService {
     
         const player = this.spriteStore.getByRole(GameObjectRole.Player)[0];
         player.moveTo(new Point(10, this.laneManager.min + 50));
+        this.player = player;
 
         this.laneManager.addGameObject(player);
+        this.getLayerContainer().getLayerById('game-layer').addChild(player);
         this.laneManager.player = player;
         this.jumpMotion.gameObject = player;
 

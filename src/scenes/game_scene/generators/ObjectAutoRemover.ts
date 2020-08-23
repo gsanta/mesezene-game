@@ -27,7 +27,7 @@ export class ObjectAutoRemover {
     
         invalidObjects.forEach(removable => {
             this.scene.spriteStore.remove(removable);
-            this.scene.laneManager.lanes[removable.layer].removeChild(removable);
+            this.scene.getLayerContainer().getLayerById('game-layer').removeChild(removable);
         });
     
         this.registry.services.scene.application.stage.removeChild(...invalidObjects.map(balloon => balloon.container));

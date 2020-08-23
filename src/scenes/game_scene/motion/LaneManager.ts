@@ -13,11 +13,14 @@ export class LaneManager {
 
     min: number;
     max: number;
+    laneHeight: number;
 
     lanes: LaneObject[] = [];
     activeLane: LaneObject;
 
     private laneRanges: [number, number][];
+
+    private colors: string[] = ['#ff0000', '#00ff00'];
 
     constructor(scene: GameScene, registry: Registry, laneRanges: [number, number][]) {
         this.scene = scene;
@@ -25,38 +28,37 @@ export class LaneManager {
         this.min = laneRanges[0][0];
         this.max = laneRanges[laneRanges.length - 1][1];
         this.laneRanges = laneRanges;
+        this.laneHeight = (this.max - this.min) / laneRanges.length;
     }
     
     draw() {
-        this.lanes = this.laneRanges.map(range => {
-            const lane = new LaneObject(range);
+        this.lanes = this.laneRanges.map((range, index) => {
+            const lane = new LaneObject(range, (index % 2 === 0) ? this.colors[0] : this.colors[1]);
             
             this.scene.getLayerContainer().getLayerById('game-layer').addChild(lane);
     
             return lane;
         });
         // this.scene.getLayerContainer().getLayerById('background-layer').addChild(this.lane);
-        // this.lanes.forEach(lane => {
-        //     lane.graphics.draw()
-        // });
+        this.lanes.forEach((lane, index) => {
+            lane.graphics.draw()
+        });
     }
 
     addGameObject(gameObject: GameObject) {
-        const y = gameObject.getDimensions().y;
+        // const y = gameObject.getDimensions().y;
 
-        const lane = this.lanes.find(lane => lane.isWithinRange(y));
-        lane.addChild(gameObject);
-        gameObject.layer = this.lanes.indexOf(lane);
+        // const lane = this.lanes.find(lane => lane.isWithinRange(y));
+        // lane.addChild(gameObject);
+        // gameObject.layer = this.lanes.indexOf(lane);
     }
 
     updateGameObject(gameObject: GameObject) {
-        const y = gameObject.getDimensions().y + this.scene.jumpMotion.currentJumpY;
+        const y = gameObject.getDimensions().bottom() + this.scene.jumpMotion.currentJumpY;
 
         const laneIndex = this.lanes.findIndex(lane => lane.isWithinRange(y));
 
         if (gameObject.layer !== laneIndex) {
-            this.lanes[gameObject.layer].removeChild(gameObject);
-            this.lanes[laneIndex].addChild(gameObject);
             gameObject.layer = laneIndex;
         }
     }
@@ -70,7 +72,7 @@ export class LaneManager {
             speed.x = 0;
         }
         
-        const y = this.player.container.y - this.scene.jumpMotion.currentJumpY;
+        const y = (this.player.container.y + this.player.getDimensions().height) - this.scene.jumpMotion.currentJumpY;
 
         if (y <= this.min && speed.y < 0) {
             speed.y = 0;

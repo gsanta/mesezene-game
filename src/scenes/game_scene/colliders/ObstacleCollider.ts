@@ -1,21 +1,20 @@
-import { Registry } from "../../../Registry";
-import { GameObjectRole, GameObjectTag, GameObject } from "../../../model/GameObject";
-import { AbstractScene } from "../../AbstractScene";
+import { GameObject, GameObjectRole, GameObjectTag } from "../../../model/GameObject";
+import { AbstractCollider } from "./AbstractCollider";
 
-export class ObstacleCollider {
-    private registry: Registry;
-    private scene: AbstractScene;
+export class ObstacleCollider extends AbstractCollider {
 
-    constructor(scene: AbstractScene, registry: Registry) {
-        this.scene = scene;
-        this.registry = registry;
-    }
-        
     checkCollisions(): GameObject | null {
-        const collidedObj = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle).find(obstacle => obstacle.tags.has(GameObjectTag.Collided)); 
+
+        const collidedObj = this.calculateCollision();
+
+        // const collidedObj = this.scene.spriteStore.getByRole(GameObjectRole.Obstacle).find(obstacle => obstacle.tags.has(GameObjectTag.Collided)); 
         if (collidedObj && !collidedObj.tags.has(GameObjectTag.CollisionSuspended)) {
             collidedObj.tags.add(GameObjectTag.CollisionSuspended);
             return collidedObj;
         }    
+    }
+
+    protected getCollidingObjects() {
+        return this.scene.spriteStore.getByRole(GameObjectRole.Obstacle).filter(gameObject => gameObject.layer === this.scene.player.layer)
     }
 }

@@ -1,30 +1,26 @@
-import { GameObjectRole, GameObjectTag } from "../../../model/GameObject";
-import { Registry } from "../../../Registry";
-import { GameScene } from "../GameScene";
+import { GameObjectRole } from "../../../model/GameObject";
+import { AbstractCollider } from "./AbstractCollider";
 
-export class CoinCollider {
-    private registry: Registry;
-    private scene: GameScene;
-
-    constructor(scene: GameScene, registry: Registry) {
-        this.registry = registry;
-        this.scene = scene;
-    }
+export class CoinCollider extends AbstractCollider {
     
     checkCollisions() {
-        this.removeBalloon();
+        const coin = this.calculateCollision();
+
+        let balloons = this.scene.spriteStore.getByRole(GameObjectRole.Coin); 
+    
+        // const collidedBalloons = balloons.filter(balloon => balloon.tags.has(GameObjectTag.Collided));
+    
+        // collidedObj.forEach(coin => {
+        if (coin) {
+            this.scene.spriteStore.remove(coin);
+            const layerContainer = this.scene.getLayerContainer();
+    
+            this.scene.laneManager.lanes[coin.layer].removeChild(coin);
+        }
+        // });
     }
 
-    removeBalloon() {
-        let balloons = this.scene.spriteStore.getByRole(GameObjectRole.Coin); 
-
-        const collidedBalloons = balloons.filter(balloon => balloon.tags.has(GameObjectTag.Collided));
-
-        collidedBalloons.forEach(coin => {
-            this.scene.spriteStore.remove(coin);
-            const layerContainer = this.registry.stores.layer.getContainer(this.scene.id);
-
-            this.scene.laneManager.lanes[coin.layer].removeChild(coin);
-        });
+    protected getCollidingObjects() {
+        return this.scene.spriteStore.getByRole(GameObjectRole.Coin).filter(gameObject => gameObject.layer === this.scene.player.layer);
     }
 }
